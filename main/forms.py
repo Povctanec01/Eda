@@ -1,6 +1,8 @@
 from django import forms
 from .models import Card
 
+
+
 class StaffRegistrationForm(forms.Form):
     username = forms.CharField(
         max_length=150,
