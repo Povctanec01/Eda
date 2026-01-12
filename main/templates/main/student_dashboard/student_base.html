@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/dashboard.css' %}">
+    <script src="{% static 'main/js/student_dashboard.js' %}"></script>
+    <script src="{% static 'main/js/dashboard.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <main class="main-content">  <!--Основной контент (вверх)-->
+        <header class="top-bar">
+        <div class="top-bar-left">
+            <h1>Добро пожаловать, {{ user.username }}!</h1>
+            <p>Сегодня: <span id="currentDate">Загрузка...</span></p>
+        </div>
+            <div class="top-bar-right">
+                <div class="notification-bell" onclick="showNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">2</span>
+                </div>
+                <div class="balance-info">
+                    <i class="fas fa-wallet"></i>
+                    <span>Баланс: <strong id="balanceAmount">540</strong> руб.</span>
+                    <button class="btn btn-sm btn-outline" onclick="topUpBalance()">
+                        <i class="fas fa-plus"></i> Пополнить
+                    </button>
+                </div>
+            </div>
+        </header>
+        {% block body %}
+        {% endblock %}
+    </main>
+    <aside class="sidebar">  <!--Боковой бар-->
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <span>Школьная Столовая</span>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="user-info">
+            <div class="avatar">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="user-details">
+                <h3>{{ user.username }}</h3>
+                <p class="user-role">Ученик</p>
+                <p class="user-email">student@school.ru</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="{% url 'student_dashboard/student_home_page' %}" {% if request.resolver_match.url_name == 'student_dashboard/student_home_page' %}class="active"{% endif %}>
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </a>
+            <a href="{% url 'student_menu' %}" {% if request.resolver_match.url_name == 'student_menu' %}class="active"{% endif %}>
+                <i class="fas fa-utensils"></i>
+                <span>Меню</span>
+            </a>
+            <a href="{% url 'student_my_orders' %}" {% if request.resolver_match.url_name == 'student_my_orders' %}class="active"{% endif %}>
+                <i class="fas fa-shopping-cart"></i>
+                <span>Мои заказы</span>
+                <span class="badge">3</span>
+            </a>
+            <a href="#" onclick="showSection('preferences')">
+                <i class="fas fa-heart"></i>
+                <span>Предпочтения</span>
+            </a>
+            <a href="{% url 'student_feedback' %}" {% if request.resolver_match.url_name == 'student_feedback' %}class="active"{% endif %}>
+                <i class="fas fa-star"></i>
+                <span>Отзывы</span>
+            </a>
+            <a href="#" onclick="showSection('settings')">
+                <i class="fas fa-cog"></i>
+                <span>Настройки</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'logout' %}" class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Выйти</span>
+            </a>
+        </div>
+    </aside>
+</body>
+</html>

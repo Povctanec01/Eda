@@ -1,0 +1,269 @@
+{% extends 'main/student_dashboard/student_base.html' %}
+{% load static %}
+{% block title %}Панель ученика - Школьная Столовая{% endblock %}
+{% block body %}
+
+<section class="today-menu">
+    <div class="section-header">
+        <h2><i class="fas fa-concierge-bell"></i> Меню на сегодня</h2>
+        <div class="meal-types">
+            <button class="meal-type-btn active" onclick="filterMenu('all')">Все</button>
+            <button class="meal-type-btn" onclick="filterMenu('breakfast')">Завтраки</button>
+            <button class="meal-type-btn" onclick="filterMenu('lunch')">Обеды</button>
+        </div>
+    </div>
+
+    <div class="menu-items">
+        <div class="menu-item" data-type="breakfast">
+            <div class="menu-item-header">
+                <h3>Омлет с овощами</h3>
+                <span class="price">120 ₽</span>
+            </div>
+            <p class="menu-item-desc">Питательный омлет с помидорами, перцем и зеленью</p>
+            <div class="menu-item-footer">
+                <span class="badge bg-blue">Завтрак</span>
+                <div class="ingredients">
+                    <i class="fas fa-egg"></i> яйца, помидоры, перец
+                </div>
+                <button class="btn-order" onclick="openOrderModal('Омлет с овощами', 120, 'Питательный омлет с помидорами, перцем и зеленью')">
+                    <i class="fas fa-cart-plus"></i> Заказать
+                </button>
+            </div>
+        </div>
+
+        <div class="menu-item" data-type="breakfast">
+            <div class="menu-item-header">
+                <h3>Каша овсяная</h3>
+                <span class="price">80 ₽</span>
+            </div>
+            <p class="menu-item-desc">Овсяная каша с фруктами и медом</p>
+            <div class="menu-item-footer">
+                <span class="badge bg-blue">Завтрак</span>
+                <div class="ingredients">
+                    <i class="fas fa-apple-alt"></i> овсянка, молоко, мед
+                </div>
+                <button class="btn-order" onclick="openOrderModal('Каша овсяная', 80, 'Овсяная каша с фруктами и медом')">
+                    <i class="fas fa-cart-plus"></i> Заказать
+                </button>
+            </div>
+        </div>
+
+        <div class="menu-item" data-type="lunch">
+            <div class="menu-item-header">
+                <h3>Суп куриный</h3>
+                <span class="price">150 ₽</span>
+            </div>
+            <p class="menu-item-desc">Наваристый куриный суп с лапшой</p>
+            <div class="menu-item-footer">
+                <span class="badge bg-green">Обед</span>
+                <div class="ingredients">
+                    <i class="fas fa-drumstick-bite"></i> курица, морковь, лапша
+                </div>
+                <button class="btn-order" onclick="openOrderModal('Суп куриный', 150, 'Наваристый куриный суп с лапшой')">
+                    <i class="fas fa-cart-plus"></i> Заказать
+                </button>
+            </div>
+        </div>
+
+        <div class="menu-item" data-type="lunch">
+            <div class="menu-item-header">
+                <h3>Плов</h3>
+                <span class="price">200 ₽</span>
+            </div>
+            <p class="menu-item-desc">Узбекский плов с бараниной</p>
+            <div class="menu-item-footer">
+                <span class="badge bg-green">Обед</span>
+                <div class="ingredients">
+                    <i class="fas fa-carrot"></i> рис, баранина, морковь
+                </div>
+                <button class="btn-order" onclick="openOrderModal('Плов', 200, 'Узбекский плов с бараниной')">
+                    <i class="fas fa-cart-plus"></i> Заказать
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="my-orders">
+    <h2><i class="fas fa-history"></i> Последние заказы</h2>
+    <div class="orders-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Блюдо</th>
+                    <th>Дата</th>
+                    <th>Тип оплаты</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="order-item">
+                            <i class="fas fa-utensil-spoon"></i>
+                            <span>Суп куриный</span>
+                        </div>
+                    </td>
+                    <td>27.01.2024 12:30</td>
+                    <td><span class="badge bg-blue">Абонемент</span></td>
+                    <td><span class="status received">Получено</span></td>
+                    <td>
+                        <button class="btn-action" onclick="leaveReview('Суп куриный')">
+                            <i class="fas fa-star"></i> Оценить
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="order-item">
+                            <i class="fas fa-utensil-spoon"></i>
+                            <span>Омлет с овощами</span>
+                        </div>
+                    </td>
+                    <td>27.01.2024 08:15</td>
+                    <td><span class="badge bg-green">Разовый</span></td>
+                    <td><span class="status received">Получено</span></td>
+                    <td>
+                        <button class="btn-action" onclick="leaveReview('Омлет с овощами')">
+                            <i class="fas fa-star"></i> Оценить
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="order-item">
+                            <i class="fas fa-utensil-spoon"></i>
+                            <span>Плов</span>
+                        </div>
+                    </td>
+                    <td>26.01.2024 13:00</td>
+                    <td><span class="badge bg-green">Разовый</span></td>
+                    <td><span class="status pending">Готовится</span></td>
+                    <td>
+                        <button class="btn-action" onclick="markAsReceived(this, 'Плов')">
+                            <i class="fas fa-check"></i> Получил
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+
+<div id="preferences" class="dashboard-section">
+    <div class="preferences-container">
+        <h2><i class="fas fa-heart"></i> Мои предпочтения</h2>
+        <div class="preferences-form">
+            <div class="form-group">
+                <label><i class="fas fa-allergies"></i> Аллергии</label>
+                <textarea id="allergiesInput" placeholder="Укажите ваши аллергии (например: лактоза, орехи, глютен)">лактоза</textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-utensils"></i> Пищевые предпочтения</label>
+                <textarea id="preferencesInput" placeholder="Укажите ваши предпочтения (например: вегетарианское, без сахара)"></textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-ban"></i> Нелюбимые продукты</label>
+                <textarea id="dislikesInput" placeholder="Продукты, которые вы не любите"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="savePreferences()">
+                <i class="fas fa-save"></i> Сохранить предпочтения
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="orderModal" class="modal">  <!--Заказы-->
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Оформление заказа</h3>
+            <button class="close-modal" onclick="closeOrderModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="order-details">
+                <h4 id="modalDishName">Омлет с овощами</h4>
+                <p id="modalDishDesc">Питательный омлет с помидорами, перцем и зеленью</p>
+                <p class="price">120 ₽</p>
+            </div>
+
+            <div class="order-options">
+                <div class="form-group">
+                    <label>Тип оплаты:</label>
+                    <div class="payment-options">
+                        <label class="radio-option">
+                            <input type="radio" name="payment" value="single" checked onchange="updatePaymentType()">
+                            <span>Разовый платёж</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="payment" value="subscription" onchange="updatePaymentType()">
+                            <span>Использовать абонемент</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Количество:</label>
+                    <div class="quantity-selector">
+                        <button class="qty-btn" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" id="quantity" value="1" min="1" max="10" onchange="updateTotalPrice()">
+                        <button class="qty-btn" onclick="changeQuantity(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="order-summary">
+                    <p>Итого: <span id="totalPrice">120</span> ₽</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeOrderModal()">Отмена</button>
+            <button class="btn btn-primary" onclick="placeOrder()">
+                <i class="fas fa-check"></i> Подтвердить заказ
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="reviewModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Оставить отзыв</h3>
+            <button class="close-modal" onclick="closeReviewModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Блюдо:</label>
+                <select id="reviewDish">
+                    <option>Омлет с овощами</option>
+                    <option>Каша овсяная</option>
+                    <option>Суп куриный</option>
+                    <option>Плов</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Оценка:</label>
+                <div class="rating-stars" id="ratingStars">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
+                </div>
+                <input type="hidden" id="ratingValue" value="0">
+            </div>
+            <div class="form-group">
+                <label>Комментарий:</label>
+                <textarea id="reviewComment" rows="4" placeholder="Поделитесь вашим мнением о блюде..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeReviewModal()">Отмена</button>
+            <button class="btn btn-primary" onclick="submitReview()">
+                <i class="fas fa-paper-plane"></i> Отправить отзыв
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Школьная Столовая - Система управления</title>
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <script src="{% static 'main/js/index.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-utensils"></i>
+                    <span>Школьная Столовая</span>
+                </a>
+                <div class="nav-links">
+                    <a href="index.html"><i class="fas fa-home"></i> Главная</a>
+                    <a href="/login/"><i class="fas fa-sign-in-alt"></i> Вход</a>
+                    <a href="#about"><i class="fas fa-info-circle"></i> О системе</a>
+                </div>
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+        <header class="hero"> <!--Центр сайта-->
+            <div class="hero-content">
+                <h1>Автоматизированная система управления школьной столовой</h1>
+                <p>Удобный инструмент для организации питания, учета и контроля</p>
+                <div class="hero-buttons">
+                    <a href="{% url 'login' %}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Начать работу
+                    </a>
+                    <a href="#features" class="btn btn-secondary">
+                        <i class="fas fa-play-circle"></i> Узнать больше
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="{% static 'main/img/logo.png' %}" alt="Школьная столовая">
+            </div>
+        </header>
+
+        <section class="roles-section"> <!--Основной контент (роли)-->
+            <h2 class="section-title">Пользовательские роли</h2>
+            <div class="roles-grid">
+                <div class="role-card">
+
+                    <div class="role-icon student">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3>Ученик</h3>
+                    <ul class="role-features">
+                        <li><i class="fas fa-check-circle"></i> Просмотр меню</li>
+                        <li><i class="fas fa-check-circle"></i> Заказ питания</li>
+                        <li><i class="fas fa-check-circle"></i> Указание аллергий</li>
+                        <li><i class="fas fa-check-circle"></i> Отзывы о блюдах</li>
+                    </ul>
+                    <!--<a href="login.html?role=student" class="btn btn-outline">Войти как ученик</a>-->
+                </div>
+                <div class="role-card">
+
+                    <div class="role-icon chef">
+						<i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3>Повар</h3>
+                    <ul class="role-features">
+                        <li><i class="fas fa-check-circle"></i> Учёт выданных блюд</li>
+                        <li><i class="fas fa-check-circle"></i> Контроль остатков</li>
+                        <li><i class="fas fa-check-circle"></i> Заявки на закупку</li>
+                        <li><i class="fas fa-check-circle"></i> Управление меню</li>
+                    </ul>
+                    <!--<a href="login.html?role=chef" class="btn btn-outline">Войти как повар</a>-->
+                </div>
+                <div class="role-card">
+
+                    <div class="role-icon admin">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>Администратор</h3>
+                    <ul class="role-features">
+                        <li><i class="fas fa-check-circle"></i> Статистика и отчёты</li>
+                        <li><i class="fas fa-check-circle"></i> Согласование заявок</li>
+                        <li><i class="fas fa-check-circle"></i> Аналитика посещаемости</li>
+                        <li><i class="fas fa-check-circle"></i> Управление системой</li>
+                    </ul>
+                    <!--<a href="login.html?role=admin" class="btn btn-outline">Войти как администратор</a>-->
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features-section">
+            <h2 class="section-title">Возможности системы</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Удобный интерфейс</h3>
+                    <p>Адаптивный дизайн для работы с любого устройства</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Аналитика и отчёты</h3>
+                    <p>Детальная статистика по питанию и посещаемости</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Безопасность данных</h3>
+                    <p>Защита персональных данных и платёжной информации</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Уведомления</h3>
+                    <p>Своевременные оповещения для всех участников</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer"> <!-- Низ сайта-->
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Школьная Столовая</h4>
+                    <p>Автоматизированная система управления питанием в образовательных учреждениях</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Быстрые ссылки</h4>
+                    <a href="index.html">Главная</a>
+                    <a href="login.html">Вход в систему</a>
+                    <a href="#features">Возможности</a>
+                    <a href="#about">О проекте</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Контакты</h4>
+                    <p><i class="fas fa-envelope"></i> support@school-cafe.ru</p>
+                    <p><i class="fas fa-phone"></i> +7 (495) 123-45-67</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Школьная Столовая. Все права защищены.</p>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,467 @@
+{% extends 'main/chef_dashboard/chef_base.html' %}
+{% load static %}
+{% block title %}Панель повара - Школьная Столовая{% endblock %}
+{% block body %}
+<main class="main-content">
+    <header class="top-bar">
+        <div class="top-bar-left">
+            <h1>Доброй день, {{ user.username }}!</h1>
+            <p>Сегодня: <span id="currentDate">Загрузка...</span></p>
+        </div>
+        <div class="top-bar-right">
+            <div class="notification-bell" onclick="showNotifications()">
+                <i class="fas fa-bell"></i>
+                <span class="badge">5</span>
+            </div>
+            <div class="kitchen-status">
+                <span class="status-indicator active"></span>
+                <span>Кухня работает</span>
+                <button class="btn btn-sm btn-outline" onclick="toggleKitchenStatus()">
+                    <i class="fas fa-power-off"></i> Статус
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="dashboard" class="dashboard-section active">
+        <section class="dashboard-cards">
+            <div class="card">
+                <div class="card-icon bg-orange">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Текущие заказы</h3>
+                    <p class="card-value">8</p>
+                    <p class="card-desc">Ожидают приготовления</p>
+                    <button class="btn btn-sm btn-outline" onclick="showSection('orders')">Посмотреть</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon bg-green">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Выполнено сегодня</h3>
+                    <p class="card-value">24</p>
+                    <p class="card-desc">Блюд приготовлено</p>
+                    <button class="btn btn-sm btn-outline" onclick="showDailyStats()">Статистика</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon bg-blue">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Низкие остатки</h3>
+                    <p class="card-value">3</p>
+                    <p class="card-desc">Продуктов</p>
+                    <button class="btn btn-sm btn-outline" onclick="showSection('inventory')">Проверить</button>
+                </div>
+            </div>
+
+        </section>
+
+        <div class="dashboard-grid">
+            <section class="orders-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-concierge-bell"></i> Активные заказы</h2>
+                    <button class="btn btn-primary" onclick="markAllPrepared()">
+                        <i class="fas fa-check-double"></i> Отметить все готовыми
+                    </button>
+                </div>
+
+                <div class="orders-list">
+                    <div class="order-item" data-order="235">
+                        <div class="order-header">
+                            <div class="order-number">
+                                <strong>#235</strong>
+                                <span class="order-time">08:15</span>
+                            </div>
+                            <div class="student-info">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Иван Петров</span>
+                            </div>
+                        </div>
+                        <div class="order-details">
+                            <div class="meal-info">
+                                <h4>Омлет с овощами</h4>
+                                <p class="meal-ingredients">яйца, помидоры, перец, лук</p>
+                            </div>
+                            <div class="order-actions">
+                                <span class="badge bg-orange">В ожидании</span>
+                                <button class="btn btn-success btn-sm" onclick="markPrepared(235)">
+                                    <i class="fas fa-check"></i> Готово
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-item" data-order="236">
+                        <div class="order-header">
+                            <div class="order-number">
+                                <strong>#236</strong>
+                                <span class="order-time">08:20</span>
+                            </div>
+                            <div class="student-info">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Мария Сидорова</span>
+                            </div>
+                        </div>
+                        <div class="order-details">
+                            <div class="meal-info">
+                                <h4>Каша овсяная</h4>
+                                <p class="meal-ingredients">овсянка, молоко, мед, яблоко</p>
+                            </div>
+                            <div class="order-actions">
+                                <span class="badge bg-orange">В ожидании</span>
+                                <button class="btn btn-success btn-sm" onclick="markPrepared(236)">
+                                    <i class="fas fa-check"></i> Готово
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-item" data-order="237">
+                        <div class="order-header">
+                            <div class="order-number">
+                                <strong>#237</strong>
+                                <span class="order-time">08:25</span>
+                            </div>
+                            <div class="student-info">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Алексей Иванов</span>
+                            </div>
+                        </div>
+                        <div class="order-details">
+                            <div class="meal-info">
+                                <h4>Омлет с овощами</h4>
+                                <p class="meal-ingredients">яйца, помидоры, перец, лук</p>
+                                <div class="allergy-warning">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>Аллергия: лактоза</span>
+                                </div>
+                            </div>
+                            <div class="order-actions">
+                                <span class="badge bg-orange">В ожидании</span>
+                                <button class="btn btn-success btn-sm" onclick="markPrepared(237)">
+                                    <i class="fas fa-check"></i> Готово
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="inventory-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-boxes"></i> Остатки продуктов</h2>
+                    <button class="btn btn-primary" onclick="openPurchaseModal()">
+                        <i class="fas fa-plus"></i> Новая заявка
+                    </button>
+                </div>
+
+                <div class="inventory-list">
+                    <div class="inventory-item low" data-product="chicken">
+                        <div class="product-info">
+                            <h4>Куриное филе</h4>
+                            <p class="product-category">Мясо и птица</p>
+                        </div>
+                        <div class="product-stock">
+                            <div class="stock-bar">
+                                <div class="stock-fill" style="width: 20%"></div>
+                            </div>
+                            <span class="stock-amount">2 кг</span>
+                        </div>
+                        <button class="btn btn-warning btn-sm" onclick="requestProduct('Куриное филе', '2 кг', '20%')">
+                            Заказать
+                        </button>
+                    </div>
+
+                    <div class="inventory-item normal" data-product="eggs">
+                        <div class="product-info">
+                            <h4>Яйца</h4>
+                            <p class="product-category">Молочные продукты</p>
+                        </div>
+                        <div class="product-stock">
+                            <div class="stock-bar">
+                                <div class="stock-fill" style="width: 60%"></div>
+                            </div>
+                            <span class="stock-amount">150 шт</span>
+                        </div>
+                        <button class="btn btn-warning btn-sm" onclick="requestProduct('Яйца', '150 шт', '60%')">
+                            Заказать
+                        </button>
+                    </div>
+
+                    <div class="inventory-item critical" data-product="milk">
+                        <div class="product-info">
+                            <h4>Молоко</h4>
+                            <p class="product-category">Молочные продукты</p>
+                        </div>
+                        <div class="product-stock">
+                            <div class="stock-bar">
+                                <div class="stock-fill" style="width: 10%"></div>
+                            </div>
+                            <span class="stock-amount">5 л</span>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="requestProduct('Молоко', '5 л', '10%')">
+                            Срочно!
+                        </button>
+                    </div>
+
+                    <div class="inventory-item normal" data-product="rice">
+                        <div class="product-info">
+                            <h4>Рис</h4>
+                            <p class="product-category">Крупы</p>
+                        </div>
+                        <div class="product-stock">
+                            <div class="stock-bar">
+                                <div class="stock-fill" style="width: 75%"></div>
+                            </div>
+                            <span class="stock-amount">15 кг</span>
+                        </div>
+                        <button class="btn btn-warning btn-sm" onclick="requestProduct('Рис', '15 кг', '75%')">
+                            Заказать
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="purchase-requests">
+            <div class="section-header">
+                <h2><i class="fas fa-shopping-cart"></i> Мои заявки на закупку</h2>
+                <div class="request-filters">
+                    <button class="filter-btn active" onclick="filterRequests('all')">Все</button>
+                    <button class="filter-btn" onclick="filterRequests('pending')">В ожидании</button>
+                    <button class="filter-btn" onclick="filterRequests('approved')">Одобрено</button>
+                    <button class="filter-btn" onclick="filterRequests('rejected')">Отклонено</button>
+                </div>
+            </div>
+
+            <div class="requests-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Продукт</th>
+                            <th>Количество</th>
+                            <th>Причина</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="request-item" data-status="pending">
+                            <td>Куриное филе</td>
+                            <td>10 кг</td>
+                            <td>Заканчивается запас</td>
+                            <td>26.01.2024</td>
+                            <td><span class="status pending">В ожидании</span></td>
+                            <td>
+                                <button class="btn-action btn-edit" onclick="editRequest(this)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="request-item" data-status="approved">
+                            <td>Овощи сезонные</td>
+                            <td>15 кг</td>
+                            <td>Новое меню</td>
+                            <td>25.01.2024</td>
+                            <td><span class="status approved">Одобрено</span></td>
+                            <td>
+                                <button class="btn-action btn-view" onclick="viewRequest(this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="request-item" data-status="rejected">
+                            <td>Молоко</td>
+                            <td>20 л</td>
+                            <td>Критически мало</td>
+                            <td>24.01.2024</td>
+                            <td><span class="status rejected">Отклонено</span></td>
+                            <td>
+                                <button class="btn-action btn-delete" onclick="deleteRequest(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div id="menu" class="dashboard-section">
+        <div class="menu-management">
+            <h2><i class="fas fa-utensils"></i> Управление меню</h2>
+            <div class="menu-actions">
+                <button class="btn btn-primary" onclick="addNewDish()">
+                    <i class="fas fa-plus"></i> Добавить блюдо
+                </button>
+                <button class="btn btn-secondary" onclick="editMenu()">
+                    <i class="fas fa-edit"></i> Редактировать меню
+                </button>
+                <button class="btn btn-success" onclick="updatePrices()">
+                    <i class="fas fa-tags"></i> Обновить цены
+                </button>
+            </div>
+            <div class="menu-preview">
+                <h3>Текущее меню</h3>
+                <div class="dishes-list">
+                    <div class="dish-item">
+                        <div class="dish-header">
+                            <h4>Омлет с овощами</h4>
+                            <span class="dish-price">120 ₽</span>
+                        </div>
+                        <p class="dish-desc">Питательный омлет с помидорами, перцем и зеленью</p>
+                        <div class="dish-actions">
+                            <button class="btn btn-sm btn-outline" onclick="editDish(this)">Изменить</button>
+                            <button class="btn btn-sm btn-danger" onclick="removeDish(this)">Удалить</button>
+                        </div>
+                    </div>
+                    <div class="dish-item">
+                        <div class="dish-header">
+                            <h4>Каша овсяная</h4>
+                            <span class="dish-price">80 ₽</span>
+                        </div>
+                        <p class="dish-desc">Овсяная каша с фруктами и медом</p>
+                        <div class="dish-actions">
+                            <button class="btn btn-sm btn-outline" onclick="editDish(this)">Изменить</button>
+                            <button class="btn btn-sm btn-danger" onclick="removeDish(this)">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="purchaseModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Новая заявка на закупку</h3>
+            <button class="close-modal" onclick="closePurchaseModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="purchaseForm">
+                <div class="form-group">
+                    <label>Продукт:</label>
+                    <input type="text" id="productName" placeholder="Название продукта" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Количество:</label>
+                        <input type="number" id="productQuantity" placeholder="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Единица измерения:</label>
+                        <select id="productUnit" required>
+                            <option value="kg">кг</option>
+                            <option value="g">г</option>
+                            <option value="l">л</option>
+                            <option value="ml">мл</option>
+                            <option value="pcs">шт</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Приоритет:</label>
+                    <div class="priority-options">
+                        <label class="radio-option">
+                            <input type="radio" name="priority" value="normal" checked onchange="updatePriority()">
+                            <span class="priority-badge normal">Обычный</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="priority" value="high" onchange="updatePriority()">
+                            <span class="priority-badge high">Высокий</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="priority" value="critical" onchange="updatePriority()">
+                            <span class="priority-badge critical">Критический</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Причина заявки:</label>
+                    <textarea id="purchaseReason" rows="3" placeholder="Опишите причину заявки..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox" id="urgent" required>
+                        <span>Подтверждаю необходимость закупки</span>
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closePurchaseModal()">Отмена</button>
+            <button class="btn btn-primary" onclick="submitPurchase()">
+                <i class="fas fa-paper-plane"></i> Отправить заявку
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="dishModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="dishModalTitle">Новое блюдо</h3>
+            <button class="close-modal" onclick="closeDishModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="dishForm">
+                <div class="form-group">
+                    <label>Название блюда:</label>
+                    <input type="text" id="dishName" placeholder="Введите название" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Описание:</label>
+                    <textarea id="dishDescription" rows="3" placeholder="Опишите блюдо..." required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Цена (руб):</label>
+                        <input type="number" id="dishPrice" placeholder="100" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Тип:</label>
+                        <select id="dishType" required>
+                            <option value="breakfast">Завтрак</option>
+                            <option value="lunch">Обед</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Ингредиенты:</label>
+                    <textarea id="dishIngredients" rows="3" placeholder="Перечислите ингредиенты через запятую..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox" id="dishAvailable" checked>
+                        <span>Блюдо доступно для заказа</span>
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeDishModal()">Отмена</button>
+            <button class="btn btn-primary" onclick="saveDish()">
+                <i class="fas fa-save"></i> Сохранить
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

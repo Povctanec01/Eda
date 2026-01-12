@@ -1,0 +1,143 @@
+{% extends 'main/admin_dashboard/admin_base.html' %}
+{% load static %}
+{% block title %}Статистика{% endblock %}
+{% block body %}
+<div class="dashboard-grid">
+    <section class="stats-section">
+        <div class="section-header">
+            <h2><i class="fas fa-chart-line"></i> Статистика за неделю</h2>
+            <select class="period-select">
+                <option>За неделю</option>
+                <option>За месяц</option>
+                <option>За квартал</option>
+                <option>За год</option>
+            </select>
+        </div>
+
+        <div class="stats-chart">
+            <div class="chart-bars">
+                <div class="chart-bar">
+                    <div class="bar-label">Пн</div>
+                    <div class="bar-container">
+                        <div class="bar breakfast" style="height: 60%"></div>
+                        <div class="bar lunch" style="height: 80%"></div>
+                    </div>
+                    <div class="bar-value">140</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="bar-label">Вт</div>
+                    <div class="bar-container">
+                        <div class="bar breakfast" style="height: 70%"></div>
+                        <div class="bar lunch" style="height: 85%"></div>
+                    </div>
+                    <div class="bar-value">155</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="bar-label">Ср</div>
+                    <div class="bar-container">
+                        <div class="bar breakfast" style="height: 65%"></div>
+                        <div class="bar lunch" style="height: 90%"></div>
+                    </div>
+                    <div class="bar-value">155</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="bar-label">Чт</div>
+                    <div class="bar-container">
+                        <div class="bar breakfast" style="height: 75%"></div>
+                        <div class="bar lunch" style="height: 95%"></div>
+                    </div>
+                    <div class="bar-value">170</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="bar-label">Пт</div>
+                    <div class="bar-container">
+                        <div class="bar breakfast" style="height: 80%"></div>
+                        <div class="bar lunch" style="height: 100%"></div>
+                    </div>
+                    <div class="bar-value">180</div>
+                </div>
+            </div>
+            <div class="chart-legend">
+                <div class="legend-item">
+                    <span class="legend-color breakfast"></span>
+                    <span>Завтраки</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color lunch"></span>
+                    <span>Обеды</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="requests-section">
+        <div class="section-header">
+            <h2><i class="fas fa-shopping-cart"></i> Заявки на согласование</h2>
+            <button class="btn btn-primary" onclick="processAllRequests()">
+                <i class="fas fa-check-double"></i> Обработать все
+            </button>
+        </div>
+
+        <div class="requests-list">
+            <div class="request-item">
+                <div class="request-header">
+                    <div class="requester-info">
+                        <i class="fas fa-user-chef"></i>
+                        <div>
+                            <strong>Иван Шефов</strong>
+                            <small>Повар</small>
+                        </div>
+                    </div>
+                    <span class="request-date">Сегодня, 10:30</span>
+                </div>
+                <div class="request-details">
+                    <h4>Куриное филе</h4>
+                    <p class="request-quantity">10 кг</p>
+                    <p class="request-reason">Заканчивается запас, необходимо для приготовления обедов на неделю.</p>
+                </div>
+                <div class="request-actions">
+                    <button class="btn btn-success btn-sm" onclick="approveRequest(this)">
+                        <i class="fas fa-check"></i> Одобрить
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="rejectRequest(this)">
+                        <i class="fas fa-times"></i> Отклонить
+                    </button>
+                    <button class="btn btn-secondary btn-sm">
+                        <i class="fas fa-comment"></i> Обсудить
+                    </button>
+                </div>
+            </div>
+
+            <div class="request-item">
+                <div class="request-header">
+                    <div class="requester-info">
+                        <i class="fas fa-user-chef"></i>
+                        <div>
+                            <strong>Мария Поварова</strong>
+                            <small>Повар</small>
+                        </div>
+                    </div>
+                    <span class="request-date">Вчера, 16:45</span>
+                </div>
+                <div class="request-details">
+                    <h4>Овощи сезонные</h4>
+                    <p class="request-quantity">15 кг</p>
+                    <p class="request-reason">Для нового сезонного меню и салатов.</p>
+                    <div class="priority-badge high">Высокий приоритет</div>
+                </div>
+                <div class="request-actions">
+                    <button class="btn btn-success btn-sm" onclick="approveRequest(this)">
+                        <i class="fas fa-check"></i> Одобрить
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="rejectRequest(this)">
+                        <i class="fas fa-times"></i> Отклонить
+                    </button>
+                    <button class="btn btn-secondary btn-sm">
+                        <i class="fas fa-comment"></i> Обсудить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход в систему - Школьная Столовая</title>
+  <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'main/css/auth.css' %}">
+  <script src="{% static 'main/js/auth.js' %}" defer></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="auth-page">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="messages {% if message.tags == 'success' %}success{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="auth-container">
+    <div class="auth-header">
+      <a href="{% url 'logout' %}" class="back-home">
+        <i class="fas fa-arrow-left"></i> На главную
+      </a>
+      <div class="logo">
+        <i class="fas fa-utensils"></i>
+        <span>Школьная Столовая</span>
+      </div>
+    </div>
+
+    <div class="auth-main">
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="loginTab">
+            <i class="fas fa-sign-in-alt"></i> Вход
+          </button>
+          <button class="auth-tab" id="registerTab">
+            <i class="fas fa-user-plus"></i> Регистрация
+          </button>
+        </div>
+
+        <!-- Форма входа -->
+        <div id="login-form" class="auth-form active">
+          <h2>Вход в систему</h2>
+          <p class="form-subtitle">Введите данные для входа</p>
+          <form method="post" id="loginForm">
+            {% csrf_token %}
+            <input type="hidden" name="login_submit" value="1">
+            <div class="form-group">
+              <label for="{{ login_form.username.id_for_label }}">Имя пользователя:</label><br>
+              {{ login_form.username }}
+              {% if login_form.username.errors %}
+                <div style="color: red; font-size: 0.9em;">{{ login_form.username.errors }}</div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="{{ login_form.password.id_for_label }}">Пароль:</label><br>
+              {{ login_form.password }}
+              {% if login_form.password.errors %}
+                <div style="color: red;">{{ login_form.password.errors }}</div>
+              {% endif %}
+            </div>
+            {% if login_form.non_field_errors %}
+              <div style="color: red;">{{ login_form.non_field_errors }}</div>
+            {% endif %}
+            <div class="form-options">
+              <label class="checkbox">
+                <input type="checkbox" id="remember">
+                <span>Запомнить меня</span>
+              </label>
+              <a href="#" class="forgot-password">Забыли пароль?</a>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fas fa-sign-in-alt"></i> Войти
+            </button>
+          </form>
+        </div>
+
+        <!-- Форма регистрации -->
+        <div id="register-form" class="auth-form">
+          <h3>Регистрация</h3>
+          <form method="post" id="registerForm">
+            {% csrf_token %}
+            <input type="hidden" name="register_submit" value="1">
+
+            <div class="form-group">
+              <label for="{{ register_form.username.id_for_label }}">Имя пользователя:</label><br>
+              {{ register_form.username }}
+              {% if register_form.username.errors %}
+                <div class="floating-error hidden" data-field="username">
+                  {% for error in register_form.username.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ register_form.password1.id_for_label }}">Пароль:</label><br>
+              {{ register_form.password1 }}
+              {% if register_form.password1.errors %}
+                <div class="floating-error hidden" data-field="password1">
+                  {% for error in register_form.password1.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ register_form.password2.id_for_label }}">Подтвердите пароль:</label><br>
+              {{ register_form.password2 }}
+              {% if register_form.password2.errors %}
+                <div class="floating-error hidden" data-field="password2">
+                  {% for error in register_form.password2.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            {% if register_form.non_field_errors %}
+              <div class="floating-error hidden non-field-error">
+                {% for error in register_form.non_field_errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fas fa-user-plus"></i> Зарегистрироваться
+            </button>
+          </form>
+
+          <div class="test-credentials">
+            <h4><i class="fas fa-vial"></i> Тестовые данные:</h4>
+            <div class="test-account"><strong>Ученик:</strong> student@school.ru / password123</div>
+            <div class="test-account"><strong>Повар:</strong> chef@school.ru / password123</div>
+            <div class="test-account"><strong>Администратор:</strong> admin@school.ru / admin123</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

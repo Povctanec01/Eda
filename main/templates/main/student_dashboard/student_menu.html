@@ -1,0 +1,41 @@
+{% extends 'main/student_dashboard/student_base.html' %}
+{% load static %}
+{% block title %}{% endblock %}
+{% block body %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+<section class="menu-management" style="margin-top: 30px;">
+<h2><i class="fas fa-trash-alt"></i> Удалить карточки</h2>
+{% if cards %}
+  <div class="dishes-list">
+    {% for card in cards %}
+      <div class="dish-item">
+        <div class="dish-header">
+          <div>
+            <h3>{{ card.title }}</h3>
+            <span class="badge" style="background: #667eea; color: white;">{{ card.get_meal_type_display }}</span>
+          </div>
+          <span class="dish-price">ID: {{ card.id }}</span>
+        </div>
+        <p class="dish-desc">{{ card.description|default:"Без описания" }}</p>
+        <div class="dish-actions">
+          <form method="post" onsubmit="return confirm('Удалить блюдо «{{ card.title }}»?');" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="delete" value="1">
+            <input type="hidden" name="card_id" value="{{ card.id }}">
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p style="color: #666; font-style: italic;">Нет карточек для удаления.</p>
+{% endif %}
+</section>
+{% endblock %}
