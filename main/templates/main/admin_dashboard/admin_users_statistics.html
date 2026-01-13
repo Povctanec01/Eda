@@ -1,0 +1,89 @@
+{% extends 'main/admin_dashboard/admin_base.html' %}
+{% load static %}
+{% block title %}Статистика пользователей{% endblock %}
+{% block body %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary fw-bold">📊 Статистика пользователей</h2>
+  </div>
+
+  <!-- Карточки статистики -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card border-left-primary shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title text-muted">Студенты</h5>
+          <h2 class="display-5 fw-bold text-primary">{{ role_counts.student }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-left-success shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title text-muted">Повара</h5>
+          <h2 class="display-5 fw-bold text-success">{{ role_counts.chef }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-left-danger shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title text-muted">Администраторы</h5>
+          <h2 class="display-5 fw-bold text-danger">{{ role_counts.admin }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Таблица пользователей -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-white border-bottom">
+      <h5 class="mb-0">Список всех пользователей</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if users_with_roles %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="px-4 py-3">Имя пользователя</th>
+                <th scope="col" class="px-4 py-3">Роль</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users_with_roles %}
+              <tr>
+                <td class="px-4 py-3">{{ user.username }}</td>
+                <td class="px-4 py-3">
+                  <span class="badge
+                    {% if user.role == 'student' %}bg-primary
+                    {% elif user.role == 'chef' %}bg-success
+                    {% elif user.role == 'admin' %}bg-danger
+                    {% else %}bg-secondary{% endif %}">
+                    {{ user.role|title }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-4 text-muted">
+          <p>Нет зарегистрированных пользователей.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .border-left-primary { border-left: 4px solid #0d6efd !important; }
+  .border-left-success { border-left: 4px solid #198754 !important; }
+  .border-left-danger  { border-left: 4px solid #dc3545 !important; }
+  .card { transition: transform 0.2s; }
+  .card:hover { transform: translateY(-2px); }
+</style>
+
+
+{% endblock %}

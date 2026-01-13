@@ -141,14 +141,14 @@ def admin_home_page(request):
     else:
         registered_username = ''
         registered_role = ''
-
+    student_count = Profile.objects.filter(role='student').count()
     return render(request, 'main/admin_dashboard/admin_home_page.html', {
+        'student_count': student_count,
         'staff_form': staff_form,
         'registration_success': registration_success,
         'registered_username': registered_username,
         'registered_role': registered_role,
     })
-
 
 def redirect_by_role(user):
     try:
@@ -256,31 +256,57 @@ def _cleanup_old_orders():
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     Order.objects.filter(ordered_at__lt=today_start).delete()
 
-
-def student_menu(request):
+def admin_buys(request):
     if request.method == 'POST' and 'add' in request.POST:
-        form = CardForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Блюдо добавлено!")
-            return redirect('student_card_edit')
+        form_buys = CardFormBuys(request.POST)
+        if form_buys.is_valid():
+            form_buys.save()
+            messages.success(request, "Запрос отправлен!")
+            return redirect('admin_buys')
         else:
-            for field, errors in form.errors.items():
+            # Форма не валидна — покажем ошибки через messages
+            for field, errors in form_buys.errors.items():
                 for error in errors:
                     messages.error(request, f"Ошибка: {error}")
     else:
-        form = CardForm()
+        form_buys = CardFormBuys()
 
     # Удаление (остаётся без изменений)
     if request.method == 'POST' and 'delete' in request.POST:
-        card_id = request.POST.get('card_id')
-        card = get_object_or_404(Card, id=card_id)
-        card.delete()
+        card_id_buys = request.POST.get('card_id_buys')
+        form_buys = get_object_or_404(CardBuys, id=card_id_buys)
+        form_buys.delete()
+        messages.success(request, "Блюдо удалено.")
+        return redirect('admin_buys')
+    buys = CardBuys.objects.all().order_by( 'title')
+
+    return render(request, 'main/admin_dashboard/admin_buys.html', {'form_buys': form_buys, 'buys': buys})
+
+
+def student_menu(request):
+    if request.method == 'POST' and 'add' in request.POST:
+        form_buys = CardFormBuys(request.POST)
+        if form_buys.is_valid():
+            form_buys.save()
+            messages.success(request, "Запрос отправлен!")
+            return redirect('student_menu')
+        else:
+            # Форма не валидна — покажем ошибки через messages
+            for field, errors in form_buys.errors.items():
+                for error in errors:
+                    messages.error(request, f"Ошибка: {error}")
+    else:
+        form_buys = CardFormBuys()
+
+    # Удаление (остаётся без изменений)
+    if request.method == 'POST' and 'delete' in request.POST:
+        card_id_buys = request.POST.get('card_id_buys')
+        form_buys = get_object_or_404(CardBuys, id=card_id_buys)
+        form_buys.delete()
         messages.success(request, "Блюдо удалено.")
         return redirect('student_menu')
-
-    cards = Card.objects.all().order_by('meal_type', 'title')
-    return render(request, 'main/student_dashboard/student_menu.html', {'form': form, 'cards': cards})
+    buys = CardBuys.objects.all().order_by( 'title')
+    return render(request, 'main/chef_dashboard/student_menu.html', {'form_buys': form_buys, 'buys': buys})
 
 def student_feedback(request):
     if not request.user.is_authenticated:
@@ -303,13 +329,6 @@ def student_my_orders(request):
         return render(request, 'main/student_dashboard/student_my_orders.html')
 
 
-def admin_buys(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    else:
-        return render(request, 'main/admin_dashboard/admin_buys.html')
-
-
 def admin_finance(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -322,14 +341,6 @@ def admin_statistics(request):
         return redirect('login')
     else:
         return render(request, 'main/admin_dashboard/admin_statistics.html')
-
-
-def admin_users(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    else:
-        return render(request, 'main/admin_dashboard/admin_users.html')
-
 
 
 def chef_card_edit(request):
@@ -400,3 +411,49 @@ def chef_orders(request):
         return redirect('login')
     else:
         return render(request, 'main/chef_dashboard/chef_orders.html')
+
+from django.contrib.auth.models import User
+from .models import Profile
+
+def admin_users_statistics(request):
+    if not request.user.is_authenticated:
+        return redirect('auth_view')
+    if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
+        messages.error(request, "Доступ запрещён.")
+        return redirect('auth_view')
+
+    users_with_roles = []
+    for user in User.objects.all():
+        try:
+            role = user.profile.role
+        except Profile.DoesNotExist:
+            role = 'student'  # роль по умолчанию, как в вашем коде
+        users_with_roles.append({
+            'username': user.username,
+            'role': role
+        })
+
+    # Подсчёт по ролям
+    role_counts = {'student': 0, 'chef': 0, 'admin': 0}
+    for ur in users_with_roles:
+        role_counts[ur['role']] += 1
+
+    return render(request, 'main/admin_dashboard/admin_users_statistics.html', {
+        'users_with_roles': users_with_roles,
+        'role_counts': role_counts,
+    })
+
+
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+def student_order_create(request, card_id):
+    if request.user.profile.role != 'student':
+        messages.error(request, "Только студенты могут делать заказы.")
+        return redirect('student_dashboard/student_home_page')
+
+    card = get_object_or_404(Card, id=card_id)
+    Order.objects.create(user=request.user, card=card)
+    messages.success(request, f"Вы заказали: {card.title}!")
+    return redirect('student_dashboard/student_home_page')

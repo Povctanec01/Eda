@@ -24,9 +24,9 @@ urlpatterns = [
     path('admin_buys', views.admin_buys , name='admin_buys'),
     path('admin_finance', views.admin_finance , name='admin_finance'),
     path('admin_statistics', views.admin_statistics , name='admin_statistics'),
-    path('admin_users', views.admin_users , name='admin_users'),
+    path('admin_users_statistics', views.admin_users_statistics , name='admin_users_statistics'),
     path('admin_card_edit/', views.admin_card_edit, name='admin_card_edit'),
     path('order/<int:card_id>/', views.order_create, name='order_create'),
     path('delete/<int:card_id>/', views.card_delete, name='card_delete'),
-
+    path('student/order/<int:card_id>/', views.student_order_create, name='student_order_create'),
 ]

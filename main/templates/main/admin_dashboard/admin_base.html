@@ -48,7 +48,7 @@
             <span>Закупки</span>
             <span class="badge">12</span>
           </a>
-          <a href="{% url 'admin_users' %}" {% if request.resolver_match.url_name == 'admin_users' %}class="active"{% endif %}>
+          <a href="{% url 'admin_users_statistics' %}" {% if request.resolver_match.url_name == 'admin_users_statistics' %}class="active"{% endif %}>
             <i class="fas fa-users"></i>
             <span>Пользователи</span>
           </a>

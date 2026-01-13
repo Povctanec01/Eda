@@ -37,23 +37,19 @@ class Card(models.Model):
 # cards_app/models.py (добавьте ниже)
 
 class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
     card = models.ForeignKey(
         Card,
-        on_delete=models.SET_NULL,  # ← вместо CASCADE
-        null=True,                  # ← обязательно, так как поле может стать NULL
+        on_delete=models.SET_NULL,
+        null=True,
         verbose_name="Блюдо"
     )
     ordered_at = models.DateTimeField(auto_now_add=True, verbose_name="Время заказа")
 
     def __str__(self):
-        if self.card:
-            return f"Заказ: {self.card.title} в {self.ordered_at.strftime('%H:%M')}"
-        else:
-            return f"Заказ: [УДАЛЁННОЕ БЛЮДО] в {self.ordered_at.strftime('%H:%M')}"
-
-    class Meta:
-        verbose_name = "Заказ"
-        verbose_name_plural = "Заказы"
+        username = self.user.username if self.user else "Неизвестный"
+        title = self.card.title if self.card else "[УДАЛЁННОЕ БЛЮДО]"
+        return f"{username} → {title} ({self.ordered_at.strftime('%d.%m %H:%M')})"
 
 class CardBuys(models.Model):
     title = models.CharField(max_length=200, verbose_name="Название блюда")
