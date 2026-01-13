@@ -249,20 +249,6 @@ function validateStaffForm() {
     return true;
 }
 
-// Закрыть по клику вне окна
-window.onclick = function(event) {
-    const modal = document.getElementById('staffModal');
-    const successModal = document.getElementById('successModal');
-
-    if (event.target === modal) {
-        closeModal();
-    }
-
-    if (event.target === successModal) {
-        closeSuccessModal();
-    }
-}
-
 // Основная инициализация при загрузке документа
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing admin dashboard...');

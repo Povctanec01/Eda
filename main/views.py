@@ -5,8 +5,8 @@ from django.contrib import messages
 from .models import Profile
 from django.utils import timezone
 from datetime import time, datetime
-from .models import Card, Order
-from .forms import CardForm
+from .models import Card, Order,CardBuys
+from .forms import CardForm, CardFormBuys
 from django import forms
 from django.contrib.auth.models import User
 
@@ -366,10 +366,29 @@ def chef_remaining_product(request):
         return render(request, 'main/chef_dashboard/chef_remaining_product.html')
 
 def chef_buys(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
+    if request.method == 'POST' and 'add' in request.POST:
+        form_buys = CardFormBuys(request.POST)
+        if form_buys.is_valid():
+            form_buys.save()
+            messages.success(request, "Запрос отправлен!")
+            return redirect('chef_buys')
+        else:
+            # Форма не валидна — покажем ошибки через messages
+            for field, errors in form_buys.errors.items():
+                for error in errors:
+                    messages.error(request, f"Ошибка: {error}")
     else:
-        return render(request, 'main/chef_dashboard/chef_buys.html')
+        form_buys = CardFormBuys()
+
+    # Удаление (остаётся без изменений)
+    if request.method == 'POST' and 'delete' in request.POST:
+        card_id_buys = request.POST.get('card_id_buys')
+        form_buys = get_object_or_404(CardBuys, id=card_id_buys)
+        form_buys.delete()
+        messages.success(request, "Блюдо удалено.")
+        return redirect('chef_buys')
+    buys = CardBuys.objects.all().order_by( 'title')
+    return render(request, 'main/chef_dashboard/chef_buys.html', {'form_buys': form_buys, 'buys': buys})
 
 def chef_statistics(request):
     if not request.user.is_authenticated:

@@ -54,3 +54,12 @@ class Order(models.Model):
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
+
+class CardBuys(models.Model):
+    title = models.CharField(max_length=200, verbose_name="Название блюда")
+    description = models.TextField(verbose_name="Описание")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Блюдо"
+        verbose_name_plural = "Блюда"

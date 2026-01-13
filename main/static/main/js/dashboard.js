@@ -14,3 +14,19 @@ document.addEventListener('DOMContentLoaded', function () {
         dateElement.textContent = `${day} ${month} ${year}`;
     }
 });
+
+    function showMeals(mealType) {
+      const items = document.querySelectorAll('.dish-item');
+      items.forEach(item => {
+        if (mealType === 'Все' || item.dataset.mealType === mealType) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // По умолчанию показываем все блюда
+    document.addEventListener('DOMContentLoaded', () => {
+      showMeals('Все');
+    });

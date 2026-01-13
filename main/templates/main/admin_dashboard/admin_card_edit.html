@@ -21,33 +21,41 @@
 
 <!-- Форма добавления -->
 <section class="menu-management">
-<h2><i class="fas fa-plus-circle"></i> Добавить новую карточку</h2>
-<form method="post" class="preferences-form">
-  {% csrf_token %}
-  <input type="hidden" name="add" value="1">
-  <div class="form-group">
-    <label for="{{ form.title.id_for_label }}">Название блюда:</label>
-    {{ form.title }}
-  </div>
-  <div class="form-group">
-    <label for="{{ form.description.id_for_label }}">Описание:</label>
-    {{ form.description }}
-  </div>
-  <div class="form-group">
-    <label for="{{ form.meal_type.id_for_label }}">Тип приёма пищи:</label>
-    {{ form.meal_type }}
-  </div>
-  <button type="submit" class="btn-success">Добавить карточку</button>
-</form>
+    <h2><i class="fas fa-plus-circle"></i> Добавить новый запрос</h2>
+    <form method="post" class="preferences-form">
+      {% csrf_token %}
+      <input type="hidden" name="add" value="1">
+      <div class="form-group">
+        <label for="{{ form.title.id_for_label }}">Название блюда:</label>
+        {{ form.title }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}">Описание:</label>
+        {{ form.description }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.meal_type.id_for_label }}">Тип приёма пищи:</label>
+        {{ form.meal_type }}
+      </div>
+      <button type="submit" class="btn-success">Добавить запрос</button>
+    </form>
 </section>
 
-<!-- Список для удаления -->
+
 <section class="menu-management" style="margin-top: 30px;">
-<h2><i class="fas fa-trash-alt"></i> Удалить карточки</h2>
-{% if cards %}
+  <h2>Блюда</h2>
+
+  {% if cards %}
+  <div class="dishes-filters">
+
+    <button class="btn btn-primary rounded-pill px-3"  type="button" onclick="showMeals('Все')">Все</button>
+    <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Обед')">Обеды</button>
+    <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Завтрак')">Завтраки</button>
+  </div>
+
   <div class="dishes-list">
     {% for card in cards %}
-      <div class="dish-item">
+      <div class="dish-item" data-meal-type="{{ card.get_meal_type_display }}">
         <div class="dish-header">
           <div>
             <h3>{{ card.title }}</h3>
@@ -59,17 +67,18 @@
         <div class="dish-actions">
           <form method="post" onsubmit="return confirm('Удалить блюдо «{{ card.title }}»?');" style="display: inline;">
             {% csrf_token %}
-            <input type="hidden" name="delete" value="1">
-            <input type="hidden" name="card_id" value="{{ card.id }}">
-            <button type="submit" class="btn-danger btn-sm">Удалить</button>
+                <input type="hidden" name="delete" value="1">
+                <input type="hidden" name="card_id" value="{{ card.id }}">
+                <button type="submit" class="btn-danger btn-sm">Удалить</button>
           </form>
         </div>
       </div>
     {% endfor %}
   </div>
-{% else %}
-  <p style="color: #666; font-style: italic;">Нет карточек для удаления.</p>
-{% endif %}
+  {% else %}
+    <p style="color: #666; font-style: italic;">Нет запросов</p>
+  {% endif %}
 </section>
+
 
 {% endblock %}
