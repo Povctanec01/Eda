@@ -265,7 +265,6 @@ def student_menu(request):
             messages.success(request, "Блюдо добавлено!")
             return redirect('student_card_edit')
         else:
-            # Форма не валидна — покажем ошибки через messages
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"Ошибка: {error}")
