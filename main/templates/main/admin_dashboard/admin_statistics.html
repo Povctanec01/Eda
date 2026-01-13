@@ -4,69 +4,28 @@
 {% block body %}
 <div class="dashboard-grid">
     <section class="stats-section">
-        <div class="section-header">
-            <h2><i class="fas fa-chart-line"></i> Статистика за неделю</h2>
-            <select class="period-select">
-                <option>За неделю</option>
-                <option>За месяц</option>
-                <option>За квартал</option>
-                <option>За год</option>
-            </select>
-        </div>
-
-        <div class="stats-chart">
-            <div class="chart-bars">
-                <div class="chart-bar">
-                    <div class="bar-label">Пн</div>
-                    <div class="bar-container">
-                        <div class="bar breakfast" style="height: 60%"></div>
-                        <div class="bar lunch" style="height: 80%"></div>
-                    </div>
-                    <div class="bar-value">140</div>
-                </div>
-                <div class="chart-bar">
-                    <div class="bar-label">Вт</div>
-                    <div class="bar-container">
-                        <div class="bar breakfast" style="height: 70%"></div>
-                        <div class="bar lunch" style="height: 85%"></div>
-                    </div>
-                    <div class="bar-value">155</div>
-                </div>
-                <div class="chart-bar">
-                    <div class="bar-label">Ср</div>
-                    <div class="bar-container">
-                        <div class="bar breakfast" style="height: 65%"></div>
-                        <div class="bar lunch" style="height: 90%"></div>
-                    </div>
-                    <div class="bar-value">155</div>
-                </div>
-                <div class="chart-bar">
-                    <div class="bar-label">Чт</div>
-                    <div class="bar-container">
-                        <div class="bar breakfast" style="height: 75%"></div>
-                        <div class="bar lunch" style="height: 95%"></div>
-                    </div>
-                    <div class="bar-value">170</div>
-                </div>
-                <div class="chart-bar">
-                    <div class="bar-label">Пт</div>
-                    <div class="bar-container">
-                        <div class="bar breakfast" style="height: 80%"></div>
-                        <div class="bar lunch" style="height: 100%"></div>
-                    </div>
-                    <div class="bar-value">180</div>
-                </div>
+        <div class="stats-summary text-center my-4">
+          <h3>Сегодняшние заказы</h3>
+          <div class="row justify-content-center">
+            <div class="col-auto">
+              <div class="stat-box bg-success text-white p-3 rounded">
+                <div class="h5 mb-0">{{ breakfast_count }}</div>
+                <small>Завтраков</small>
+              </div>
             </div>
-            <div class="chart-legend">
-                <div class="legend-item">
-                    <span class="legend-color breakfast"></span>
-                    <span>Завтраки</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color lunch"></span>
-                    <span>Обеды</span>
-                </div>
+            <div class="col-auto">
+              <div class="stat-box bg-primary text-white p-3 rounded">
+                <div class="h5 mb-0">{{ lunch_count }}</div>
+                <small>Обедов</small>
+              </div>
             </div>
+            <div class="col-auto">
+              <div class="stat-box bg-dark text-white p-3 rounded">
+                <div class="h5 mb-0">{{ total_today }}</div>
+                <small>Всего</small>
+              </div>
+            </div>
+          </div>
         </div>
     </section>
 

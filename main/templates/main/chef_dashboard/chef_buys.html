@@ -3,70 +3,70 @@
 {% block title %}{% endblock %}
 {% block body %}
 <main class="main-content">
-{% if messages %}
-  <div class="messages">
-    {% for message in messages %}
-      {% if message.tags == 'error' %}
-        <div class="alert alert-error">
-          {{ message }}
-        </div>
-      {% else %}
-        <div class="alert alert-success">
-          {{ message }}
-        </div>
-      {% endif %}
-    {% endfor %}
-  </div>
-{% endif %}
-
-<!-- Форма добавления -->
-<section class="menu-management">
-<h2><i class="fas fa-plus-circle"></i> Добавить новую карточку</h2>
-<form method="post" class="preferences-form">
-  {% csrf_token %}
-  <input type="hidden" name="add" value="1">
-  <div class="form-group">
-    <label for="{{ form_buys.title.id_for_label }}">Название блюда:</label>
-    {{ form_buys.title }}
-  </div>
-  <div class="form-group">
-    <label for="{{ form_buys.description.id_for_label }}">Описание:</label>
-    {{ form_buys.description }}
-  </div>
-  <button type="submit" class="btn-success">Добавить карточку</button>
-</form>
-</section>
-
-
-<section class="menu-management" style="margin-top: 30px;">
-  <h2>Блюда</h2>
-
-  {% if buys %}
-
-  <div class="dishes-list">
-    {% for card_buys in buys %}
-      <div class="dish-item" data-meal-type="{{ card_buys.get_meal_type_display }}">
-        <div class="dish-header">
-          <div>
-            <h3>{{ card_buys.title }}</h3>
-          </div>
-          <span class="dish-price">ID: {{ card_buys.id }}</span>
-        </div>
-        <p class="dish-desc">{{ card_buys.description|default:"Без описания" }}</p>
-        <div class="dish-actions">
-          <form method="post" onsubmit="return confirm('Удалить блюдо «{{ card_buys.title }}»?');" style="display: inline;">
-            {% csrf_token %}
-                <input type="hidden" name="delete" value="1">
-                <input type="hidden" name="card_id_buys" value="{{ card_buys.id }}">
-                <button type="submit" class="btn-danger btn-sm">Удалить</button>
-          </form>
-        </div>
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          {% if message.tags == 'error' %}
+            <div class="alert alert-error">
+              {{ message }}
+            </div>
+          {% else %}
+            <div class="alert alert-success">
+              {{ message }}
+            </div>
+          {% endif %}
+        {% endfor %}
       </div>
-    {% endfor %}
-  </div>
-  {% else %}
-    <p style="color: #666; font-style: italic;">Нет карточек для удаления.</p>
-  {% endif %}
-</section>
+    {% endif %}
+
+    <!-- Форма добавления -->
+    <section class="menu-management">
+    <h2><i class="fas fa-plus-circle"></i> Добавить новую карточку</h2>
+    <form method="post" class="preferences-form">
+      {% csrf_token %}
+      <input type="hidden" name="add" value="1">
+      <div class="form-group">
+        <label for="{{ form_buys.title.id_for_label }}">Название блюда:</label>
+        {{ form_buys.title }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form_buys.description.id_for_label }}">Описание:</label>
+        {{ form_buys.description }}
+      </div>
+      <button type="submit" class="btn-success">Добавить карточку</button>
+    </form>
+    </section>
+
+
+    <section class="menu-management" style="margin-top: 30px;">
+      <h2>Блюда</h2>
+
+      {% if buys %}
+
+      <div class="dishes-list">
+        {% for card_buys in buys %}
+          <div class="dish-item" data-meal-type="{{ card_buys.get_meal_type_display }}">
+            <div class="dish-header">
+              <div>
+                <h3>{{ card_buys.title }}</h3>
+              </div>
+              <span class="dish-price">ID: {{ card_buys.id }}</span>
+            </div>
+            <p class="dish-desc">{{ card_buys.description|default:"Без описания" }}</p>
+            <div class="dish-actions">
+              <form method="post" onsubmit="return confirm('Удалить блюдо «{{ card_buys.title }}»?');" style="display: inline;">
+                {% csrf_token %}
+                    <input type="hidden" name="delete" value="1">
+                    <input type="hidden" name="card_id_buys" value="{{ card_buys.id }}">
+                    <button type="submit" class="btn-danger btn-sm">Удалить</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <p style="color: #666; font-style: italic;">Нет карточек для удаления.</p>
+      {% endif %}
+    </section>
 </main>
 {% endblock %}

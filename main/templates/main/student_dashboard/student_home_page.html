@@ -4,14 +4,32 @@
 {% block body %}
 
 <section class="today-menu">
-    <div class="section-header">
-        <h2><i class="fas fa-concierge-bell"></i> Меню на сегодня</h2>
-        <div class="meal-types">
-            <button class="meal-type-btn active" onclick="filterMenu('all')">Все</button>
-            <button class="meal-type-btn" onclick="filterMenu('breakfast')">Завтраки</button>
-            <button class="meal-type-btn" onclick="filterMenu('lunch')">Обеды</button>
-        </div>
+  <div class="section-header">
+    <h2><i class="fas fa-concierge-bell"></i> Меню на сегодня</h2>
+    <div class="meal-types">
+      <button class="meal-type-btn active" onclick="filterMenu('all')">Все</button>
+      <button class="meal-type-btn" onclick="filterMenu('breakfast')">Завтраки</button>
+      <button class="meal-type-btn" onclick="filterMenu('lunch')">Обеды</button>
     </div>
+  </div>
+
+  <!-- Список блюд -->
+  <div class="menu-items">
+    {% for card in today_cards %}
+    <div class="menu-item" data-meal-type="{{ card.meal_type }}">
+      <h4>{{ card.title }}</h4>
+      <p class="text-muted">{{ card.description|default:"Без описания" }}</p>
+        <span class="badge {{ card.badge_class }}">
+          {{ card.get_meal_type_display }}
+        </span>
+      <a href="{% url 'student_order_create' card.id %}" class="btn btn-sm btn-outline-primary mt-2">
+        Заказать
+      </a>
+    </div>
+    {% empty %}
+    <p class="text-muted">Сегодня меню не загружено.</p>
+    {% endfor %}
+  </div>
 </section>
 
 <section class="my-orders">

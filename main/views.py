@@ -1,14 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Profile
 from django.utils import timezone
+from django.http import JsonResponse
+from django import forms
 from datetime import time, datetime
 from .models import Card, Order,CardBuys
 from .forms import CardForm, CardFormBuys
-from django import forms
-from django.contrib.auth.models import User
+from .models import Profile
 
 
 def auth_view(request):
@@ -19,7 +21,7 @@ def auth_view(request):
     register_form = UserCreationForm()
 
     if request.method == 'POST':
-        # Вход
+        # Авторизация
         if 'login_submit' in request.POST:
             login_form = AuthenticationForm(request, data=request.POST)
             if login_form.is_valid():
@@ -29,7 +31,6 @@ def auth_view(request):
                 if user is not None:
                     login(request, user)
                     return redirect_by_role(user)
-
         # Регистрация
         elif 'register_submit' in request.POST:
             register_form = UserCreationForm(request.POST)
@@ -47,7 +48,7 @@ def auth_view(request):
     })
 
 
-# Форма для регистрации staff (chef/admin) — можно вынести в отдельный файл позже
+# Форма для регистрации staff
 class StaffRegistrationForm(forms.Form):
     username = forms.CharField(
         max_length=150,
@@ -103,7 +104,6 @@ def admin_home_page(request):
         return redirect('auth_view')
     if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
         return redirect('auth_view')
-
     # Обработка формы регистрации персонала
     staff_form = None
     registration_success = False
@@ -114,7 +114,7 @@ def admin_home_page(request):
             try:
                 user = staff_form.save()
                 registration_success = True
-                # Сохраняем информацию о успешной регистрации в сессии
+                # Сохраняем информация об успешной регистрации в сессии
                 request.session['staff_registration_success'] = True
                 request.session['registered_username'] = user.username
                 request.session['registered_role'] = user.profile.role
@@ -150,6 +150,7 @@ def admin_home_page(request):
         'registered_role': registered_role,
     })
 
+
 def redirect_by_role(user):
     try:
         role = user.profile.role
@@ -177,8 +178,22 @@ def student_home_page(request):
         return redirect('login')
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'student':
         return redirect('login')
-    return render(request, 'main/student_dashboard/student_home_page.html')
 
+    # Получаем все блюда
+    today_cards = Card.objects.exclude(meal_type='select').order_by('meal_type', 'title')
+
+    # Добавляем к каждому карточке CSS-класс на основе meal_type
+    for card in today_cards:
+        if card.meal_type == 'breakfast':
+            card.badge_class = 'bg-success'
+        elif card.meal_type == 'lunch':
+            card.badge_class = 'bg-primary'
+        else:
+            card.badge_class = 'bg-secondary'
+
+    return render(request, 'main/student_dashboard/student_home_page.html', {
+        'today_cards': today_cards
+    })
 
 def chef_home_page(request):
     if not request.user.is_authenticated:
@@ -284,29 +299,9 @@ def admin_buys(request):
 
 
 def student_menu(request):
-    if request.method == 'POST' and 'add' in request.POST:
-        form_buys = CardFormBuys(request.POST)
-        if form_buys.is_valid():
-            form_buys.save()
-            messages.success(request, "Запрос отправлен!")
-            return redirect('student_menu')
-        else:
-            # Форма не валидна — покажем ошибки через messages
-            for field, errors in form_buys.errors.items():
-                for error in errors:
-                    messages.error(request, f"Ошибка: {error}")
-    else:
-        form_buys = CardFormBuys()
-
-    # Удаление (остаётся без изменений)
-    if request.method == 'POST' and 'delete' in request.POST:
-        card_id_buys = request.POST.get('card_id_buys')
-        form_buys = get_object_or_404(CardBuys, id=card_id_buys)
-        form_buys.delete()
-        messages.success(request, "Блюдо удалено.")
-        return redirect('student_menu')
-    buys = CardBuys.objects.all().order_by( 'title')
-    return render(request, 'main/chef_dashboard/student_menu.html', {'form_buys': form_buys, 'buys': buys})
+    form = CardForm(request.POST)
+    cards = Card.objects.all().order_by('meal_type', 'title')
+    return render(request, 'main/student_dashboard/student_menu.html', {'form': form, 'cards': cards})
 
 def student_feedback(request):
     if not request.user.is_authenticated:
@@ -323,10 +318,12 @@ def card_delete(request):
 
 
 def student_my_orders(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
-    else:
-        return render(request, 'main/student_dashboard/student_my_orders.html')
+    orders = Order.objects.filter(user=request.user).order_by('-ordered_at')
+    return render(request, 'main/student_dashboard/student_my_orders.html', {
+        'orders': orders
+    })
 
 
 def admin_finance(request):
@@ -334,13 +331,6 @@ def admin_finance(request):
         return redirect('login')
     else:
         return render(request, 'main/admin_dashboard/admin_finance.html')
-
-
-def admin_statistics(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    else:
-        return render(request, 'main/admin_dashboard/admin_statistics.html')
 
 
 def chef_card_edit(request):
@@ -400,20 +390,32 @@ def chef_buys(request):
     buys = CardBuys.objects.all().order_by( 'title')
     return render(request, 'main/chef_dashboard/chef_buys.html', {'form_buys': form_buys, 'buys': buys})
 
+
 def chef_statistics(request):
     if not request.user.is_authenticated:
         return redirect('login')
     else:
         return render(request, 'main/chef_dashboard/chef_statistics.html')
 
-def chef_orders(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    else:
-        return render(request, 'main/chef_dashboard/chef_orders.html')
 
-from django.contrib.auth.models import User
-from .models import Profile
+from django.http import JsonResponse
+
+
+def chef_orders(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'chef':
+        return redirect('login')
+
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        order = get_object_or_404(Order, id=order_id, status='pending')
+        order.status = 'ready'
+        order.save()
+        return JsonResponse({'success': True})
+
+    # Только активные заказы
+    orders = Order.objects.filter(status='pending').select_related('user', 'card').order_by('ordered_at')
+    return render(request, 'main/chef_dashboard/chef_orders.html', {'orders': orders})
+
 
 def admin_users_statistics(request):
     if not request.user.is_authenticated:
@@ -443,8 +445,32 @@ def admin_users_statistics(request):
         'role_counts': role_counts,
     })
 
+def admin_statistics(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+        return redirect('login')
 
-from django.contrib.auth.decorators import login_required
+    # Сегодня
+    today = timezone.now().date()
+    start_of_day = timezone.make_aware(datetime.combine(today, time.min))
+    end_of_day = timezone.make_aware(datetime.combine(today, time.max))
+
+    breakfast_count = Order.objects.filter(
+        ordered_at__range=(start_of_day, end_of_day),
+        card__meal_type='breakfast'
+    ).count()
+
+    lunch_count = Order.objects.filter(
+        ordered_at__range=(start_of_day, end_of_day),
+        card__meal_type='lunch'
+    ).count()
+
+    total_today = breakfast_count + lunch_count
+
+    return render(request, 'main/admin_dashboard/admin_statistics.html', {
+        'breakfast_count': breakfast_count,
+        'lunch_count': lunch_count,
+        'total_today': total_today,
+    })
 
 
 @login_required

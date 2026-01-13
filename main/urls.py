@@ -12,6 +12,7 @@ urlpatterns = [
     path('student_feedback', views.student_feedback , name='student_feedback'),
     path('student_menu', views.student_menu , name='student_menu'),
     path('student_my_orders', views.student_my_orders , name='student_my_orders'),
+    path('student/order/<int:card_id>/', views.student_order_create, name='student_order_create'),
 
     path('chef_dashboard/chef_home_page', views.chef_home_page, name='chef_dashboard/chef_home_page'),
     path('chef_card_edit/', views.chef_card_edit , name='chef_card_edit'),
@@ -28,5 +29,4 @@ urlpatterns = [
     path('admin_card_edit/', views.admin_card_edit, name='admin_card_edit'),
     path('order/<int:card_id>/', views.order_create, name='order_create'),
     path('delete/<int:card_id>/', views.card_delete, name='card_delete'),
-    path('student/order/<int:card_id>/', views.student_order_create, name='student_order_create'),
 ]

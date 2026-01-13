@@ -1,5 +1,85 @@
 {% extends 'main/chef_dashboard/chef_base.html' %}
 {% load static %}
-{% block title %}{% endblock %}
+{% block title %}Заказы{% endblock %}
 {% block body %}
+<main class="main-content">
+  <h2><i class="fas fa-concierge-bell"></i> Активные заказы</h2>
+
+  {% if orders %}
+    <div class="orders-container">
+      {% for order in orders %}
+        <div class="order-card" id="order-{{ order.id }}">
+          <div class="order-header">
+            <strong>{{ order.user.username }}</strong>
+            <span class="badge bg-secondary">{{ order.ordered_at|date:"H:i" }}</span>
+          </div>
+          <div class="order-body">
+            <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
+            <p class="text-muted">{{ order.card.description|truncatewords:15|default:"—" }}</p>
+            <span class="badge
+              {% if order.card.meal_type == 'breakfast' %}bg-success
+              {% elif order.card.meal_type == 'lunch' %}bg-primary
+              {% else %}bg-secondary{% endif %}">
+              {{ order.card.get_meal_type_display|default:"—" }}
+            </span>
+          </div>
+          <div class="order-footer">
+            <form method="post" style="display:inline;" onsubmit="markAsReady(event, {{ order.id }})">
+              {% csrf_token %}
+              <input type="hidden" name="order_id" value="{{ order.id }}">
+              <button type="submit" class="btn btn-success btn-sm">
+                <i class="fas fa-check"></i> Готово
+              </button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">Нет активных заказов.</p>
+  {% endif %}
+</main>
+
+<style>
+.order-card {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.order-body h4 {
+  margin: 8px 0;
+}
+</style>
+
+<script>
+function markAsReady(event, orderId) {
+  event.preventDefault();
+  const form = event.target;
+  fetch('', {
+    method: 'POST',
+    body: new FormData(form),
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('order-' + orderId).remove();
+      if (!document.querySelector('.order-card')) {
+        location.reload(); // или показать сообщение "заказов нет"
+      }
+    }
+  });
+}
+</script>
 {% endblock %}
