@@ -8,6 +8,11 @@
     <h2><i class="fas fa-concierge-bell"></i> Меню на сегодня</h2>
 
   </div>
+    <div class="meal-filters mb-3">
+      <button class="btn btn-outline-primary active" data-filter="all">Все</button>
+      <button class="btn btn-outline-success" data-filter="breakfast">Завтрак</button>
+      <button class="btn btn-outline-primary" data-filter="lunch">Обед</button>
+    </div>
 
   <!-- Список блюд -->
   <div class="menu-items">
@@ -220,5 +225,28 @@ function markAllPrepared() {
     });
   });
 }
+document.addEventListener('DOMContentLoaded', function () {
+  const filterButtons = document.querySelectorAll('.meal-filters button');
+  const menuItems = document.querySelectorAll('.menu-item');
+
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      // Убираем активный класс у всех кнопок
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      // Добавляем активный класс текущей кнопке
+      this.classList.add('active');
+
+      const filter = this.getAttribute('data-filter');
+
+      menuItems.forEach(item => {
+        if (filter === 'all' || item.dataset.mealType === filter) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  });
+});
 </script>
 {% endblock %}

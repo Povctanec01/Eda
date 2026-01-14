@@ -31,14 +31,9 @@
             <h3>{{ card.title }}</h3>
             <span class="badge" style="background: #667eea; color: white;">{{ card.get_meal_type_display }}</span>
           </div>
-          <span class="dish-price">ID: {{ card.id }}</span>
         </div>
-        <p class="dish-desc">{{ card.description|default:"Без описания" }}</p>
+        <p class="dish-desc">Описание: {{ card.description|default:"Без описания" }}</p>
         <div class="dish-actions">
-          <form method="post" onsubmit="return confirm('Удалить блюдо «{{ card.title }}»?');" style="display: inline;">
-            {% csrf_token %}
-            <input type="hidden" name="card_id" value="{{ card.id }}">
-          </form>
         </div>
       </div>
     {% endfor %}
