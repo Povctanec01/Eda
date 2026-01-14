@@ -338,3 +338,24 @@ document.addEventListener('DOMContentLoaded', function () {
         dateElement.textContent = `${day} ${month} ${year}`;
     }
 });
+
+function markAsReady(event, orderId) {
+  event.preventDefault();
+  const form = event.target;
+  fetch('', {
+    method: 'POST',
+    body: new FormData(form),
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('order-' + orderId).remove();
+      if (!document.querySelector('.order-card')) {
+        location.reload(); // или показать сообщение "заказов нет"
+      }
+    }
+  });
+}
