@@ -1740,3 +1740,115 @@ body {
 .btn-success:hover {
     background-color: #45a049;
 }
+
+/* Стили для карточек заказов на главной */
+.orders-section .order-item {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.orders-section .order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.orders-section .order-number strong {
+  font-size: 1rem;
+  color: #333;
+}
+.orders-section .order-time {
+  font-size: 0.85rem;
+  color: #888;
+  margin-left: 0.5rem;
+}
+
+.orders-section .student-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.orders-section .student-info i {
+  color: #6c757d;
+}
+.orders-section .student-info span {
+  font-size: 0.95rem;
+}
+
+.orders-section .order-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.orders-section .meal-info h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+}
+
+.orders-section .meal-ingredients {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.orders-section .allergy-warning {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.orders-section .order-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.orders-section .order-actions .badge {
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+}
+
+.orders-section .badge.bg-orange {
+  background-color: #ffc107 !important;
+  color: #212529 !important;
+}
+
+.orders-section .badge.bg-success {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+.orders-section .btn.btn-success.btn-sm {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .orders-section .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .orders-section .order-details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .orders-section .order-actions {
+    align-items: stretch;
+  }
+}
+

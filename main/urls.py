@@ -27,6 +27,5 @@ urlpatterns = [
     path('admin_statistics', views.admin_statistics , name='admin_statistics'),
     path('admin_users_statistics', views.admin_users_statistics , name='admin_users_statistics'),
     path('admin_card_edit/', views.admin_card_edit, name='admin_card_edit'),
-    path('order/<int:card_id>/', views.order_create, name='order_create'),
     path('delete/<int:card_id>/', views.card_delete, name='card_delete'),
 ]

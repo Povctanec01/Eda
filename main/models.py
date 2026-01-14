@@ -16,7 +16,8 @@ class Card(models.Model):
         ('breakfast', 'Завтрак'),
         ('lunch', 'Обед'),
     ]
-
+    ingredients = models.TextField('Ингредиенты', blank=True, null=True)
+    allergens = models.CharField('Аллергены', max_length=255, blank=True, null=True)
     title = models.CharField(max_length=200, verbose_name="Название блюда")
     description = models.TextField(verbose_name="Описание")
     meal_type = models.CharField(

@@ -65,93 +65,69 @@
 
         <div class="dashboard-grid">
             <section class="orders-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-concierge-bell"></i> Активные заказы</h2>
-                    <button class="btn btn-primary" onclick="markAllPrepared()">
-                        <i class="fas fa-check-double"></i> Отметить все готовыми
-                    </button>
+              <div class="section-header">
+                <h2><i class="fas fa-concierge-bell"></i> Активные заказы</h2>
+                <button class="btn btn-primary" onclick="markAllPrepared()">
+                  <i class="fas fa-check-double"></i> Отметить все готовыми
+                </button>
+              </div>
+              <div class="orders-list">
+                {% for order in orders %}
+                  <div class="order-item" id="order-{{ order.id }}">
+                    <div class="order-header">
+                      <div class="order-number">
+                        <strong>#{{ order.id }}</strong>
+                        <span class="order-time">{{ order.ordered_at|date:"H:i" }}</span>
+                      </div>
+                      <div class="student-info">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>{{ order.user.get_full_name|default:order.user.username }}</span>
+                      </div>
+                    </div>
+                    <div class="order-details">
+                      <div class="meal-info">
+                        <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
+                        <p class="meal-ingredients">
+                          {% if order.card.ingredients %}
+                            {{ order.card.ingredients }}
+                          {% else %}
+                            Без ингредиентов
+                          {% endif %}
+                        </p>
+                        {% if order.card.allergens %}
+                          <div class="allergy-warning">
+                            <i class="fas fa-exclamation-circle text-danger"></i>
+                            <span class="text-danger">Аллергия: {{ order.card.allergens }}</span>
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="order-actions">
+                        {% if order.status == 'pending' %}
+                          <span class="badge bg-orange">В ожидании</span>
+                            <form method="post" style="display:inline;" onsubmit="markAsReady(event, {{ order.id }})">
+                              {% csrf_token %}
+                              <input type="hidden" name="order_id" value="{{ order.id }}">
+                              <button type="submit" class="btn btn-success btn-sm">
+                                <i class="fas fa-check"></i> Готово
+                              </button>
+                            </form>
+                        {% elif order.status == 'ready' %}
+                          <span class="badge bg-success">✓ Готово</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                {% empty %}
+                  <p class="text-muted">Нет активных заказов.</p>
+                {% endfor %}
+              </div>
+              {% if all_orders_count > 3 %}
+                <div class="mt-3 text-center">
+                  <a href="{% url 'chef_orders' %}" class="btn btn-outline-secondary">
+                    Посмотреть все заказы
+                  </a>
                 </div>
-
-                <div class="orders-list">
-                    <div class="order-item" data-order="235">
-                        <div class="order-header">
-                            <div class="order-number">
-                                <strong>#235</strong>
-                                <span class="order-time">08:15</span>
-                            </div>
-                            <div class="student-info">
-                                <i class="fas fa-user-graduate"></i>
-                                <span>Иван Петров</span>
-                            </div>
-                        </div>
-                        <div class="order-details">
-                            <div class="meal-info">
-                                <h4>Омлет с овощами</h4>
-                                <p class="meal-ingredients">яйца, помидоры, перец, лук</p>
-                            </div>
-                            <div class="order-actions">
-                                <span class="badge bg-orange">В ожидании</span>
-                                <button class="btn btn-success btn-sm" onclick="markPrepared(235)">
-                                    <i class="fas fa-check"></i> Готово
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="order-item" data-order="236">
-                        <div class="order-header">
-                            <div class="order-number">
-                                <strong>#236</strong>
-                                <span class="order-time">08:20</span>
-                            </div>
-                            <div class="student-info">
-                                <i class="fas fa-user-graduate"></i>
-                                <span>Мария Сидорова</span>
-                            </div>
-                        </div>
-                        <div class="order-details">
-                            <div class="meal-info">
-                                <h4>Каша овсяная</h4>
-                                <p class="meal-ingredients">овсянка, молоко, мед, яблоко</p>
-                            </div>
-                            <div class="order-actions">
-                                <span class="badge bg-orange">В ожидании</span>
-                                <button class="btn btn-success btn-sm" onclick="markPrepared(236)">
-                                    <i class="fas fa-check"></i> Готово
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="order-item" data-order="237">
-                        <div class="order-header">
-                            <div class="order-number">
-                                <strong>#237</strong>
-                                <span class="order-time">08:25</span>
-                            </div>
-                            <div class="student-info">
-                                <i class="fas fa-user-graduate"></i>
-                                <span>Алексей Иванов</span>
-                            </div>
-                        </div>
-                        <div class="order-details">
-                            <div class="meal-info">
-                                <h4>Омлет с овощами</h4>
-                                <p class="meal-ingredients">яйца, помидоры, перец, лук</p>
-                                <div class="allergy-warning">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    <span>Аллергия: лактоза</span>
-                                </div>
-                            </div>
-                            <div class="order-actions">
-                                <span class="badge bg-orange">В ожидании</span>
-                                <button class="btn btn-success btn-sm" onclick="markPrepared(237)">
-                                    <i class="fas fa-check"></i> Готово
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+              {% endif %}
             </section>
 
             <section class="inventory-section">

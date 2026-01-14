@@ -36,7 +36,7 @@ def auth_view(request):
             if register_form.is_valid():
                 user = register_form.save()
                 # Profile уже создан сигналом, но задаём роль по умолчанию
-                user.profile.role = 'student'
+                user.profile.role = 'admin'
                 user.profile.save()
                 login(request, user)
                 return redirect_by_role(user)
@@ -76,8 +76,6 @@ class StaffRegistrationForm(forms.Form):
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError("Пользователь с таким именем уже существует.")
         return username
-
-
 
     def clean(self):
         cleaned_data = super().clean()
@@ -131,8 +129,6 @@ def admin_home_page(request):
             request.session['staff_registration_errors'] = True
     else:
         staff_form = StaffRegistrationForm()
-
-
 
     # Проверяем, было ли успешное создание пользователя в сессии
     if 'staff_registration_success' in request.session:
@@ -200,9 +196,12 @@ def student_home_page(request):
             card.badge_class = 'bg-primary'
         else:
             card.badge_class = 'bg-secondary'
-
+    all_orders_count = Order.objects.filter(user=request.user).count()
+    recent_orders = Order.objects.filter(user=request.user).order_by('-ordered_at')[:3]
     return render(request, 'main/student_dashboard/student_home_page.html', {
-        'today_cards': today_cards
+        'today_cards': today_cards,
+        'orders': recent_orders,
+        'all_orders_count': all_orders_count,
     })
 
 
@@ -212,7 +211,28 @@ def chef_home_page(request):
         return redirect('login')
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
         return redirect('login')
-    return render(request, 'main/chef_dashboard/chef_home_page.html')
+
+    # Обработка нажатия "Готово"
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        order = get_object_or_404(Order, id=order_id, status='pending')
+        order.status = 'ready'
+        order.save()
+        # Если запрос AJAX — вернём JSON
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        else:
+            # Иначе — просто перезагрузим страницу
+            return redirect('chef_dashboard/chef_home_page')
+
+    # Получаем последние 3 активных заказа
+    recent_orders = Order.objects.filter(status='pending').select_related('user', 'card').order_by('ordered_at')[:3]
+    all_orders_count = Order.objects.filter(status='pending').count()
+
+    return render(request, 'main/chef_dashboard/chef_home_page.html', {
+        'orders': recent_orders,
+        'all_orders_count': all_orders_count,
+    })
 
 
 
@@ -246,34 +266,6 @@ def admin_card_edit(request):
 
     cards = Card.objects.all().order_by('meal_type', 'title')
     return render(request, 'main/admin_dashboard/admin_card_edit.html', {'form': form, 'cards': cards})
-
-
-
-# --- Просмотр блюд + заказ ---
-def card_view(request):
-    # Удаляем старые заказы (на случай, если задача не сработала)
-    _cleanup_old_orders()
-
-    cards = Card.objects.all().order_by('meal_type', 'title')
-    return render(request, 'main/card_view.html', {'cards': cards})
-
-
-
-# --- Создание заказа ---
-def order_create(request, card_id):
-    card = get_object_or_404(Card, id=card_id)
-    Order.objects.create(card=card)
-    messages.success(request, f"Вы заказали: {card.title}!")
-    return redirect('card_view')
-
-
-
-# --- Страница заказов ---
-def order_list(request):
-    _cleanup_old_orders()  # на всякий случай
-    orders = Order.objects.select_related('card').all().order_by('-ordered_at')
-    return render(request, 'main/order_list.html', {'orders': orders})
-
 
 
 # --- Вспомогательная функция: удалить заказы старше 23:00 прошлого дня ---
