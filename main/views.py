@@ -8,19 +8,17 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django import forms
 from datetime import time, datetime
-from .models import Card, Order,CardBuys
+from .models import Card, Order, CardBuys
 from .forms import CardForm, CardFormBuys
 from .models import Profile
+
 
 def auth_view(request):
     if request.user.is_authenticated:
         return redirect_by_role(request.user)
-
     login_form = AuthenticationForm()
     register_form = UserCreationForm()
-
     if request.method == 'POST':
-        # Авторизация
         if 'login_submit' in request.POST:
             login_form = AuthenticationForm(request, data=request.POST)
             if login_form.is_valid():
@@ -30,25 +28,20 @@ def auth_view(request):
                 if user is not None:
                     login(request, user)
                     return redirect_by_role(user)
-        # Регистрация
         elif 'register_submit' in request.POST:
             register_form = UserCreationForm(request.POST)
             if register_form.is_valid():
                 user = register_form.save()
-                # Profile уже создан сигналом, но задаём роль по умолчанию
                 user.profile.role = 'admin'
                 user.profile.save()
                 login(request, user)
                 return redirect_by_role(user)
-
     return render(request, 'main/login.html', {
         'login_form': login_form,
         'register_form': register_form,
     })
 
 
-
-# Форма для регистрации staff
 class StaffRegistrationForm(forms.Form):
     username = forms.CharField(
         max_length=150,
@@ -69,8 +62,6 @@ class StaffRegistrationForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
-
-
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if User.objects.filter(username=username).exists():
@@ -81,14 +72,10 @@ class StaffRegistrationForm(forms.Form):
         cleaned_data = super().clean()
         password1 = cleaned_data.get('password1')
         password2 = cleaned_data.get('password2')
-
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Пароли не совпадают")
-
-        # Дополнительная проверка сложности пароля
         if password1 and len(password1) < 8:
             raise forms.ValidationError("Пароль должен содержать минимум 8 символов")
-
         return cleaned_data
 
     def save(self):
@@ -101,23 +88,20 @@ class StaffRegistrationForm(forms.Form):
         return user
 
 
-
 def admin_home_page(request):
     if not request.user.is_authenticated:
         return redirect('auth_view')
     if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
         return redirect('auth_view')
-    # Обработка формы регистрации персонала
+
     staff_form = None
     registration_success = False
-
     if request.method == 'POST' and 'register_staff' in request.POST:
         staff_form = StaffRegistrationForm(request.POST)
         if staff_form.is_valid():
             try:
                 user = staff_form.save()
                 registration_success = True
-                # Сохраняем информация об успешной регистрации в сессии
                 request.session['staff_registration_success'] = True
                 request.session['registered_username'] = user.username
                 request.session['registered_role'] = user.profile.role
@@ -125,17 +109,14 @@ def admin_home_page(request):
             except Exception as e:
                 messages.error(request, f"Ошибка при создании пользователя: {str(e)}")
         else:
-            # Форма не валидна - сохраняем в сессии информацию об ошибке
             request.session['staff_registration_errors'] = True
     else:
         staff_form = StaffRegistrationForm()
 
-    # Проверяем, было ли успешное создание пользователя в сессии
     if 'staff_registration_success' in request.session:
         registration_success = True
         registered_username = request.session.get('registered_username', '')
         registered_role = request.session.get('registered_role', '')
-        # Очищаем данные из сессии после использования
         del request.session['staff_registration_success']
         if 'registered_username' in request.session:
             del request.session['registered_username']
@@ -144,6 +125,7 @@ def admin_home_page(request):
     else:
         registered_username = ''
         registered_role = ''
+
     student_count = Profile.objects.filter(role='student').count()
     return render(request, 'main/admin_dashboard/admin_home_page.html', {
         'student_count': student_count,
@@ -154,13 +136,11 @@ def admin_home_page(request):
     })
 
 
-
 def redirect_by_role(user):
     try:
         role = user.profile.role
     except Profile.DoesNotExist:
         role = 'student'
-
     match role:
         case 'chef':
             return redirect('chef_dashboard/chef_home_page')
@@ -171,12 +151,10 @@ def redirect_by_role(user):
     return redirect('login')
 
 
-
 def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
     return render(request, 'main/index.html')
-
 
 
 def student_home_page(request):
@@ -184,11 +162,7 @@ def student_home_page(request):
         return redirect('login')
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'student':
         return redirect('login')
-
-    # Получаем все блюда
     today_cards = Card.objects.exclude(meal_type='select').order_by('meal_type', 'title')
-
-    # Добавляем к каждому карточке CSS-класс на основе meal_type
     for card in today_cards:
         if card.meal_type == 'breakfast':
             card.badge_class = 'bg-success'
@@ -205,43 +179,37 @@ def student_home_page(request):
     })
 
 
-
 def chef_home_page(request):
     if not request.user.is_authenticated:
         return redirect('login')
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
         return redirect('login')
 
-    # Обработка нажатия "Готово"
     if request.method == 'POST':
         order_id = request.POST.get('order_id')
         order = get_object_or_404(Order, id=order_id, status='pending')
         order.status = 'ready'
         order.save()
-        # Если запрос AJAX — вернём JSON
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+
+        # Проверяем, является ли запрос AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': True})
+            return redirect('chef_dashboard/chef_home_page')
         else:
-            # Иначе — просто перезагрузим страницу
+            # Для обычных запросов — перезагрузка страницы
+            return JsonResponse({'success': True})
             return redirect('chef_dashboard/chef_home_page')
 
-    # Получаем последние 3 активных заказа
     recent_orders = Order.objects.filter(status='pending').select_related('user', 'card').order_by('ordered_at')[:3]
-    all_orders_count = Order.objects.filter(status='pending').count()
-
     return render(request, 'main/chef_dashboard/chef_home_page.html', {
         'orders': recent_orders,
-        'all_orders_count': all_orders_count,
     })
-
 
 
 def index(request):
     return render(request, 'main/index.html')
 
 
-
-# views.py
 def admin_card_edit(request):
     if request.method == 'POST' and 'add' in request.POST:
         form = CardForm(request.POST)
@@ -250,13 +218,12 @@ def admin_card_edit(request):
             messages.success(request, "Блюдо добавлено!")
             return redirect('admin_card_edit')
         else:
-            # Форма не валидна — покажем ошибки через messages
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"Ошибка: {error}")
     else:
         form = CardForm()
-    # Удаление (остаётся без изменений)
+
     if request.method == 'POST' and 'delete' in request.POST:
         card_id = request.POST.get('card_id')
         card = get_object_or_404(Card, id=card_id)
@@ -268,18 +235,13 @@ def admin_card_edit(request):
     return render(request, 'main/admin_dashboard/admin_card_edit.html', {'form': form, 'cards': cards})
 
 
-# --- Вспомогательная функция: удалить заказы старше 23:00 прошлого дня ---
 def _cleanup_old_orders():
     now = timezone.localtime(timezone.now())
-    # Если сейчас после 23:00, то удаляем всё
     if now.time() >= time(23, 0):
         Order.objects.all().delete()
         return
-
-    # Иначе удаляем заказы, созданные **вчера или раньше**
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     Order.objects.filter(ordered_at__lt=today_start).delete()
-
 
 
 def admin_buys(request):
@@ -290,31 +252,27 @@ def admin_buys(request):
             messages.success(request, "Запрос отправлен!")
             return redirect('admin_buys')
         else:
-            # Форма не валидна — покажем ошибки через messages
             for field, errors in form_buys.errors.items():
                 for error in errors:
                     messages.error(request, f"Ошибка: {error}")
     else:
         form_buys = CardFormBuys()
 
-    # Удаление (остаётся без изменений)
     if request.method == 'POST' and 'delete' in request.POST:
         card_id_buys = request.POST.get('card_id_buys')
         form_buys = get_object_or_404(CardBuys, id=card_id_buys)
         form_buys.delete()
         messages.success(request, "Блюдо удалено.")
         return redirect('admin_buys')
-    buys = CardBuys.objects.all().order_by( 'title')
 
+    buys = CardBuys.objects.all().order_by('title')
     return render(request, 'main/admin_dashboard/admin_buys.html', {'form_buys': form_buys, 'buys': buys})
-
 
 
 def student_menu(request):
     form = CardForm(request.POST)
     cards = Card.objects.all().order_by('meal_type', 'title')
     return render(request, 'main/student_dashboard/student_menu.html', {'form': form, 'cards': cards})
-
 
 
 def student_feedback(request):
@@ -324,13 +282,11 @@ def student_feedback(request):
         return render(request, 'main/student_dashboard/student_feedback.html')
 
 
-
 def card_delete(request):
     if not request.user.is_authenticated:
         return redirect('login')
     else:
         return render(request, 'main/admin_dashboard/card_delete.html')
-
 
 
 def student_my_orders(request):
@@ -342,13 +298,11 @@ def student_my_orders(request):
     })
 
 
-
 def admin_finance(request):
     if not request.user.is_authenticated:
         return redirect('login')
     else:
         return render(request, 'main/admin_dashboard/admin_finance.html')
-
 
 
 def chef_card_edit(request):
@@ -359,13 +313,12 @@ def chef_card_edit(request):
             messages.success(request, "Блюдо добавлено!")
             return redirect('chef_card_edit')
         else:
-            # Форма не валидна — покажем ошибки через messages
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"Ошибка: {error}")
     else:
         form = CardForm()
-    # Удаление (остаётся без изменений)
+
     if request.method == 'POST' and 'delete' in request.POST:
         card_id = request.POST.get('card_id')
         card = get_object_or_404(Card, id=card_id)
@@ -377,13 +330,11 @@ def chef_card_edit(request):
     return render(request, 'main/chef_dashboard/chef_card_edit.html', {'form': form, 'cards': cards})
 
 
-
 def chef_remaining_product(request):
     if not request.user.is_authenticated:
         return redirect('login')
     else:
         return render(request, 'main/chef_dashboard/chef_remaining_product.html')
-
 
 
 def chef_buys(request):
@@ -394,23 +345,21 @@ def chef_buys(request):
             messages.success(request, "Запрос отправлен!")
             return redirect('chef_buys')
         else:
-            # Форма не валидна — покажем ошибки через messages
             for field, errors in form_buys.errors.items():
                 for error in errors:
                     messages.error(request, f"Ошибка: {error}")
     else:
         form_buys = CardFormBuys()
 
-    # Удаление (остаётся без изменений)
     if request.method == 'POST' and 'delete' in request.POST:
         card_id_buys = request.POST.get('card_id_buys')
         form_buys = get_object_or_404(CardBuys, id=card_id_buys)
         form_buys.delete()
         messages.success(request, "Блюдо удалено.")
         return redirect('chef_buys')
-    buys = CardBuys.objects.all().order_by( 'title')
-    return render(request, 'main/chef_dashboard/chef_buys.html', {'form_buys': form_buys, 'buys': buys})
 
+    buys = CardBuys.objects.all().order_by('title')
+    return render(request, 'main/chef_dashboard/chef_buys.html', {'form_buys': form_buys, 'buys': buys})
 
 
 def chef_statistics(request):
@@ -420,22 +369,17 @@ def chef_statistics(request):
         return render(request, 'main/chef_dashboard/chef_statistics.html')
 
 
-
 def chef_orders(request):
     if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
-
     if request.method == 'POST':
         order_id = request.POST.get('order_id')
         order = get_object_or_404(Order, id=order_id, status='pending')
         order.status = 'ready'
         order.save()
         return JsonResponse({'success': True})
-
-    # Только активные заказы
     orders = Order.objects.filter(status='pending').select_related('user', 'card').order_by('ordered_at')
     return render(request, 'main/chef_dashboard/chef_orders.html', {'orders': orders})
-
 
 
 def admin_users_statistics(request):
@@ -444,49 +388,40 @@ def admin_users_statistics(request):
     if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
         messages.error(request, "Доступ запрещён.")
         return redirect('auth_view')
-
     users_with_roles = []
     for user in User.objects.all():
         try:
             role = user.profile.role
         except Profile.DoesNotExist:
-            role = 'student'  # роль по умолчанию, как в вашем коде
+            role = 'student'
         users_with_roles.append({
             'username': user.username,
             'role': role
         })
-    # Подсчёт по ролям
     role_counts = {'student': 0, 'chef': 0, 'admin': 0}
     for ur in users_with_roles:
         role_counts[ur['role']] += 1
-
     return render(request, 'main/admin_dashboard/admin_users_statistics.html', {
         'users_with_roles': users_with_roles,
         'role_counts': role_counts,
     })
 
 
-
 def admin_statistics(request):
     if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-    # Сегодня
     today = timezone.now().date()
     start_of_day = timezone.make_aware(datetime.combine(today, time.min))
     end_of_day = timezone.make_aware(datetime.combine(today, time.max))
-
     breakfast_count = Order.objects.filter(
         ordered_at__range=(start_of_day, end_of_day),
         card__meal_type='breakfast'
     ).count()
-
     lunch_count = Order.objects.filter(
         ordered_at__range=(start_of_day, end_of_day),
         card__meal_type='lunch'
     ).count()
-
     total_today = breakfast_count + lunch_count
-
     return render(request, 'main/admin_dashboard/admin_statistics.html', {
         'breakfast_count': breakfast_count,
         'lunch_count': lunch_count,
@@ -499,7 +434,6 @@ def student_order_create(request, card_id):
     if request.user.profile.role != 'student':
         messages.error(request, "Только студенты могут делать заказы.")
         return redirect('student_dashboard/student_home_page')
-
     card = get_object_or_404(Card, id=card_id)
     Order.objects.create(user=request.user, card=card)
     messages.success(request, f"Вы заказали: {card.title}!")
