@@ -1,0 +1,102 @@
+# main/views/chef_views.py
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from ..models import Card, Order, CardBuys, Profile
+from ..forms import CardForm, CardFormBuys
+
+@login_required
+def chef_home_page(request):
+    if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
+        return redirect('login')
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        order = get_object_or_404(Order, id=order_id, status='pending')
+        order.status = 'ready'
+        order.save()
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        else:
+            return redirect('chef_dashboard/chef_home_page')
+    recent_orders = Order.objects.filter(status='pending').select_related('user', 'card').order_by('ordered_at')[:3]
+    all_orders_count = Order.objects.filter(status='pending').count()
+    return render(request, 'main/chef_dashboard/chef_home_page.html', {
+        'orders': recent_orders,
+        'all_orders_count': all_orders_count,
+    })
+
+@login_required
+def chef_orders(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'chef':
+        return redirect('login')
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        order = get_object_or_404(Order, id=order_id, status='pending')
+        order.status = 'ready'
+        order.save()
+        return JsonResponse({'success': True})
+    orders = Order.objects.filter(status='pending').select_related('user', 'card').order_by('ordered_at')
+    return render(request, 'main/chef_dashboard/chef_orders.html', {'orders': orders})
+
+@login_required
+def chef_card_edit(request):
+    if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
+        return redirect('login')
+    if request.method == 'POST' and 'add' in request.POST:
+        form = CardForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Блюдо добавлено!")
+            return redirect('chef_card_edit')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Ошибка: {error}")
+    else:
+        form = CardForm()
+    if request.method == 'POST' and 'delete' in request.POST:
+        card_id = request.POST.get('card_id')
+        card = get_object_or_404(Card, id=card_id)
+        card.delete()
+        messages.success(request, "Блюдо удалено.")
+        return redirect('chef_card_edit')
+    cards = Card.objects.all().order_by('meal_type', 'title')
+    return render(request, 'main/chef_dashboard/chef_card_edit.html', {'form': form, 'cards': cards})
+
+@login_required
+def chef_buys(request):
+    if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
+        return redirect('login')
+    if request.method == 'POST' and 'add' in request.POST:
+        form_buys = CardFormBuys(request.POST)
+        if form_buys.is_valid():
+            form_buys.save()
+            messages.success(request, "Запрос отправлен!")
+            return redirect('chef_buys')
+        else:
+            for field, errors in form_buys.errors.items():
+                for error in errors:
+                    messages.error(request, f"Ошибка: {error}")
+    else:
+        form_buys = CardFormBuys()
+    if request.method == 'POST' and 'delete' in request.POST:
+        card_id_buys = request.POST.get('card_id_buys')
+        form_buys = get_object_or_404(CardBuys, id=card_id_buys)
+        form_buys.delete()
+        messages.success(request, "Блюдо удалено.")
+        return redirect('chef_buys')
+    buys = CardBuys.objects.all().order_by('title')
+    return render(request, 'main/chef_dashboard/chef_buys.html', {'form_buys': form_buys, 'buys': buys})
+
+@login_required
+def chef_remaining_product(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    return render(request, 'main/chef_dashboard/chef_remaining_product.html')
+
+@login_required
+def chef_statistics(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    return render(request, 'main/chef_dashboard/chef_statistics.html')
