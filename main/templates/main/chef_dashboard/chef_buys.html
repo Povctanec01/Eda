@@ -2,93 +2,92 @@
 {% load static %}
 {% block title %}{% endblock %}
 {% block body %}
-<main class="main-content">
-    {% if messages %}
-      <div class="messages">
-        {% for message in messages %}
-          {% if message.tags == 'error' %}
-            <div class="alert alert-error">
-              {{ message }}
-            </div>
-          {% else %}
-            <div class="alert alert-success">
-              {{ message }}
-            </div>
-          {% endif %}
-        {% endfor %}
-      </div>
-    {% endif %}
 
-    <!-- Форма добавления -->
-    <section class="menu-management">
-    <h2><i class="fas fa-plus-circle"></i> Добавить новую карточку</h2>
-    <form method="post" class="preferences-form">
-      {% csrf_token %}
-      <input type="hidden" name="add" value="1">
-      <div class="form-group">
-        <label for="{{ form_buys.title.id_for_label }}">Название блюда:</label>
-        {{ form_buys.title }}
-      </div>
-      <div class="form-group">
-        <label for="{{ form_buys.description.id_for_label }}">Описание:</label>
-        {{ form_buys.description }}
-      </div>
-      <button type="submit" class="btn-success">Добавить карточку</button>
-    </form>
-    </section>
-
-
-    <section class="menu-management" style="margin-top: 30px;">
-      <h2>Блюда</h2>
-
-        <div class="status-counters mb-3">
-          <span class="status-badge bg-warning text-dark">В рассмотрении: {{ pending_count }}</span>
+{% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      {% if message.tags == 'error' %}
+        <div class="alert alert-error">
+          {{ message }}
         </div>
-        <div class="status-counters mb-3">
-          <span class="status-badge bg-danger text-white">Отклонено: {{ rejected_count }}</span>
+      {% else %}
+        <div class="alert alert-success">
+          {{ message }}
         </div>
-        <div class="status-counters mb-3">
-          <span class="status-badge bg-success text-white">Принято: {{ approved_count }}</span>
-        </div>
-      {% if buys %}
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}
 
-      <div class="dishes-list">
-        {% for card_buys in buys %}
-            <div class="dish-item
-              {% if card_buys.status == 'approved' %}border-success
-              {% elif card_buys.status == 'rejected' %}border-danger
-              {% else %}border-warning{% endif %}"
-              data-meal-type="{{ card_buys.get_meal_type_display }}">
-                <div class="dish-header">
-                  <div>
-                    <h3>{{ card_buys.title }}</h3>
-                    <span class="badge
-                      {% if card_buys.status == 'approved' %}bg-success
-                      {% elif card_buys.status == 'rejected' %}bg-danger
-                      {% else %}bg-warning text-dark{% endif %}">
-                      {{ card_buys.get_status_display }}
-                    </span>
-                  </div>
-                  <div class="dish-meta">
-                    <span class="dish-id">ID: {{ card_buys.id }}</span>
-                    <span class="dish-time">{{ card_buys.created_at|date:"d.m.Y H:i" }}</span>
-                  </div>
-                </div>
-              <p class="dish-desc">{{ card_buys.description|default:"Без описания" }}</p>
-              <div class="dish-actions">
-                <form method="post" onsubmit="return confirm('Удалить блюдо «{{ card_buys.title }}»?');" style="display: inline;">
-                  {% csrf_token %}
-                  <input type="hidden" name="delete" value="1">
-                  <input type="hidden" name="card_id_buys" value="{{ card_buys.id }}">
-                  <button type="submit" class="btn-danger btn-sm">Удалить</button>
-                </form>
+<!-- Форма добавления -->
+<section class="menu-management">
+<h2><i class="fas fa-plus-circle"></i> Добавить новую карточку</h2>
+<form method="post" class="preferences-form">
+  {% csrf_token %}
+  <input type="hidden" name="add" value="1">
+  <div class="form-group">
+    <label for="{{ form_buys.title.id_for_label }}">Название блюда:</label>
+    {{ form_buys.title }}
+  </div>
+  <div class="form-group">
+    <label for="{{ form_buys.description.id_for_label }}">Описание:</label>
+    {{ form_buys.description }}
+  </div>
+  <button type="submit" class="btn-success">Добавить карточку</button>
+</form>
+</section>
+
+
+<section class="menu-management" style="margin-top: 30px;">
+  <h2>Блюда</h2>
+
+    <div class="status-counters mb-3">
+      <span class="status-badge bg-warning text-dark">В рассмотрении: {{ pending_count }}</span>
+    </div>
+    <div class="status-counters mb-3">
+      <span class="status-badge bg-danger text-white">Отклонено: {{ rejected_count }}</span>
+    </div>
+    <div class="status-counters mb-3">
+      <span class="status-badge bg-success text-white">Принято: {{ approved_count }}</span>
+    </div>
+  {% if buys %}
+
+  <div class="dishes-list">
+    {% for card_buys in buys %}
+        <div class="dish-item
+          {% if card_buys.status == 'approved' %}border-success
+          {% elif card_buys.status == 'rejected' %}border-danger
+          {% else %}border-warning{% endif %}"
+          data-meal-type="{{ card_buys.get_meal_type_display }}">
+            <div class="dish-header">
+              <div>
+                <h3>{{ card_buys.title }}</h3>
+                <span class="badge
+                  {% if card_buys.status == 'approved' %}bg-success
+                  {% elif card_buys.status == 'rejected' %}bg-danger
+                  {% else %}bg-warning text-dark{% endif %}">
+                  {{ card_buys.get_status_display }}
+                </span>
+              </div>
+              <div class="dish-meta">
+                <span class="dish-id">ID: {{ card_buys.id }}</span>
+                <span class="dish-time">{{ card_buys.created_at|date:"d.m.Y H:i" }}</span>
               </div>
             </div>
-        {% endfor %}
-      </div>
-      {% else %}
-        <p style="color: #666; font-style: italic;">Нет карточек для удаления.</p>
-      {% endif %}
-    </section>
-</main>
+          <p class="dish-desc">{{ card_buys.description|default:"Без описания" }}</p>
+          <div class="dish-actions">
+            <form method="post" onsubmit="return confirm('Удалить блюдо «{{ card_buys.title }}»?');" style="display: inline;">
+              {% csrf_token %}
+              <input type="hidden" name="delete" value="1">
+              <input type="hidden" name="card_id_buys" value="{{ card_buys.id }}">
+              <button type="submit" class="btn-danger btn-sm">Удалить</button>
+            </form>
+          </div>
+        </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p style="color: #666; font-style: italic;">Нет карточек для удаления.</p>
+  {% endif %}
+</section>
 {% endblock %}

@@ -1,5 +1,6 @@
 # main/views/admin_views.py
 from django import forms
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -97,6 +98,24 @@ def admin_home_page(request):
         'registered_username': registered_username,
         'registered_role': registered_role,
     })
+
+@login_required
+def admin_settings(request):
+    if not (hasattr(request.user, 'profile') or request.user.profile.role != 'admin'):
+        messages.error(request, "У вас нет доступа к этой странице.")
+        return redirect('student_dashboard/student_home_page')
+
+    if request.method == 'POST':
+        # Удаление аккаунта
+        user = request.user
+        username = user.username
+        user.delete()
+        logout(request)
+        messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
+        return redirect('login')
+
+    # GET: просто показываем страницу настроек
+    return render(request, 'main/admin_dashboard/admin_settings.html')
 
 @login_required
 def admin_card_edit(request):

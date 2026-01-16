@@ -1,5 +1,6 @@
 # main/views/chef_views.py
 from django.contrib import messages
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
@@ -46,6 +47,24 @@ def chef_home_page(request):
         'form_buys': form_buys,
         'buys': buys
     })
+
+@login_required
+def chef_settings(request):
+    if not (hasattr(request.user, 'profile') or request.user.profile.role != 'chef'):
+        messages.error(request, "У вас нет доступа к этой странице.")
+        return redirect('chef_dashboard/chef_home_page')
+
+    if request.method == 'POST':
+        # Удаление аккаунта
+        user = request.user
+        username = user.username
+        user.delete()
+        logout(request)
+        messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
+        return redirect('login')
+
+    # GET: просто показываем страницу настроек
+    return render(request, 'main/chef_dashboard/chef_settings.html')
 
 @login_required
 def chef_orders(request):

@@ -1,10 +1,13 @@
 # main/views/student_views.py
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
 from ..models import Card, Order, Profile
 from django.utils import timezone
 from datetime import time, datetime
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.contrib import messages
+
 
 @login_required
 def student_home_page(request):
@@ -49,21 +52,26 @@ def student_home_page(request):
         'ready_orders_count': ready_orders_count,       # ← Добавлено
     })
 
+
+
+
 @login_required
-def student_my_orders(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'student':
+def student_settings(request):
+    if not hasattr(request.user, 'profile') or request.user.profile.role != 'student':
+        messages.error(request, "У вас нет доступа к этой странице.")
+        return redirect('student_dashboard/student_home_page')
+
+    if request.method == 'POST':
+        # Удаление аккаунта
+        user = request.user
+        username = user.username
+        user.delete()
+        logout(request)
+        messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
         return redirect('login')
 
-    status_filter = request.GET.get('status')
-    if status_filter in ['pending', 'ready']:
-        orders = Order.objects.filter(user=request.user, status=status_filter).order_by('-ordered_at')
-    else:
-        orders = Order.objects.filter(user=request.user).order_by('-ordered_at')
-
-    return render(request, 'main/student_dashboard/student_my_orders.html', {
-        'orders': orders,
-        'current_status': status_filter
-    })
+    # GET: просто показываем страницу настроек
+    return render(request, 'main/student_dashboard/student_settings.html')
 
 @login_required
 def student_order_create(request, card_id):
@@ -85,3 +93,32 @@ def student_feedback(request):
     if not request.user.is_authenticated:
         return redirect('login')
     return render(request, 'main/student_dashboard/student_feedback.html')
+
+
+@login_required
+def student_order_history(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+
+    # Все заказы пользователя, от новых к старым
+    orders = Order.objects.filter(user=request.user).select_related('card').order_by('-ordered_at')
+
+    return render(request, 'main/student_dashboard/student_order_history.html', {
+        'orders': orders
+    })
+
+@login_required
+def student_my_orders(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+
+    status_filter = request.GET.get('status')
+    if status_filter in ['pending', 'ready']:
+        orders = Order.objects.filter(user=request.user, status=status_filter).order_by('-ordered_at')
+    else:
+        orders = Order.objects.filter(user=request.user).order_by('-ordered_at')
+
+    return render(request, 'main/student_dashboard/student_my_orders.html', {
+        'orders': orders,
+        'current_status': status_filter
+    })

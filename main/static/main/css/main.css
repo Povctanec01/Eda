@@ -440,3 +440,14 @@ body {
 .dish-id, .dish-time {
   margin: 0;
 }
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-danger:hover {
+    background-color: #c82333;
+}
