@@ -23,7 +23,11 @@
 <!-- Счётчики за последнюю неделю -->
 <div class="status-counters mb-3">
   <span class="status-badge bg-warning text-dark">В рассмотрении: {{ pending_count }}</span>
+    </div>
+    <div class="status-counters mb-3">
   <span class="status-badge bg-danger text-white">Отклонено: {{ rejected_count }}</span>
+    </div>
+    <div class="status-counters mb-3">
   <span class="status-badge bg-success text-white">Принято: {{ approved_count }}</span>
 </div>
   {% if buys %}
@@ -41,6 +45,7 @@
               </span>
             </div>
             <span class="dish-price">ID: {{ card_buys.id }}</span>
+            <span class="dish-time">Создана в:   {{ card_buys.created_at|date:"d.m.Y H:i" }}</span>
           </div>
           <p class="dish-desc">{{ card_buys.description|default:"Без описания" }}</p>
           <div class="dish-actions">

@@ -7,29 +7,46 @@ from ..models import Card, Order, CardBuys, Profile
 from ..forms import CardForm, CardFormBuys
 from datetime import timedelta
 from django.utils import timezone
+
 @login_required
 def chef_home_page(request):
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
         return redirect('login')
+
+    # Обработка POST-запросов
     if request.method == 'POST':
-        order_id = request.POST.get('order_id')
-        order = get_object_or_404(Order, id=order_id, status='pending')
-        order.status = 'ready'
-        order.save()
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'success': True})
-        else:
+        # Удаление заявки на закупку
+        if 'delete' in request.POST:
+            card_id_buys = request.POST.get('card_id_buys')
+            buy = get_object_or_404(CardBuys, id=card_id_buys)
+            buy.delete()
+            messages.success(request, "Заявка удалена.")
             return redirect('chef_dashboard/chef_home_page')
+
+        # Отметка заказа как готового
+        order_id = request.POST.get('order_id')
+        if order_id:
+            order = get_object_or_404(Order, id=order_id, status='pending')
+            order.status = 'ready'
+            order.save()
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            else:
+                return redirect('chef_dashboard/chef_home_page')
+
+    # GET-часть
     form_buys = CardFormBuys()
-    buys = CardBuys.objects.all().order_by('title')
+    buys = CardBuys.objects.all().order_by('-created_at')[:2]
     recent_orders = Order.objects.filter(status='pending').select_related('user', 'card').order_by('ordered_at')[:3]
     all_orders_count = Order.objects.filter(status='pending').count()
+
     return render(request, 'main/chef_dashboard/chef_home_page.html', {
         'orders': recent_orders,
         'all_orders_count': all_orders_count,
         'form_buys': form_buys,
         'buys': buys
     })
+
 @login_required
 def chef_orders(request):
     if not request.user.is_authenticated or request.user.profile.role != 'chef':
@@ -90,13 +107,13 @@ def chef_buys(request):
                     messages.error(request, f"Ошибка: {error}")
     else:
         form_buys = CardFormBuys()
-    if request.method == 'POST' and 'delete' in request.POST:
+    if 'delete' in request.POST:
         card_id_buys = request.POST.get('card_id_buys')
-        form_buys = get_object_or_404(CardBuys, id=card_id_buys)
-        form_buys.delete()
+        buy = get_object_or_404(CardBuys, id=card_id_buys)
+        buy.delete()
         messages.success(request, "Блюдо удалено.")
         return redirect('chef_buys')
-    buys = CardBuys.objects.all().order_by('title')
+    buys = CardBuys.objects.all().order_by('-created_at')
     return render(request, 'main/chef_dashboard/chef_buys.html', {
         'form_buys': form_buys,
         'buys': buys,

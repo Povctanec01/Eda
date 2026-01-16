@@ -3,11 +3,32 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from ..models import Card, Order, Profile
+from django.utils import timezone
+from datetime import time, datetime
 
 @login_required
 def student_home_page(request):
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'student':
         return redirect('login')
+
+    # Определяем начало и конец текущего дня
+    today = timezone.now().date()
+    start_of_day = timezone.make_aware(datetime.combine(today, time.min))
+    end_of_day = timezone.make_aware(datetime.combine(today, time.max))
+
+    # Подсчёт заказов за сегодня
+    pending_orders_count = Order.objects.filter(
+        user=request.user,
+        status='pending',
+        ordered_at__range=(start_of_day, end_of_day)
+    ).count()
+
+    ready_orders_count = Order.objects.filter(
+        user=request.user,
+        status='ready',
+        ordered_at__range=(start_of_day, end_of_day)
+    ).count()
+
     today_cards = Card.objects.exclude(meal_type='select').order_by('meal_type', 'title')
     for card in today_cards:
         if card.meal_type == 'breakfast':
@@ -16,21 +37,32 @@ def student_home_page(request):
             card.badge_class = 'bg-primary'
         else:
             card.badge_class = 'bg-secondary'
+
     all_orders_count = Order.objects.filter(user=request.user).count()
     recent_orders = Order.objects.filter(user=request.user).order_by('-ordered_at')[:3]
+
     return render(request, 'main/student_dashboard/student_home_page.html', {
         'today_cards': today_cards,
         'orders': recent_orders,
         'all_orders_count': all_orders_count,
+        'pending_orders_count': pending_orders_count,   # ← Добавлено
+        'ready_orders_count': ready_orders_count,       # ← Добавлено
     })
 
 @login_required
 def student_my_orders(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
-    orders = Order.objects.filter(user=request.user).order_by('-ordered_at')
+
+    status_filter = request.GET.get('status')
+    if status_filter in ['pending', 'ready']:
+        orders = Order.objects.filter(user=request.user, status=status_filter).order_by('-ordered_at')
+    else:
+        orders = Order.objects.filter(user=request.user).order_by('-ordered_at')
+
     return render(request, 'main/student_dashboard/student_my_orders.html', {
-        'orders': orders
+        'orders': orders,
+        'current_status': status_filter
     })
 
 @login_required

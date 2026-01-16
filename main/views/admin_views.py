@@ -170,13 +170,14 @@ def admin_buys(request):
     else:
         form_buys = CardFormBuys()
 
-    buys = CardBuys.objects.all().order_by('title')
+    buys = CardBuys.objects.all().order_by('-created_at')
     return render(request, 'main/admin_dashboard/admin_buys.html', {
         'form_buys': form_buys,
         'buys': buys,
         'pending_count': pending_count,
         'rejected_count': rejected_count,
         'approved_count': approved_count,})
+
 @login_required
 def admin_finance(request):
     if not request.user.is_authenticated:
