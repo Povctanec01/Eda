@@ -8,6 +8,7 @@ from django.utils import timezone
 from datetime import time, datetime
 from ..models import Card, Order, CardBuys, Profile
 from ..forms import CardForm, CardFormBuys
+from datetime import timedelta
 
 class StaffRegistrationForm(forms.Form):
     username = forms.CharField(
@@ -126,27 +127,56 @@ def admin_card_edit(request):
 def admin_buys(request):
     if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
         return redirect('auth_view')
-    if request.method == 'POST' and 'add' in request.POST:
-        form_buys = CardFormBuys(request.POST)
-        if form_buys.is_valid():
-            form_buys.save()
-            messages.success(request, "Запрос отправлен!")
+    one_week_ago = timezone.now() - timedelta(days=7)
+    buys_queryset = CardBuys.objects.filter(created_at__gte=one_week_ago)
+
+    pending_count = buys_queryset.filter(status='pending').count()
+    rejected_count = buys_queryset.filter(status='rejected').count()
+    approved_count = buys_queryset.filter(status='approved').count()
+    if request.method == 'POST':
+        # Обработка Принять / Отклонить
+        if 'action' in request.POST:
+            buy_id = request.POST.get('buy_id')
+            action = request.POST.get('action')
+            buy = get_object_or_404(CardBuys, id=buy_id)
+            if action == 'approve':
+                buy.status = 'approved'
+                messages.success(request, f"Запрос «{buy.title}» принят.")
+            elif action == 'reject':
+                buy.status = 'rejected'
+                messages.warning(request, f"Запрос «{buy.title}» отклонён.")
+            buy.save()
             return redirect('admin_buys')
-        else:
-            for field, errors in form_buys.errors.items():
-                for error in errors:
-                    messages.error(request, f"Ошибка: {error}")
+
+        # Обработка удаления
+        if 'delete' in request.POST:
+            card_id_buys = request.POST.get('card_id_buys')
+            buy = get_object_or_404(CardBuys, id=card_id_buys)
+            buy.delete()
+            messages.success(request, "Блюдо удалено.")
+            return redirect('admin_buys')
+
+        # Обработка добавления (остаётся без изменений)
+        if 'add' in request.POST:
+            form_buys = CardFormBuys(request.POST)
+            if form_buys.is_valid():
+                form_buys.save()
+                messages.success(request, "Запрос отправлен!")
+                return redirect('admin_buys')
+            else:
+                for field, errors in form_buys.errors.items():
+                    for error in errors:
+                        messages.error(request, f"Ошибка: {error}")
     else:
         form_buys = CardFormBuys()
-    if request.method == 'POST' and 'delete' in request.POST:
-        card_id_buys = request.POST.get('card_id_buys')
-        form_buys = get_object_or_404(CardBuys, id=card_id_buys)
-        form_buys.delete()
-        messages.success(request, "Блюдо удалено.")
-        return redirect('admin_buys')
-    buys = CardBuys.objects.all().order_by('title')
-    return render(request, 'main/admin_dashboard/admin_buys.html', {'form_buys': form_buys, 'buys': buys})
 
+    buys = CardBuys.objects.all().order_by('title')
+    return render(request, 'main/admin_dashboard/admin_buys.html', {
+        'form_buys': form_buys,
+        'buys': buys,
+        'pending_count': pending_count,
+        'rejected_count': rejected_count,
+        'approved_count': approved_count,})
 @login_required
 def admin_finance(request):
     if not request.user.is_authenticated:

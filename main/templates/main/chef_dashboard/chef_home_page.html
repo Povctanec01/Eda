@@ -131,36 +131,43 @@
         </div>
       {% endif %}
     </section>
-
-    <!-- Остальной контент (остатки, закупки) можно оставить без изменений -->
+  </div>
     <section class="inventory-section">
       <div class="section-header">
-        <h2><i class="fas fa-boxes"></i> Остатки продуктов</h2>
-        <button class="btn btn-primary" onclick="openPurchaseModal()">
+        <h2><i class="fas fa-boxes"></i> Заявки на закупку</h2>
+        <a href="{% url 'chef_buys' %}" class="btn btn-primary" onclick="openPurchaseModal()">
           <i class="fas fa-plus"></i> Новая заявка
-        </button>
+        </a>
       </div>
-      <div class="inventory-list">
-        <!-- Можно оставить статический контент или заменить на динамический позже -->
-        <div class="inventory-item low" data-product="chicken">
-          <div class="product-info">
-            <h4>Куриное филе</h4>
-            <p class="product-category">Мясо и птица</p>
+          <h2>Заказы</h2>
+
+          {% if buys %}
+
+          <div class="dishes-list">
+            {% for card_buys in buys %}
+              <div class="dish-item" data-meal-type="{{ card_buys.get_meal_type_display }}">
+                <div class="dish-header">
+                  <div>
+                    <h3>{{ card_buys.title }}</h3>
+                  </div>
+                  <span class="dish-price">ID: {{ card_buys.id }}</span>
+                </div>
+                <p class="dish-desc">{{ card_buys.description|default:"Без описания" }}</p>
+                <div class="dish-actions">
+                  <form method="post" onsubmit="return confirm('Удалить блюдо «{{ card_buys.title }}»?');" style="display: inline;">
+                    {% csrf_token %}
+                        <input type="hidden" name="delete" value="1">
+                        <input type="hidden" name="card_id_buys" value="{{ card_buys.id }}">
+                        <button type="submit" class="btn-danger btn-sm">Удалить</button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
           </div>
-          <div class="product-stock">
-            <div class="stock-bar">
-              <div class="stock-fill" style="width: 20%"></div>
-            </div>
-            <span class="stock-amount">2 кг</span>
-          </div>
-          <button class="btn btn-warning btn-sm" onclick="requestProduct('Куриное филе', '2 кг', '20%')">
-            Заказать
-          </button>
-        </div>
-        <!-- ... остальные продукты ... -->
-      </div>
+          {% else %}
+            <p style="color: #666; font-style: italic;">Нет Активных заявок</p>
+          {% endif %}
     </section>
-  </div>
-</div>
+    </div>
 </main>
 {% endblock %}

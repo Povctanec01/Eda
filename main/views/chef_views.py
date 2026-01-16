@@ -5,7 +5,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from ..models import Card, Order, CardBuys, Profile
 from ..forms import CardForm, CardFormBuys
-
+from datetime import timedelta
+from django.utils import timezone
 @login_required
 def chef_home_page(request):
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
@@ -19,13 +20,16 @@ def chef_home_page(request):
             return JsonResponse({'success': True})
         else:
             return redirect('chef_dashboard/chef_home_page')
+    form_buys = CardFormBuys()
+    buys = CardBuys.objects.all().order_by('title')
     recent_orders = Order.objects.filter(status='pending').select_related('user', 'card').order_by('ordered_at')[:3]
     all_orders_count = Order.objects.filter(status='pending').count()
     return render(request, 'main/chef_dashboard/chef_home_page.html', {
         'orders': recent_orders,
         'all_orders_count': all_orders_count,
+        'form_buys': form_buys,
+        'buys': buys
     })
-
 @login_required
 def chef_orders(request):
     if not request.user.is_authenticated or request.user.profile.role != 'chef':
@@ -68,6 +72,12 @@ def chef_card_edit(request):
 def chef_buys(request):
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
         return redirect('login')
+    one_week_ago = timezone.now() - timedelta(days=7)
+    buys_queryset = CardBuys.objects.filter(created_at__gte=one_week_ago)
+
+    pending_count = buys_queryset.filter(status='pending').count()
+    rejected_count = buys_queryset.filter(status='rejected').count()
+    approved_count = buys_queryset.filter(status='approved').count()
     if request.method == 'POST' and 'add' in request.POST:
         form_buys = CardFormBuys(request.POST)
         if form_buys.is_valid():
@@ -87,7 +97,13 @@ def chef_buys(request):
         messages.success(request, "Блюдо удалено.")
         return redirect('chef_buys')
     buys = CardBuys.objects.all().order_by('title')
-    return render(request, 'main/chef_dashboard/chef_buys.html', {'form_buys': form_buys, 'buys': buys})
+    return render(request, 'main/chef_dashboard/chef_buys.html', {
+        'form_buys': form_buys,
+        'buys': buys,
+        'pending_count': pending_count,
+        'rejected_count': rejected_count,
+        'approved_count': approved_count,
+    })
 
 @login_required
 def chef_remaining_product(request):

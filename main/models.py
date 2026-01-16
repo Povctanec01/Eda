@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Profile(models.Model):
     ROLE_CHOICES = (
@@ -36,15 +37,19 @@ class Card(models.Model):
         verbose_name_plural = "Блюда"
 
 class CardBuys(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Ожидает'),
+        ('approved', 'Принято'),
+        ('rejected', 'Отклонено'),
+    ]
     title = models.CharField(max_length=200, verbose_name="Название блюда")
     description = models.TextField(verbose_name="Описание")
-    created_at = models.DateTimeField(auto_now_add=True)
-
+    created_at = models.DateTimeField(default=timezone.now)
+    meal_type = models.CharField(max_length=20, choices=[('breakfast', 'Завтрак'), ('lunch', 'Обед')], blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     class Meta:
         verbose_name = "Блюдо"
         verbose_name_plural = "Блюда"
-
-
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Готовится'),

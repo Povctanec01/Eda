@@ -417,3 +417,16 @@ body {
     font-size: 1rem;
     box-sizing: border-box;
 }
+.status-indicators {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
