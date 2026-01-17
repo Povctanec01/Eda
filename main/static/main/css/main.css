@@ -1,3 +1,19 @@
+:root {
+    --gradient-primary: linear-gradient(135deg, #667eea, #764ba2);
+    --gradient-success: linear-gradient(135deg, #28a745, #20c997);
+    --gradient-warning: linear-gradient(135deg, #ffc107, #fd7e14);
+    --gradient-danger: linear-gradient(135deg, #dc3545, #fd7e14);
+    --gradient-purple: linear-gradient(135deg, #6f42c1, #a370f7);
+}
+
+[data-theme="dark"] {
+    --gradient-primary: linear-gradient(135deg, #7c93ff, #9b7bd9);
+    --gradient-success: linear-gradient(135deg, #2ecc71, #1abc9c);
+    --gradient-warning: linear-gradient(135deg, #f39c12, #e67e22);
+    --gradient-danger: linear-gradient(135deg, #e74c3c, #d35400);
+    --gradient-purple: linear-gradient(135deg, #8e44ad, #a370f7);
+}
+
 * {
     margin: 0;
     padding: 0;

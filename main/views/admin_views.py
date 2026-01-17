@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.utils import timezone
-from datetime import time, datetime
+from datetime import time, datetime, timedelta
 from ..models import Card, Order, CardBuys, Profile
 from ..forms import CardForm, CardFormBuys
 from datetime import timedelta
@@ -56,66 +56,31 @@ class StaffRegistrationForm(forms.Form):
         user.profile.save()
         return user
 
+
 @login_required
 def admin_home_page(request):
     if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
         return redirect('auth_view')
-    staff_form = None
-    registration_success = False
-    if request.method == 'POST' and 'register_staff' in request.POST:
-        staff_form = StaffRegistrationForm(request.POST)
-        if staff_form.is_valid():
-            try:
-                user = staff_form.save()
-                registration_success = True
-                request.session['staff_registration_success'] = True
-                request.session['registered_username'] = user.username
-                request.session['registered_role'] = user.profile.role
-                return redirect('admin_home_page')
-            except Exception as e:
-                messages.error(request, f"Ошибка при создании пользователя: {str(e)}")
-        else:
-            request.session['staff_registration_errors'] = True
-    else:
-        staff_form = StaffRegistrationForm()
-    if 'staff_registration_success' in request.session:
-        registration_success = True
-        registered_username = request.session.get('registered_username', '')
-        registered_role = request.session.get('registered_role', '')
-        del request.session['staff_registration_success']
-        if 'registered_username' in request.session:
-            del request.session['registered_username']
-        if 'registered_role' in request.session:
-            del request.session['registered_role']
-    else:
-        registered_username = ''
-        registered_role = ''
     student_count = Profile.objects.filter(role='student').count()
     return render(request, 'main/admin_dashboard/admin_home_page.html', {
         'student_count': student_count,
-        'staff_form': staff_form,
-        'registration_success': registration_success,
-        'registered_username': registered_username,
-        'registered_role': registered_role,
     })
+
 
 @login_required
 def admin_settings(request):
     if not (hasattr(request.user, 'profile') or request.user.profile.role != 'admin'):
         messages.error(request, "У вас нет доступа к этой странице.")
         return redirect('student_dashboard/student_home_page')
-
     if request.method == 'POST':
-        # Удаление аккаунта
         user = request.user
         username = user.username
         user.delete()
         logout(request)
         messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
         return redirect('login')
-
-    # GET: просто показываем страницу настроек
     return render(request, 'main/admin_dashboard/admin_settings.html')
+
 
 @login_required
 def admin_card_edit(request):
@@ -142,18 +107,17 @@ def admin_card_edit(request):
     cards = Card.objects.all().order_by('meal_type', 'title')
     return render(request, 'main/admin_dashboard/admin_card_edit.html', {'form': form, 'cards': cards})
 
+
 @login_required
 def admin_buys(request):
     if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
         return redirect('auth_view')
     one_week_ago = timezone.now() - timedelta(days=7)
     buys_queryset = CardBuys.objects.filter(created_at__gte=one_week_ago)
-
     pending_count = buys_queryset.filter(status='pending').count()
     rejected_count = buys_queryset.filter(status='rejected').count()
     approved_count = buys_queryset.filter(status='approved').count()
     if request.method == 'POST':
-        # Обработка Принять / Отклонить
         if 'action' in request.POST:
             buy_id = request.POST.get('buy_id')
             action = request.POST.get('action')
@@ -166,16 +130,12 @@ def admin_buys(request):
                 messages.warning(request, f"Запрос «{buy.title}» отклонён.")
             buy.save()
             return redirect('admin_buys')
-
-        # Обработка удаления
         if 'delete' in request.POST:
             card_id_buys = request.POST.get('card_id_buys')
             buy = get_object_or_404(CardBuys, id=card_id_buys)
             buy.delete()
             messages.success(request, "Блюдо удалено.")
             return redirect('admin_buys')
-
-        # Обработка добавления (остаётся без изменений)
         if 'add' in request.POST:
             form_buys = CardFormBuys(request.POST)
             if form_buys.is_valid():
@@ -188,14 +148,15 @@ def admin_buys(request):
                         messages.error(request, f"Ошибка: {error}")
     else:
         form_buys = CardFormBuys()
-
     buys = CardBuys.objects.all().order_by('-created_at')
     return render(request, 'main/admin_dashboard/admin_buys.html', {
         'form_buys': form_buys,
         'buys': buys,
         'pending_count': pending_count,
         'rejected_count': rejected_count,
-        'approved_count': approved_count,})
+        'approved_count': approved_count,
+    })
+
 
 @login_required
 def admin_finance(request):
@@ -203,11 +164,26 @@ def admin_finance(request):
         return redirect('login')
     return render(request, 'main/admin_dashboard/admin_finance.html')
 
+
 @login_required
 def admin_users_statistics(request):
     if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
         messages.error(request, "Доступ запрещён.")
         return redirect('auth_view')
+
+    # Обработка формы добавления персонала
+    staff_form = StaffRegistrationForm()
+    if request.method == 'POST':
+        staff_form = StaffRegistrationForm(request.POST)
+        if staff_form.is_valid():
+            try:
+                user = staff_form.save()
+                messages.success(request, f"Пользователь '{user.username}' успешно создан как {user.profile.get_role_display()}.")
+                return redirect('admin_users_statistics')
+            except Exception as e:
+                messages.error(request, f"Ошибка при создании пользователя: {str(e)}")
+
+    # Сбор статистики
     users_with_roles = []
     for user in User.objects.all():
         try:
@@ -221,29 +197,46 @@ def admin_users_statistics(request):
     role_counts = {'student': 0, 'chef': 0, 'admin': 0}
     for ur in users_with_roles:
         role_counts[ur['role']] += 1
+
     return render(request, 'main/admin_dashboard/admin_users_statistics.html', {
         'users_with_roles': users_with_roles,
         'role_counts': role_counts,
+        'staff_form': staff_form,
     })
+
 
 @login_required
 def admin_statistics(request):
     if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-    today = timezone.now().date()
-    start_of_day = timezone.make_aware(datetime.combine(today, time.min))
-    end_of_day = timezone.make_aware(datetime.combine(today, time.max))
-    breakfast_count = Order.objects.filter(
-        ordered_at__range=(start_of_day, end_of_day),
-        card__meal_type='breakfast'
-    ).count()
-    lunch_count = Order.objects.filter(
-        ordered_at__range=(start_of_day, end_of_day),
-        card__meal_type='lunch'
-    ).count()
+
+    from datetime import timedelta
+    from django.utils import timezone
+
+    now = timezone.now()
+    today_start = timezone.make_aware(timezone.datetime.combine(now.date(), time.min))
+    today_end = timezone.make_aware(timezone.datetime.combine(now.date(), time.max))
+
+    # Сегодня
+    orders_today = Order.objects.filter(
+        ordered_at__range=(today_start, today_end)
+    )
+    breakfast_count = orders_today.filter(card__meal_type='breakfast').count()
+    lunch_count = orders_today.filter(card__meal_type='lunch').count()
     total_today = breakfast_count + lunch_count
+
+    # Неделя (последние 7 дней, включая сегодня)
+    week_start = now - timedelta(days=7)
+    total_week = Order.objects.filter(ordered_at__gte=week_start).count()
+
+    # Месяц (последние 30 дней)
+    month_start = now - timedelta(days=30)
+    total_month = Order.objects.filter(ordered_at__gte=month_start).count()
+
     return render(request, 'main/admin_dashboard/admin_statistics.html', {
         'breakfast_count': breakfast_count,
         'lunch_count': lunch_count,
         'total_today': total_today,
+        'total_week': total_week,
+        'total_month': total_month,
     })

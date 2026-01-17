@@ -3,13 +3,13 @@
 {% block title %}{% endblock %}
 {% block body %}
 <div class="settings-section">
-  <h3>Опасные действия</h3>
-  <form method="post" action="{% url 'admin_settings' %}"
+    <h3>Опасные действия</h3>
+    <form
+        method="post"
+        action="{% url 'admin_settings' %}"
         onsubmit="return confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить!');">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">
-      <i class="fas fa-user-times"></i> Удалить аккаунт
-    </button>
-  </form>
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"><i class="fas fa-user-times"></i> Удалить аккаунт</button>
+    </form>
 </div>
 {% endblock %}

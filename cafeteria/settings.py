@@ -52,6 +52,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'main.context_processors.chef_orders_count',
+                'main.context_processors.admin_sidebar_context',
             ],
         },
     },

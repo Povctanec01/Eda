@@ -1,5 +1,7 @@
 from django.apps import apps
-
+from django.utils import timezone
+from datetime import timedelta
+from .models import CardBuys
 def chef_orders_count(request):
     try:
         if request.user.is_authenticated:
@@ -11,3 +13,13 @@ def chef_orders_count(request):
     except Exception:
         pass
     return {'chef_active_orders_count': 0}
+
+def admin_sidebar_context(request):
+    if request.user.is_authenticated and hasattr(request.user, 'profile') and request.user.profile.role == 'admin':
+        one_week_ago = timezone.now() - timedelta(days=7)
+        pending_count = CardBuys.objects.filter(
+            created_at__gte=one_week_ago,
+            status='pending'
+        ).count()
+        return {'pending_count': pending_count}
+    return {}

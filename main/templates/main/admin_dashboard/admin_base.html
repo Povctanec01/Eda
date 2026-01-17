@@ -1,163 +1,84 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
-    <link rel="stylesheet" href="{% static 'main/css/dashboard.css' %}">
-    <script src="{% static 'main/js/admin_dashboard.js' %}"></script>
-    <script src="{% static 'main/js/dashboard.js' %}"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.css">
-</head>
-<body>
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'main/css/main.css' %}" />
+        <link rel="stylesheet" href="{% static 'main/css/dashboard.css' %}" />
+        <link rel="stylesheet" href="{% static 'main/css/themes.css' %}" />
+        <script src="{% static 'main/js/admin_dashboard.js' %}"></script>
+        <script src="{% static 'main/js/dashboard.js' %}"></script>
+        <script src="{% static 'main/js/theme.js' %}"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.css" />
+    </head>
+    <body>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-utensils"></i>
+                    <span>Школьная Столовая</span>
+                </div>
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="user-info">
+                <div class="avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="user-details">
+                    <h3>{{ user.username }}</h3>
+                    <p class="user-role">Роль пользователя:</p>
+                    <p class="user-role">{{ user.profile.role }}</p>
+                </div>
+                <div class="theme-toggle" style="margin-top: 15px">
+                    <label class="theme-switch">
+                        <input type="checkbox" id="themeToggle" />
+                        <span class="theme-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <nav class="sidebar-menu">
+              <a href="{% url 'admin_dashboard/admin_home_page' %}" {% if request.resolver_match.url_name == 'admin_dashboard/admin_home_page' %}class="active"{% endif %}>
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Дашборд</span>
+              </a>
+              <a href="{% url 'admin_statistics' %}" {% if request.resolver_match.url_name == 'admin_statistics' %}class="active"{% endif %}>
+                <i class="fas fa-chart-line"></i>
+                <span>Статистика</span>
+              </a>
+                <a href="{% url 'admin_buys' %}" {% if request.resolver_match.url_name == 'admin_buys' %}class="active"{% endif %}>
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Закупки</span>
+                    <span class="badge badge-pending">{{ pending_count }}</span>
+                </a>
+              <a href="{% url 'admin_users_statistics' %}" {% if request.resolver_match.url_name == 'admin_users_statistics' %}class="active"{% endif %}>
+                <i class="fas fa-users"></i>
+                <span>Пользователи</span>
+              </a>
+              <a href="{% url 'admin_card_edit' %}" {% if request.resolver_match.url_name == 'admin_card_edit' %}class="active"{% endif %}>
                 <i class="fas fa-utensils"></i>
-                <span>Школьная Столовая</span>
+                <span>Меню</span>
+              </a>
+              <a href="{% url 'admin_finance' %}" {% if request.resolver_match.url_name == 'admin_finance' %}class="active"{% endif %}>
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Финансы</span>
+              </a>
+                <a href="{% url 'admin_settings' %}" {% if request.resolver_match.url_name == 'admin_settings' %}class="active"{% endif %}>
+                  <i class="fas fa-cog"></i>
+                  <span>Настройки</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{% url 'logout' %}" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </a>
             </div>
-            <button class="sidebar-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-
-        <div class="user-info">
-            <div class="avatar">
-                <i class="fas fa-user-shield"></i>
-            </div>
-            <div class="user-details">
-                <h3>{{ user.username }}</h3>
-                <p class="user-role"> Роль пользователя:</p>
-                <p class="user-role">{{ user.profile.role }}</p>
-            </div>
-        </div>
-
-        <nav class="sidebar-menu">
-          <a href="{% url 'admin_dashboard/admin_home_page' %}" {% if request.resolver_match.url_name == 'admin_dashboard/admin_home_page' %}class="active"{% endif %}>
-            <i class="fas fa-tachometer-alt"></i>
-            <span>Дашборд</span>
-          </a>
-          <a href="{% url 'admin_statistics' %}" {% if request.resolver_match.url_name == 'admin_statistics' %}class="active"{% endif %}>
-            <i class="fas fa-chart-line"></i>
-            <span>Статистика</span>
-          </a>
-          <a href="{% url 'admin_buys' %}" {% if request.resolver_match.url_name == 'admin_buys' %}class="active"{% endif %}>
-            <i class="fas fa-shopping-cart"></i>
-            <span>Закупки</span>
-            <span class="badge">12</span>
-          </a>
-          <a href="{% url 'admin_users_statistics' %}" {% if request.resolver_match.url_name == 'admin_users_statistics' %}class="active"{% endif %}>
-            <i class="fas fa-users"></i>
-            <span>Пользователи</span>
-          </a>
-          <a href="{% url 'admin_card_edit' %}" {% if request.resolver_match.url_name == 'admin_card_edit' %}class="active"{% endif %}>
-            <i class="fas fa-utensils"></i>
-            <span>Меню</span>
-          </a>
-          <a href="{% url 'admin_finance' %}" {% if request.resolver_match.url_name == 'admin_finance' %}class="active"{% endif %}>
-            <i class="fas fa-file-invoice-dollar"></i>
-            <span>Финансы</span>
-          </a>
-          <a href="#" onclick="openStaffModal();">
-            <i class="fas fa-user-plus"></i>
-            <span>Регистрация персонала</span>
-          </a>
-            <a href="{% url 'admin_settings' %}" {% if request.resolver_match.url_name == 'admin_settings' %}class="active"{% endif %}>
-              <i class="fas fa-cog"></i>
-              <span>Настройки</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-footer">
-            <a href="{% url 'logout' %}" class="btn-logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Выйти</span>
-            </a>
-        </div>
-    </aside>
-<main class="main-content no-vertical-padding">
-    {% block body %} {% endblock %}
-    <div id="staffModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h3>Регистрация поваров и администраторов</h3>
-
-            <!-- Блок для отображения ошибок -->
-            <div id="staffErrors" class="error-messages" style="display: none;">
-                <div class="alert alert-error">
-                    <strong>Ошибка регистрации:</strong>
-                    <ul id="errorList"></ul>
-                </div>
-            </div>
-
-            {% if messages %}
-                <div class="messages">
-                    {% for message in messages %}
-                        <div class="alert {{ message.tags }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <form method="post" id="staffForm">
-                {% csrf_token %}
-                <input type="hidden" name="register_staff" value="1">
-                <div class="form-group">
-                    <label for="{{ staff_form.username.id_for_label }}">Имя пользователя:</label>
-                    {{ staff_form.username }}
-                    {% if staff_form.username.errors %}
-                        <div class="field-error">{{ staff_form.username.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="{{ staff_form.password1.id_for_label }}">Пароль:</label>
-                    {{ staff_form.password1 }}
-                    {% if staff_form.password1.errors %}
-                        <div class="field-error">{{ staff_form.password1.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="{{ staff_form.password2.id_for_label }}">Подтвердите пароль:</label>
-                    {{ staff_form.password2 }}
-                    {% if staff_form.password2.errors %}
-                        <div class="field-error">{{ staff_form.password2.errors }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="{{ staff_form.role.id_for_label }}">Роль:</label>
-                    {{ staff_form.role }}
-                    {% if staff_form.role.errors %}
-                        <div class="field-error">{{ staff_form.role.errors }}</div>
-                    {% endif %}
-                </div>
-                <button type="submit" class="btn btn-primary">Создать</button>
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-            </form>
-        </div>
-    </div>
-</main>
-    <!-- Модальное окно для успешной регистрации -->
-    <div id="successModal" class="modal" style="display: none;">
-        <div class="modal-content success-modal">
-            <div class="success-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h3>Успешно!</h3>
-            <p id="successMessage">Пользователь успешно создан.</p>
-            <div class="user-details-success">
-                <p><strong>Имя пользователя:</strong> <span id="successUsername"></span></p>
-                <p><strong>Роль:</strong> <span id="successRole"></span></p>
-            </div>
-            <button type="button" class="btn btn-success" onclick="closeSuccessModal()">OK</button>
-        </div>
-    </div>
-    <!-- Добавьте это в admin_base.html.txt, перед закрывающим тегом </body> -->
-    <div id="registrationSuccessData"
-         data-success="{% if registration_success %}true{% else %}false{% endif %}"
-         data-username="{{ registered_username|escapejs }}"
-         data-role="{{ registered_role|escapejs }}"
-         style="display: none;">
-    </div>
-</body>
+        </aside>
+        <main class="main-content no-vertical-padding">{% block body %} {% endblock %}</main>
+        <div id="themeData" data-theme="light" style="display: none"></div>
+    </body>
 </html>

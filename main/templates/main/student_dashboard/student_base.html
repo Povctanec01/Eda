@@ -7,8 +7,10 @@
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
     <link rel="stylesheet" href="{% static 'main/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/themes.css' %}" />
     <script src="{% static 'main/js/student_dashboard.js' %}"></script>
     <script src="{% static 'main/js/dashboard.js' %}"></script>
+    <script src="{% static 'main/js/theme.js' %}"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.css">
 </head>
 <body>
@@ -64,6 +66,12 @@
                 <h3>{{ user.username }}</h3>
                 <p class="user-role">Ученик</p>
                 <p class="user-email">student@school.ru</p>
+            </div>
+            <div class="theme-toggle" style="margin-top: 15px">
+                <label class="theme-switch">
+                    <input type="checkbox" id="themeToggle" />
+                    <span class="theme-slider"></span>
+                </label>
             </div>
         </div>
 

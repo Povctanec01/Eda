@@ -15,7 +15,7 @@ urlpatterns = [
     path('student_my_orders', student_views.student_my_orders, name='student_my_orders'),
     path('student_order_history', student_views.student_order_history, name='student_order_history'),
     path('student_settings', student_views.student_settings, name='student_settings'),
-    # ← НОВАЯ СТРОКА
+    path('student/order/create/<int:card_id>/', student_views.student_order_create, name='student_order_create'),
 
     # Chef
     path('chef_dashboard/chef_home_page', chef_views.chef_home_page, name='chef_dashboard/chef_home_page'),

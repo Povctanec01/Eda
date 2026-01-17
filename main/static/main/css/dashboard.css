@@ -1,14 +1,13 @@
+/* main/static/main/css/dashboard.css (обновлённый) */
+
 body {
     display: flex;
     min-height: 100vh;
-    background: #f8f9fa;
     margin: 0;
 }
 
 .sidebar {
     width: 250px;
-    background: white;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -18,20 +17,17 @@ body {
 
 .sidebar-header {
     padding: 20px;
-    border-bottom: 1px solid #e0e0e0;
 }
 
 .sidebar-header .logo {
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: #333;
     font-size: 1.2rem;
     font-weight: bold;
 }
 
 .sidebar-header .logo i {
-    color: #667eea;
     margin-right: 10px;
     font-size: 1.5rem;
 }
@@ -41,42 +37,30 @@ body {
     background: none;
     border: none;
     font-size: 1.2rem;
-    color: #333;
     cursor: pointer;
 }
 
 .user-info {
     padding: 30px 20px;
     text-align: center;
-    border-bottom: 1px solid #e0e0e0;
 }
 
 .avatar {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 15px;
-    color: white;
     font-size: 2rem;
 }
 
 .user-details h3 {
     margin-bottom: 5px;
-    color: #333;
-}
-
-.user-role {
-    color: #667eea;
-    font-weight: 600;
-    margin-bottom: 5px;
 }
 
 .user-email {
-    color: #666;
     font-size: 0.9rem;
 }
 
@@ -90,21 +74,17 @@ body {
     display: flex;
     align-items: center;
     padding: 15px 25px;
-    color: #555;
     text-decoration: none;
     transition: all 0.3s;
     border-left: 4px solid transparent;
 }
 
 .sidebar-menu a:hover {
-    background: #f8f9fa;
-    color: #667eea;
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .sidebar-menu a.active {
-    background: rgba(102, 126, 234, 0.1);
-    color: #667eea;
-    border-left-color: #667eea;
+    border-left-color: var(--primary-color);
 }
 
 .sidebar-menu a i {
@@ -113,8 +93,6 @@ body {
 }
 
 .badge {
-    background: #667eea;
-    color: white;
     padding: 3px 8px;
     border-radius: 10px;
     font-size: 0.8rem;
@@ -123,27 +101,15 @@ body {
 
 .sidebar-footer {
     padding: 20px;
-    border-top: 1px solid #e0e0e0;
 }
 
 .btn-logout {
     display: flex;
     align-items: center;
     padding: 12px 20px;
-    background: #f8f9fa;
-    color: #666;
     text-decoration: none;
     border-radius: 8px;
     transition: all 0.3s;
-}
-
-.btn-logout:hover {
-    background: #e9ecef;
-    color: #dc3545;
-}
-
-.btn-logout i {
-    margin-right: 10px;
 }
 
 .main-content {
@@ -157,7 +123,6 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 40px;
-    background: white;
     padding: 25px;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -165,12 +130,7 @@ body {
 
 .top-bar h1 {
     font-size: 1.8rem;
-    color: #333;
     margin-bottom: 5px;
-}
-
-.top-bar p {
-    color: #666;
 }
 
 .top-bar-right {
@@ -183,15 +143,12 @@ body {
     position: relative;
     cursor: pointer;
     font-size: 1.3rem;
-    color: #666;
 }
 
 .notification-bell .badge {
     position: absolute;
     top: -8px;
     right: -8px;
-    background: #dc3545;
-    color: white;
     width: 20px;
     height: 20px;
     display: flex;
@@ -206,11 +163,6 @@ body {
     align-items: center;
     gap: 10px;
     font-size: 1.1rem;
-    color: #333;
-}
-
-.balance-info i {
-    color: #28a745;
 }
 
 .dashboard-cards {
@@ -221,7 +173,6 @@ body {
 }
 
 .card {
-    background: white;
     border-radius: 15px;
     padding: 20px;
     display: flex;
@@ -246,14 +197,8 @@ body {
     font-size: 24px;
 }
 
-.bg-blue { background: linear-gradient(135deg, #667eea, #764ba2); }
-.bg-green { background: linear-gradient(135deg, #28a745, #20c997); }
-.bg-orange { background: linear-gradient(135deg, #fd7e14, #ffc107); }
-.bg-red { background: linear-gradient(135deg, #dc3545, #fd7e14); }
-
 .card-content h3 {
     font-size: 1rem;
-    color: #666;
     margin-bottom: 5px;
 }
 
@@ -264,12 +209,10 @@ body {
 }
 
 .card-desc {
-    color: #666;
     font-size: 14px;
 }
 
 .today-menu {
-    background: white;
     border-radius: 15px;
     padding: 25px;
     margin-bottom: 30px;
@@ -284,7 +227,6 @@ body {
 }
 
 .section-header h2 {
-    color: #333;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -297,17 +239,15 @@ body {
 
 .meal-type-btn {
     padding: 8px 20px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid;
     border-radius: 20px;
-    background: white;
+    background: transparent;
     cursor: pointer;
     transition: all 0.3s;
 }
 
 .meal-type-btn.active {
-    background: #667eea;
     color: white;
-    border-color: #667eea;
 }
 
 .menu-items {
@@ -317,14 +257,13 @@ body {
 }
 
 .menu-item {
-    border: 1px solid #e0e0e0;
+    border: 1px solid;
     border-radius: 12px;
     padding: 20px;
     transition: all 0.3s;
 }
 
 .menu-item:hover {
-    border-color: #667eea;
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
@@ -336,18 +275,15 @@ body {
 }
 
 .menu-item-header h3 {
-    color: #333;
     margin: 0;
 }
 
 .price {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #28a745;
 }
 
 .menu-item-desc {
-    color: #666;
     margin-bottom: 15px;
     line-height: 1.5;
 }
@@ -367,7 +303,6 @@ body {
 }
 
 .ingredients {
-    color: #666;
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -375,9 +310,7 @@ body {
 }
 
 .btn-order {
-    background: linear-gradient(135deg, #28a745, #20c997);
     border: none;
-    color: white;
     padding: 10px 20px;
     border-radius: 20px;
     font-weight: 600;
@@ -390,18 +323,15 @@ body {
 
 .btn-order:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
 }
 
 .my-orders {
-    background: white;
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 .my-orders h2 {
-    color: #333;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -418,17 +348,15 @@ body {
 }
 
 .orders-table th {
-    background: #f8f9fa;
     padding: 15px;
     text-align: left;
-    color: #333;
     font-weight: 600;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 2px solid;
 }
 
 .orders-table td {
     padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid;
     vertical-align: middle;
 }
 
@@ -438,10 +366,6 @@ body {
     gap: 10px;
 }
 
-.order-item i {
-    color: #667eea;
-}
-
 .status {
     padding: 5px 12px;
     border-radius: 12px;
@@ -449,19 +373,7 @@ body {
     font-weight: 600;
 }
 
-.status.received {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status.pending {
-    background: #fff3cd;
-    color: #856404;
-}
-
 .btn-action {
-    background: #667eea;
-    color: white;
     border: none;
     padding: 8px 15px;
     border-radius: 8px;
@@ -474,7 +386,6 @@ body {
 }
 
 .btn-action:hover {
-    background: #764ba2;
     transform: translateY(-2px);
 }
 
@@ -492,7 +403,6 @@ body {
 }
 
 .modal-content {
-    background: white;
     border-radius: 20px;
     width: 90%;
     max-width: 500px;
@@ -515,19 +425,17 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 25px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid;
 }
 
 .modal-header h3 {
     margin: 0;
-    color: #333;
 }
 
 .close-modal {
     background: none;
     border: none;
     font-size: 1.5rem;
-    color: #666;
     cursor: pointer;
 }
 
@@ -542,12 +450,10 @@ body {
 
 .order-details h4 {
     margin-bottom: 10px;
-    color: #333;
 }
 
 .order-details .price {
     font-size: 2rem;
-    color: #28a745;
 }
 
 .payment-options {
@@ -562,18 +468,13 @@ body {
     align-items: center;
     gap: 10px;
     padding: 12px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid;
     border-radius: 10px;
     cursor: pointer;
 }
 
-.radio-option input[type="radio"]:checked + span {
-    font-weight: 600;
-    color: #667eea;
-}
-
 .radio-option:hover {
-    border-color: #667eea;
+    border-color: var(--primary-color);
 }
 
 .quantity-selector {
@@ -586,8 +487,8 @@ body {
 .qty-btn {
     width: 40px;
     height: 40px;
-    border: 2px solid #e0e0e0;
-    background: white;
+    border: 2px solid;
+    background: transparent;
     border-radius: 8px;
     font-size: 1.2rem;
     cursor: pointer;
@@ -595,22 +496,21 @@ body {
 }
 
 .qty-btn:hover {
-    border-color: #667eea;
-    color: #667eea;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 #quantity {
     width: 60px;
     text-align: center;
     padding: 8px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid;
     border-radius: 8px;
     font-size: 1rem;
 }
 
 .order-summary {
     padding: 20px;
-    background: #f8f9fa;
     border-radius: 10px;
     text-align: center;
     font-size: 1.2rem;
@@ -623,7 +523,7 @@ body {
 
 .modal-footer {
     padding: 20px 25px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid;
     display: flex;
     justify-content: flex-end;
     gap: 15px;
@@ -689,18 +589,16 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #333;
 }
 
 .status-indicator {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #ccc;
 }
 
 .status-indicator.active {
-    background: #28a745;
+    background: var(--success-color);
 }
 
 .dashboard-grid {
@@ -712,7 +610,6 @@ body {
 
 .orders-section,
 .inventory-section {
-    background: white;
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -724,7 +621,7 @@ body {
 }
 
 .order-item {
-    border: 1px solid #e0e0e0;
+    border: 1px solid;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 15px;
@@ -732,7 +629,7 @@ body {
 }
 
 .order-item:hover {
-    border-color: #667eea;
+    border-color: var(--primary-color);
 }
 
 .order-header {
@@ -749,7 +646,6 @@ body {
 }
 
 .order-time {
-    color: #666;
     font-size: 0.9rem;
 }
 
@@ -757,7 +653,6 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #333;
 }
 
 .order-details {
@@ -768,11 +663,9 @@ body {
 
 .meal-info h4 {
     margin-bottom: 5px;
-    color: #333;
 }
 
 .meal-ingredients {
-    color: #666;
     font-size: 0.9rem;
     margin-bottom: 10px;
 }
@@ -781,7 +674,6 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
-    color: #dc3545;
     font-size: 0.9rem;
 }
 
@@ -801,26 +693,26 @@ body {
     display: flex;
     align-items: center;
     padding: 15px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid;
     border-radius: 12px;
     margin-bottom: 10px;
     transition: all 0.3s;
 }
 
 .inventory-item:hover {
-    border-color: #667eea;
+    border-color: var(--primary-color);
 }
 
 .inventory-item.low {
-    border-left: 4px solid #ffc107;
+    border-left: 4px solid var(--warning-color);
 }
 
 .inventory-item.critical {
-    border-left: 4px solid #dc3545;
+    border-left: 4px solid var(--danger-color);
 }
 
 .inventory-item.normal {
-    border-left: 4px solid #28a745;
+    border-left: 4px solid var(--success-color);
 }
 
 .product-info {
@@ -829,11 +721,9 @@ body {
 
 .product-info h4 {
     margin-bottom: 5px;
-    color: #333;
 }
 
 .product-category {
-    color: #666;
     font-size: 0.9rem;
 }
 
@@ -844,7 +734,7 @@ body {
 
 .stock-bar {
     height: 8px;
-    background: #e0e0e0;
+    background: var(--border-color);
     border-radius: 4px;
     margin-bottom: 5px;
     overflow: hidden;
@@ -852,19 +742,17 @@ body {
 
 .stock-fill {
     height: 100%;
-    background: #28a745;
+    background: var(--success-color);
     transition: width 0.3s;
 }
 
 .stock-amount {
     font-size: 0.9rem;
-    color: #666;
     text-align: center;
     display: block;
 }
 
 .purchase-requests {
-    background: white;
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -877,17 +765,15 @@ body {
 
 .filter-btn {
     padding: 8px 15px;
-    border: 2px solid #e0e0e0;
-    background: white;
+    border: 2px solid;
+    background: transparent;
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.3s;
 }
 
 .filter-btn.active {
-    background: #667eea;
     color: white;
-    border-color: #667eea;
 }
 
 .requests-table {
@@ -901,38 +787,20 @@ body {
 }
 
 .requests-table th {
-    background: #f8f9fa;
     padding: 15px;
     text-align: left;
-    color: #333;
     font-weight: 600;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 2px solid;
 }
 
 .requests-table td {
     padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid;
 }
 
-.status.pending {
-    background: #fff3cd;
-    color: #856404;
-    padding: 5px 12px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-}
-
-.status.approved {
-    background: #d4edda;
-    color: #155724;
-    padding: 5px 12px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-}
-
+.status.pending,
+.status.approved,
 .status.rejected {
-    background: #f8d7da;
-    color: #721c24;
     padding: 5px 12px;
     border-radius: 12px;
     font-size: 0.8rem;
@@ -947,15 +815,15 @@ body {
 }
 
 .btn-edit {
-    color: #667eea;
+    color: var(--primary-color);
 }
 
 .btn-view {
-    color: #28a745;
+    color: var(--success-color);
 }
 
 .btn-delete {
-    color: #dc3545;
+    color: var(--danger-color);
 }
 
 .priority-options {
@@ -972,34 +840,24 @@ body {
 }
 
 .priority-badge.normal {
-    background: #ffc107;
-    color: #333;
+    background: var(--warning-color);
 }
 
 .priority-badge.high {
-    background: #fd7e14;
-    color: white;
+    background: var(--warning-color);
 }
 
 .priority-badge.critical {
-    background: #dc3545;
-    color: white;
-}
-
-/* Стили для панели администратора */
-.bg-purple {
-    background: linear-gradient(135deg, #6f42c1, #a370f7);
+    background: var(--danger-color);
 }
 
 .system-status {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #333;
 }
 
 .stats-section {
-    background: white;
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -1007,10 +865,10 @@ body {
 
 .period-select {
     padding: 8px 15px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid;
     border-radius: 8px;
-    background: white;
-    color: #333;
+    background: transparent;
+    color: inherit;
 }
 
 .stats-chart {
@@ -1023,7 +881,7 @@ body {
     align-items: flex-end;
     height: 200px;
     padding: 0px 0;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid;
 }
 
 .chart-bar {
@@ -1035,7 +893,6 @@ body {
 
 .bar-label {
     margin-bottom: 10px;
-    color: #666;
 }
 
 .bar-container {
@@ -1053,17 +910,16 @@ body {
 }
 
 .bar.breakfast {
-    background: #667eea;
+    background: var(--primary-color);
 }
 
 .bar.lunch {
-    background: #28a745;
+    background: var(--success-color);
 }
 
 .bar-value {
     margin-top: 10px;
     font-weight: 600;
-    color: #333;
 }
 
 .chart-legend {
@@ -1086,22 +942,21 @@ body {
 }
 
 .legend-color.breakfast {
-    background: #667eea;
+    background: var(--primary-color);
 }
 
 .legend-color.lunch {
-    background: #28a745;
+    background: var(--success-color);
 }
 
 .requests-section {
-    background: white;
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 .request-item {
-    border: 1px solid #e0e0e0;
+    border: 1px solid;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 15px;
@@ -1122,27 +977,23 @@ body {
 
 .requester-info i {
     font-size: 1.5rem;
-    color: #667eea;
+    color: var(--primary-color);
 }
 
 .request-date {
-    color: #666;
     font-size: 0.9rem;
 }
 
 .request-details h4 {
     margin-bottom: 5px;
-    color: #333;
 }
 
 .request-quantity {
-    color: #667eea;
     font-weight: 600;
     margin-bottom: 10px;
 }
 
 .request-reason {
-    color: #666;
     margin-bottom: 15px;
 }
 
@@ -1152,7 +1003,6 @@ body {
 }
 
 .reports-section {
-    background: white;
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -1175,17 +1025,15 @@ body {
 }
 
 .reports-table th {
-    background: #f8f9fa;
     padding: 15px;
     text-align: left;
-    color: #333;
     font-weight: 600;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 2px solid;
 }
 
 .reports-table td {
     padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid;
 }
 
 .reports-summary {
@@ -1196,7 +1044,6 @@ body {
 }
 
 .summary-card {
-    background: #f8f9fa;
     border-radius: 12px;
     padding: 20px;
     text-align: center;
@@ -1204,26 +1051,23 @@ body {
 
 .summary-card h4 {
     margin-bottom: 15px;
-    color: #333;
 }
 
 .summary-value {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #667eea;
     margin-bottom: 5px;
 }
 
 .day-details {
     padding: 20px;
-    background: #f8f9fa;
     border-radius: 12px;
 }
 
 .detail-item {
     margin-bottom: 15px;
     padding-bottom: 15px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid;
 }
 
 .detail-item:last-child {
@@ -1233,7 +1077,6 @@ body {
 
 .detail-item ul {
     margin: 10px 0 0 20px;
-    color: #666;
 }
 
 @media (max-width: 1200px) {
@@ -1284,7 +1127,6 @@ body {
 
 .preferences-container,
 .reviews-container {
-    background: white;
     border-radius: 15px;
     padding: 30px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -1297,7 +1139,7 @@ body {
 .preferences-form textarea {
     width: 100%;
     padding: 15px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid;
     border-radius: 10px;
     margin-bottom: 20px;
     font-family: inherit;
@@ -1307,7 +1149,7 @@ body {
 
 .preferences-form textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--primary-color);
 }
 
 .reviews-list {
@@ -1315,7 +1157,7 @@ body {
 }
 
 .review-item {
-    border: 1px solid #e0e0e0;
+    border: 1px solid;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 15px;
@@ -1329,11 +1171,10 @@ body {
 }
 
 .review-rating {
-    color: #ffc107;
+    color: var(--warning-color);
 }
 
 .review-text {
-    color: #666;
     line-height: 1.6;
     margin-bottom: 15px;
 }
@@ -1345,7 +1186,6 @@ body {
 }
 
 .review-date {
-    color: #999;
     font-size: 0.9rem;
 }
 
@@ -1357,7 +1197,6 @@ body {
 }
 
 .rating-stars i {
-    color: #ffc107;
     font-size: 1.5rem;
     transition: color 0.3s;
 }
@@ -1373,8 +1212,7 @@ body {
 
 .btn-outline {
     background: transparent;
-    border: 2px solid #667eea;
-    color: #667eea;
+    border: 2px solid;
     padding: 8px 16px;
     border-radius: 20px;
     font-weight: 600;
@@ -1385,8 +1223,6 @@ body {
 }
 
 .btn-outline:hover {
-    background: #667eea;
-    color: white;
     transform: translateY(-2px);
 }
 
@@ -1399,41 +1235,9 @@ body {
     display: inline-block;
 }
 
-.btn-success {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-success:hover {
-    background: #218838;
-    transform: translateY(-2px);
-}
-
-.btn-danger {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-danger:hover {
-    background: #c82333;
-    transform: translateY(-2px);
-}
-
+.btn-success,
+.btn-danger,
 .btn-warning {
-    background: #ffc107;
-    color: #333;
     border: none;
     padding: 10px 20px;
     border-radius: 20px;
@@ -1442,8 +1246,9 @@ body {
     transition: all 0.3s;
 }
 
+.btn-success:hover,
+.btn-danger:hover,
 .btn-warning:hover {
-    background: #e0a800;
     transform: translateY(-2px);
 }
 
@@ -1463,7 +1268,7 @@ body {
 .modal textarea {
     width: 100%;
     padding: 12px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid;
     border-radius: 8px;
     font-family: inherit;
     margin-bottom: 15px;
@@ -1472,7 +1277,7 @@ body {
 .modal select:focus,
 .modal textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--primary-color);
 }
 
 @media (max-width: 768px) {
@@ -1492,7 +1297,6 @@ body {
 }
 
 .menu-management {
-    background: white;
     border-radius: 15px;
     padding: 30px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -1514,7 +1318,7 @@ body {
 }
 
 .dish-item {
-    border: 1px solid #e0e0e0;
+    border: 1px solid;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 15px;
@@ -1530,11 +1334,9 @@ body {
 .dish-price {
     font-size: 1.2rem;
     font-weight: bold;
-    color: #28a745;
 }
 
 .dish-desc {
-    color: #666;
     margin-bottom: 15px;
     line-height: 1.6;
 }
@@ -1550,9 +1352,6 @@ body {
 }
 
 .btn-danger {
-    background: #dc3545;
-    color: white;
-    border: none;
     border-radius: 20px;
     font-weight: 600;
     cursor: pointer;
@@ -1560,7 +1359,6 @@ body {
 }
 
 .btn-danger:hover {
-    background: #c82333;
     transform: translateY(-2px);
 }
 
@@ -1577,7 +1375,6 @@ body {
 }
 
 .modal-content {
-    background-color: white;
     padding: 25px;
     border-radius: 12px;
     width: 90%;
@@ -1586,7 +1383,6 @@ body {
 }
 
 .close {
-    color: #aaa;
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -1606,7 +1402,6 @@ body {
 }
 
 .btn-primary {
-    background-color: #667eea;
     color: white;
 }
 
@@ -1615,8 +1410,6 @@ body {
 }
 
 .btn-secondary {
-    background-color: #6c757d;
-    color: white;
     margin-left: 10px;
 }
 
@@ -1627,14 +1420,10 @@ body {
 }
 
 .alert-error {
-  background: #f8d7da;
-  color: #721c24;
   border: 1px solid #f5c6cb;
 }
 
 .alert-success {
-  background: #d4edda;
-  color: #155724;
   border: 1px solid #c3e6cb;
 }
 
@@ -1642,19 +1431,16 @@ body {
   padding-top: 0;
   padding-bottom: 0;
 }
-/* Сообщения */
+
 .messages {
   margin-bottom: 25px;
 }
 
-/* Отступ между секциями */
 .menu-management {
   margin-bottom: 30px;
 }
 
-/* Добавьте в main.css или dashboard.css */
 .error-messages {
-    background-color: #fee;
     border-left: 4px solid #f44336;
     padding: 12px 16px;
     margin-bottom: 20px;
@@ -1662,9 +1448,6 @@ body {
 }
 
 .alert-error {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
     padding: 10px;
     border-radius: 4px;
 }
@@ -1676,11 +1459,9 @@ body {
 
 #errorList li {
     margin-bottom: 5px;
-    color: #721c24;
 }
 
 .field-error {
-    color: #f44336;
     font-size: 0.85em;
     margin-top: 5px;
     padding-left: 5px;
@@ -1691,14 +1472,12 @@ body {
     padding-left: 15px;
 }
 
-/* Стили для окна успеха */
 .success-modal {
     text-align: center;
     max-width: 400px;
 }
 
 .success-icon {
-    color: #4CAF50;
     font-size: 60px;
     margin-bottom: 20px;
 }
@@ -1714,7 +1493,6 @@ body {
 }
 
 .user-details-success {
-    background-color: #f8f9fa;
     border-radius: 8px;
     padding: 15px;
     margin: 20px 0;
@@ -1727,8 +1505,6 @@ body {
 }
 
 .btn-success {
-    background-color: #4CAF50;
-    color: white;
     padding: 12px 30px;
     border: none;
     border-radius: 5px;
@@ -1741,13 +1517,12 @@ body {
     background-color: #45a049;
 }
 
-/* Стили для карточек заказов на главной */
 .orders-section .order-item {
-  border: 1px solid #dee2e6;
+  border: 1px solid;
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1rem;
-  background: white;
+  background: var(--card-bg);
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
@@ -1757,16 +1532,15 @@ body {
   align-items: center;
   margin-bottom: 0.5rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .orders-section .order-number strong {
   font-size: 1rem;
-  color: #333;
 }
+
 .orders-section .order-time {
   font-size: 0.85rem;
-  color: #888;
   margin-left: 0.5rem;
 }
 
@@ -1775,9 +1549,11 @@ body {
   align-items: center;
   gap: 0.5rem;
 }
+
 .orders-section .student-info i {
-  color: #6c757d;
+  color: var(--text-secondary);
 }
+
 .orders-section .student-info span {
   font-size: 0.95rem;
 }
@@ -1796,7 +1572,6 @@ body {
 
 .orders-section .meal-ingredients {
   font-size: 0.85rem;
-  color: #6c757d;
   margin: 0;
 }
 
@@ -1822,13 +1597,7 @@ body {
 }
 
 .orders-section .badge.bg-orange {
-  background-color: #ffc107 !important;
   color: #212529 !important;
-}
-
-.orders-section .badge.bg-success {
-  background-color: #28a745 !important;
-  color: white !important;
 }
 
 .orders-section .btn.btn-success.btn-sm {
@@ -1836,7 +1605,6 @@ body {
   font-size: 0.85rem;
 }
 
-/* Адаптация для мобильных */
 @media (max-width: 768px) {
   .orders-section .order-header {
     flex-direction: column;
@@ -1851,31 +1619,37 @@ body {
     align-items: stretch;
   }
 }
+
 .order-card {
-  border: 1px solid #dee2e6;
+  border: 1px solid;
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 16px;
-  background: #fff;
+  background: var(--card-bg);
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
+
 .order-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
 }
+
 .order-body h4 {
   margin: 8px 0;
 }
-.border-success { border-left: 4px solid #198754 !important; }
-.border-danger  { border-left: 4px solid #dc3545 !important; }
-.border-warning { border-left: 4px solid #ffc107 !important; }
+
+.border-success { border-left: 4px solid var(--success-color) !important; }
+.border-danger  { border-left: 4px solid var(--danger-color) !important; }
+.border-warning { border-left: 4px solid var(--warning-color) !important; }
+
 .status-counters {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
 }
+
 .status-badge {
   padding: 6px 12px;
   border-radius: 4px;
@@ -1883,3 +1657,30 @@ body {
   font-weight: bold;
   white-space: nowrap;
 }
+
+.badge-pending {
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin-left: auto;
+}
+
+.stat-box {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  min-width: 120px;
+}
+.stat-box.bg-success { background: linear-gradient(135deg, #28a745, #20c997); }
+.stat-box.bg-primary { background: linear-gradient(135deg, #007bff, #00d2ff); }
+.stat-box.bg-dark { background: linear-gradient(135deg, #343a40, #6c757d); }
+
+.card {
+  transition: transform 0.2s;
+}
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.border-left-warning { border-left: 4px solid #ffc107 !important; }
+.border-left-info { border-left: 4px solid #17a2b8 !important; }
+.border-left-success { border-left: 4px solid #28a745 !important; }

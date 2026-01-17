@@ -27,10 +27,18 @@
         </div>
         <div class="card-content">
             <h3>Количество студентов</h3>
-            <h2 class="display-5 fw-bold text-primary">{{ student_count }} </h2>
+            <h2 class="display-5 fw-bold text-primary">{{ student_count }}</h2>
         </div>
     </div>
-
+    <div class="card">
+        <div class="card-icon bg-blue-buys">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="card-content">
+            <h3>Запросы на закупку</h3>
+            <p class="card-value">{{ pending_count }}</p>
+        </div>
+    </div>
     <div class="card">
         <div class="card-icon bg-green">
             <i class="fas fa-money-bill-wave"></i>
@@ -52,8 +60,6 @@
             <p class="card-desc">84 завтрака, 72 обеда</p>
         </div>
     </div>
-
-
 </section>
 
 <section class="reports-section">
@@ -168,15 +174,11 @@
             <button class="close-modal">&times;</button>
         </div>
         <div class="modal-body">
-            <div id="modalContent">
-
-            </div>
+            <div id="modalContent"></div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary close-modal">Закрыть</button>
-            <button class="btn btn-primary" onclick="printDetails()">
-                <i class="fas fa-print"></i> Печать
-            </button>
+            <button class="btn btn-primary" onclick="printDetails()"><i class="fas fa-print"></i> Печать</button>
         </div>
     </div>
 </div>
