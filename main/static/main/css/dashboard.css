@@ -880,7 +880,7 @@ body {
     justify-content: space-between;
     align-items: flex-end;
     height: 200px;
-    padding: 0px 0;
+    padding: 0 0;
     border-bottom: 1px solid;
 }
 
@@ -1684,3 +1684,19 @@ body {
 .border-left-warning { border-left: 4px solid #ffc107 !important; }
 .border-left-info { border-left: 4px solid #17a2b8 !important; }
 .border-left-success { border-left: 4px solid #28a745 !important; }
+
+.border-left-secondary { border-left: 4px solid #6c757d !important; }
+.stat-box {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  min-width: 120px;
+}
+.stat-box.bg-success { background: linear-gradient(135deg, #28a745, #20c997); }
+.stat-box.bg-primary { background: linear-gradient(135deg, #007bff, #00d2ff); }
+.stat-box.bg-dark { background: linear-gradient(135deg, #343a40, #6c757d); }
+
+.card {
+  transition: transform 0.2s;
+}
+.card:hover {
+  transform: translateY(-3px);
+}

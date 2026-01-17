@@ -1,149 +1,236 @@
 {% extends 'main/admin_dashboard/admin_base.html' %}
 {% load static %}
-{% block title %}Статистика пользователей{%endblock %}
+{% block title %}Статистика пользователей{% endblock %}
 {% block body %}
 <div class="container py-4">
-    <!-- Заголовок -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary fw-bold">📊 Статистика пользователей</h2>
-    </div>
+  <!-- Заголовок -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary fw-bold">📊 Статистика пользователей</h2>
+  </div>
 
-    <!-- Форма добавления персонала -->
-    <div class="card shadow-sm mb-5">
-        <div class="card-header bg-white border-bottom">
-            <h5 class="mb-0">➕ Добавить нового сотрудника</h5>
+  <!-- Форма добавления персонала -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-white border-bottom">
+      <h5 class="mb-0">➕ Добавить нового сотрудника</h5>
+    </div>
+    <div class="card-body">
+      {% if messages %}
+        <div class="messages mb-3">
+          {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+          {% endfor %}
         </div>
-        <div class="card-body">
-            {% if messages %}
-            <div class="messages mb-3">
-                {% for message in messages %}
-                <div class="alert {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="{{ staff_form.username.id_for_label }}" class="form-label">Имя пользователя</label>
+            {{ staff_form.username }}
+            {% if staff_form.username.errors %}
+              <div class="field-error">{{ staff_form.username.errors }}</div>
             {% endif %}
-
-            <form method="post">
-                {% csrf_token %}
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="{{ staff_form.username.id_for_label }}" class="form-label">Имя пользователя</label>
-                        {{ staff_form.username }} {% if staff_form.username.errors %}
-                        <div class="field-error">{{ staff_form.username.errors }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label for="{{ staff_form.role.id_for_label }}" class="form-label">Роль</label>
-                        {{ staff_form.role }} {% if staff_form.role.errors %}
-                        <div class="field-error">{{ staff_form.role.errors }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label for="{{ staff_form.password1.id_for_label }}" class="form-label">Пароль</label>
-                        {{ staff_form.password1 }} {% if staff_form.password1.errors %}
-                        <div class="field-error">{{ staff_form.password1.errors }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label for="{{ staff_form.password2.id_for_label }}" class="form-label">Подтвердите пароль</label>
-                        {{ staff_form.password2 }} {% if staff_form.password2.errors %}
-                        <div class="field-error">{{ staff_form.password2.errors }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <button type="submit" class="btn btn-primary">Создать сотрудника</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Карточки статистики -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-4">
-            <div class="card border-left-primary shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-muted">Студенты</h5>
-                    <h2 class="display-5 fw-bold text-primary">{{ role_counts.student }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-left-success shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-muted">Повара</h5>
-                    <h2 class="display-5 fw-bold text-success">{{ role_counts.chef }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-left-danger shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-muted">Администраторы</h5>
-                    <h2 class="display-5 fw-bold text-danger">{{ role_counts.admin }}</h2>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Таблица пользователей -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-white border-bottom">
-            <h5 class="mb-0">Список всех пользователей</h5>
-        </div>
-        <div class="card-body p-0">
-            {% if users_with_roles %}
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th scope="col" class="px-4 py-3">Имя пользователя</th>
-                            <th scope="col" class="px-4 py-3">Роль</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users_with_roles %}
-                        <tr>
-                            <td class="px-4 py-3">{{ user.username }}</td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="badge {% if user.role == 'student' %}bg-primary {% elif user.role == 'chef' %}bg-success {% elif user.role == 'admin' %}bg-danger {% else %}bg-secondary{% endif %}">
-                                    {{ user.role|title }}
-                                </span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center py-4 text-muted">
-                <p>Нет зарегистрированных пользователей.</p>
-            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="{{ staff_form.role.id_for_label }}" class="form-label">Роль</label>
+            {{ staff_form.role }}
+            {% if staff_form.role.errors %}
+              <div class="field-error">{{ staff_form.role.errors }}</div>
             {% endif %}
+          </div>
+          <div class="col-md-6">
+            <label for="{{ staff_form.password1.id_for_label }}" class="form-label">Пароль</label>
+            {{ staff_form.password1 }}
+            {% if staff_form.password1.errors %}
+              <div class="field-error">{{ staff_form.password1.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-6">
+            <label for="{{ staff_form.password2.id_for_label }}" class="form-label">Подтвердите пароль</label>
+            {{ staff_form.password2 }}
+            {% if staff_form.password2.errors %}
+              <div class="field-error">{{ staff_form.password2.errors }}</div>
+            {% endif %}
+          </div>
         </div>
+        <div class="mt-3">
+          <button type="submit" class="btn btn-primary">Создать сотрудника</button>
+        </div>
+      </form>
     </div>
+  </div>
+
+  <!-- Карточки статистики -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card border-left-primary shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title text-muted">Студенты</h5>
+          <h2 class="display-5 fw-bold text-primary">{{ role_counts.student }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-left-success shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title text-muted">Повара</h5>
+          <h2 class="display-5 fw-bold text-success">{{ role_counts.chef }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-left-danger shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title text-muted">Администраторы</h5>
+          <h2 class="display-5 fw-bold text-danger">{{ role_counts.admin }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Таблица пользователей -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Список всех пользователей</h5>
+      <div class="d-flex gap-2">
+        <input type="text" id="userSearch" class="form-control" placeholder="Поиск по имени..." style="max-width: 250px;">
+        <button id="deleteSelectedBtn" class="btn btn-danger" disabled>
+          <i class="fas fa-trash"></i> Удалить выбранные
+        </button>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      {% if users_with_roles %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="px-4 py-3" style="width: 50px;">
+                  <input type="checkbox" id="selectAll">
+                </th>
+                <th scope="col" class="px-4 py-3">Имя пользователя</th>
+                <th scope="col" class="px-4 py-3">Роль</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              {% for user in users_with_roles %}
+                <tr class="user-row" data-username="{{ user.username|lower }}">
+                  <td class="px-4 py-3">
+                    <input type="checkbox" class="user-checkbox" value="{{ user.username }}">
+                  </td>
+                  <td class="px-4 py-3">{{ user.username }}</td>
+                  <td class="px-4 py-3">
+                    <span class="badge
+                      {% if user.role == 'student' %}bg-primary
+                      {% elif user.role == 'chef' %}bg-success
+                      {% elif user.role == 'admin' %}bg-danger
+                      {% else %}bg-secondary{% endif %}">
+                      {{ user.role|title }}
+                    </span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-4 text-muted">
+          <p>Нет зарегистрированных пользователей.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 
 <style>
-    .border-left-primary {
-        border-left: 4px solid #0d6efd !important;
-    }
-    .border-left-success {
-        border-left: 4px solid #198754 !important;
-    }
-    .border-left-danger {
-        border-left: 4px solid #dc3545 !important;
-    }
-    .card {
-        transition: transform 0.2s;
-    }
-    .card:hover {
-        transform: translateY(-2px);
-    }
-    .field-error {
-        color: #f44336;
-        font-size: 0.85em;
-        margin-top: 5px;
-    }
+.border-left-primary { border-left: 4px solid #0d6efd !important; }
+.border-left-success { border-left: 4px solid #198754 !important; }
+.border-left-danger  { border-left: 4px solid #dc3545 !important; }
+.card { transition: transform 0.2s; }
+.card:hover { transform: translateY(-2px); }
+.field-error {
+  color: #f44336;
+  font-size: 0.85em;
+  margin-top: 5px;
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const searchInput = document.getElementById('userSearch');
+  const selectAllCheckbox = document.getElementById('selectAll');
+  const userCheckboxes = document.querySelectorAll('.user-checkbox');
+  const deleteBtn = document.getElementById('deleteSelectedBtn');
+  const userRows = document.querySelectorAll('.user-row');
+
+  // Поиск по таблице
+  searchInput.addEventListener('input', function () {
+    const query = this.value.trim().toLowerCase();
+    userRows.forEach(row => {
+      const username = row.dataset.username;
+      if (username.includes(query)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+
+  // Выделить все/снять все
+  selectAllCheckbox.addEventListener('change', function () {
+    userCheckboxes.forEach(cb => cb.checked = this.checked);
+    updateDeleteButton();
+  });
+
+  // Обновление состояния кнопки удаления
+  function updateDeleteButton() {
+    const anyChecked = Array.from(userCheckboxes).some(cb => cb.checked);
+    deleteBtn.disabled = !anyChecked;
+  }
+
+  userCheckboxes.forEach(cb => {
+    cb.addEventListener('change', updateDeleteButton);
+  });
+
+  // Удаление выбранных пользователей
+  deleteBtn.addEventListener('click', function () {
+    const selectedUsernames = Array.from(userCheckboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value);
+
+    if (selectedUsernames.length === 0) return;
+
+    if (!confirm(`Вы уверены, что хотите удалить ${selectedUsernames.length} пользователей? Это действие нельзя отменить!`)) {
+      return;
+    }
+
+    // Отправка AJAX-запроса или редирект на страницу подтверждения
+    // В данном случае — отправим форму POST
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "admin_users_delete_selected" %}';
+
+    // CSRF токен
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+
+    // Имена пользователей
+    selectedUsernames.forEach(username => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'usernames';
+      input.value = username;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+  });
+});
+</script>
 {% endblock %}

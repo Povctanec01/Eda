@@ -3,61 +3,68 @@
 {% block title %}Статистика заказов{% endblock %}
 
 {% block body %}
-<div class="dashboard-grid">
-  <!-- Статистика по дням -->
-  <section class="stats-section">
-    <div class="stats-summary text-center my-4">
-      <h3>📊 Заказы за сегодня</h3>
-      <div class="row justify-content-center g-3 mt-3">
-        <div class="col-auto">
-          <div class="stat-box bg-success text-white p-3 rounded shadow-sm">
-            <div class="h5 mb-0">{{ breakfast_count }}</div>
-            <small>Завтраков</small>
-          </div>
+    <div class="menu-management">
+        <div class="dashboard-grid">
+            <!-- Сводка по периодам -->
+            <div class="row g-4 mt-4">
+              <!-- Заказанные -->
+                <h2>Все заказы заказы</h2>
+              <div class="col-md-4">
+                <div class="card border-left-warning h-100 shadow-sm">
+                  <div class="card-body text-center">
+                    <h5 class="card-title text-muted">📥 Заказано сегодня</h5>
+                    <h2 class="display-5 fw-bold text-warning">{{ total_ordered_today }}</h2>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card border-left-info h-100 shadow-sm">
+                  <div class="card-body text-center">
+                    <h5 class="card-title text-muted">📥 За последние 7 дней</h5>
+                    <h2 class="display-5 fw-bold text-info">{{ total_ordered_week }}</h2>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card border-left-secondary h-100 shadow-sm">
+                  <div class="card-body text-center">
+                    <h5 class="card-title text-muted">📥 За последние 30 дней</h5>
+                    <h2 class="display-5 fw-bold text-secondary">{{ total_ordered_month }}</h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Готовые -->
+            <div class="row g-4 mt-4">
+                <h2>Выданные заказы</h2>
+              <div class="col-md-4">
+                <div class="card border-left-success h-100 shadow-sm">
+                  <div class="card-body text-center">
+                    <h5 class="card-title text-muted">✅ Готово сегодня</h5>
+                    <h2 class="display-5 fw-bold text-success">{{ total_ready_today }}</h2>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card border-left-success h-100 shadow-sm">
+                  <div class="card-body text-center">
+                    <h5 class="card-title text-muted">✅ За последние 7 дней</h5>
+                    <h2 class="display-5 fw-bold text-success">{{ total_ready_week }}</h2>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card border-left-success h-100 shadow-sm">
+                  <div class="card-body text-center">
+                    <h5 class="card-title text-muted">✅ За последние 30 дней</h5>
+                    <h2 class="display-5 fw-bold text-success">{{ total_ready_month }}</h2>
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
-        <div class="col-auto">
-          <div class="stat-box bg-primary text-white p-3 rounded shadow-sm">
-            <div class="h5 mb-0">{{ lunch_count }}</div>
-            <small>Обедов</small>
-          </div>
-        </div>
-        <div class="col-auto">
-          <div class="stat-box bg-dark text-white p-3 rounded shadow-sm">
-            <div class="h5 mb-0">{{ total_today }}</div>
-            <small>Всего сегодня</small>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- Сводка по периодам -->
-    <div class="row g-4 mt-4">
-      <div class="col-md-4">
-        <div class="card border-left-warning h-100 shadow-sm">
-          <div class="card-body text-center">
-            <h5 class="card-title text-muted">📅 За неделю</h5>
-            <h2 class="display-5 fw-bold text-warning">{{ total_week }}</h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card border-left-info h-100 shadow-sm">
-          <div class="card-body text-center">
-            <h5 class="card-title text-muted">📆 За месяц</h5>
-            <h2 class="display-5 fw-bold text-info">{{ total_month }}</h2>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card border-left-success h-100 shadow-sm">
-          <div class="card-body text-center">
-            <h5 class="card-title text-muted">✅ Выполнено</h5>
-            <h2 class="display-5 fw-bold text-success">—</h2>
-            <p class="text-muted small">Скоро добавим</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-</div>
+
 {% endblock %}

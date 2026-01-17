@@ -165,6 +165,24 @@ def admin_finance(request):
     return render(request, 'main/admin_dashboard/admin_finance.html')
 
 
+from django.contrib.auth.models import User
+
+@login_required
+def admin_users_delete_selected(request):
+    if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
+        messages.error(request, "Доступ запрещён.")
+        return redirect('admin_users_statistics')
+
+    if request.method == 'POST':
+        usernames = request.POST.getlist('usernames')
+        if usernames:
+            deleted_count = User.objects.filter(username__in=usernames).exclude(id=request.user.id).delete()[0]
+            messages.success(request, f"Успешно удалено {deleted_count} пользователей.")
+        else:
+            messages.warning(request, "Не выбрано ни одного пользователя.")
+
+    return redirect('admin_users_statistics')
+
 @login_required
 def admin_users_statistics(request):
     if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
@@ -217,26 +235,49 @@ def admin_statistics(request):
     today_start = timezone.make_aware(timezone.datetime.combine(now.date(), time.min))
     today_end = timezone.make_aware(timezone.datetime.combine(now.date(), time.max))
 
-    # Сегодня
-    orders_today = Order.objects.filter(
-        ordered_at__range=(today_start, today_end)
+    # === ЗАКАЗАННЫЕ БЛЮДА (все заказы) ===
+    orders_today_all = Order.objects.filter(ordered_at__range=(today_start, today_end))
+    orders_week_all = Order.objects.filter(ordered_at__gte=now - timedelta(days=7))
+    orders_month_all = Order.objects.filter(ordered_at__gte=now - timedelta(days=30))
+
+    total_ordered_today = orders_today_all.count()
+    total_ordered_week = orders_week_all.count()
+    total_ordered_month = orders_month_all.count()
+
+    # === ГОТОВЫЕ БЛЮДА (status = 'ready' или 'received') ===
+    ready_statuses = ['ready', 'received']
+    orders_today_ready = Order.objects.filter(
+        ordered_at__range=(today_start, today_end),
+        status__in=ready_statuses
     )
-    breakfast_count = orders_today.filter(card__meal_type='breakfast').count()
-    lunch_count = orders_today.filter(card__meal_type='lunch').count()
-    total_today = breakfast_count + lunch_count
+    orders_week_ready = Order.objects.filter(
+        ordered_at__gte=now - timedelta(days=7),
+        status__in=ready_statuses
+    )
+    orders_month_ready = Order.objects.filter(
+        ordered_at__gte=now - timedelta(days=30),
+        status__in=ready_statuses
+    )
 
-    # Неделя (последние 7 дней, включая сегодня)
-    week_start = now - timedelta(days=7)
-    total_week = Order.objects.filter(ordered_at__gte=week_start).count()
+    total_ready_today = orders_today_ready.count()
+    total_ready_week = orders_week_ready.count()
+    total_ready_month = orders_month_ready.count()
 
-    # Месяц (последние 30 дней)
-    month_start = now - timedelta(days=30)
-    total_month = Order.objects.filter(ordered_at__gte=month_start).count()
+    # Для совместимости с текущим шаблоном (завтрак/обед)
+    breakfast_count = orders_today_all.filter(card__meal_type='breakfast').count()
+    lunch_count = orders_today_all.filter(card__meal_type='lunch').count()
 
     return render(request, 'main/admin_dashboard/admin_statistics.html', {
         'breakfast_count': breakfast_count,
         'lunch_count': lunch_count,
-        'total_today': total_today,
-        'total_week': total_week,
-        'total_month': total_month,
+        'total_today': total_ordered_today,
+
+        # Новые данные
+        'total_ordered_today': total_ordered_today,
+        'total_ordered_week': total_ordered_week,
+        'total_ordered_month': total_ordered_month,
+
+        'total_ready_today': total_ready_today,
+        'total_ready_week': total_ready_week,
+        'total_ready_month': total_ready_month,
     })

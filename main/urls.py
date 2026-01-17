@@ -35,4 +35,5 @@ urlpatterns = [
     path('admin_settings', admin_views.admin_settings, name='admin_settings'),
     path('admin_card_edit/', admin_views.admin_card_edit, name='admin_card_edit'),
     path('delete/<int:card_id>/', common_views.index, name='card_delete'),  # заменил на index временно
+    path('admin/users/delete-selected/', admin_views.admin_users_delete_selected, name='admin_users_delete_selected'),
 ]
