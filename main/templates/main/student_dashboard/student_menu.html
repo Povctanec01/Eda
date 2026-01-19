@@ -4,42 +4,37 @@
 {% block body %}
 {% if messages %}
 <div class="messages">
-  {% for message in messages %}
-    {{ message }}
-  {% endfor %}
+    {% for message in messages %}
+        {{ message }}
+    {% endfor %}
 </div>
 {% endif %}
-
 <section class="menu-management" style="margin-top: 30px;">
-  <h2>Блюда</h2>
-
-  {% if cards %}
-  <div class="dishes-filters">
-    <button class="btn btn-primary rounded-pill px-3"  type="button" onclick="showMeals('Все')">
-        <i class="fa-solid fa-spoon"></i>
-        Все
-    </button>
-    <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Обед')">Обеды</button>
-    <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Завтрак')">Завтраки</button>
-  </div>
-
-  <div class="dishes-list">
-    {% for card in cards %}
-      <div class="dish-item" data-meal-type="{{ card.get_meal_type_display }}">
-        <div class="dish-header">
-          <div>
-            <h3>{{ card.title }}</h3>
-            <span class="badge" style="background: #667eea; color: white;">{{ card.get_meal_type_display }}</span>
-          </div>
-        </div>
-        <p class="dish-desc">Описание: {{ card.description|default:"Без описания" }}</p>
-        <div class="dish-actions">
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-  {% else %}
-    <p style="color: #666; font-style: italic;">Пока нет добавленных блюд</p>
-  {% endif %}
+    <h2>Блюда</h2>
+    {% if cards %}
+    <div class="dishes-filters">
+        <button class="btn btn-primary rounded-pill px-3"  type="button" onclick="showMeals('Все')">
+        <i class="fa-solid fa-spoon"></i>Все</button>
+        <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Обед')">Обеды</button>
+        <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Завтрак')">Завтраки</button>
+    </div>
+    <div class="dishes-list">
+        {% for card in cards %}
+            <div class="dish-item" data-meal-type="{{ card.get_meal_type_display }}">
+                <div class="dish-header">
+                    <div>
+                        <h3>{{ card.title }}</h3>
+                        <span class="badge" style="background: #667eea; color: white;">{{ card.get_meal_type_display }}</span>
+                    </div>
+                </div>
+                <p class="dish-desc">Описание: {{ card.description|default:"Без описания" }}</p>
+                <div class="dish-actions">
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p style="color: #666; font-style: italic;">Пока нет добавленных блюд</p>
+    {% endif %}
 </section>
 {% endblock %}

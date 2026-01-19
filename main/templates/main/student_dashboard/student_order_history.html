@@ -1,81 +1,48 @@
 {% extends 'main/student_dashboard/student_base.html' %}
 {% load static %}
-
 {% block title %}История заказов{% endblock %}
-
 {% block body %}
 <main class="main-content">
-  <header class="top-bar">
-    <div class="top-bar-left">
-      <h1>История заказов</h1>
-      <p>Все ваши заказы за всё время</p>
-    </div>
-  </header>
-
-  <section class="orders-section">
-    {% if orders %}
-      <div class="orders-list">
-        {% for order in orders %}
-          <div class="order-item">
-            <div class="order-header">
-              <div class="order-number">
-                <strong>#{{ order.id }}</strong>
-                <span class="order-time">{{ order.ordered_at|date:"d.m.Y H:i" }}</span>
-              </div>
+    <header class="top-bar">
+        <div class="top-bar-left">
+            <h1>История заказов</h1>
+            <p>Все ваши заказы за всё время</p>
+        </div>
+    </header>
+    <section class="orders-section">
+        {% if orders %}
+        <div class="orders-list">
+            {% for order in orders %}
+            <div class="order-item">
+                <div class="order-header">
+                    <div class="order-number">
+                        <strong>#{{ order.id }}</strong>
+                        <span class="order-time">{{ order.ordered_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                </div>
+                <div class="order-details">
+                    <div class="meal-info">
+                        <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
+                        {% if order.card.meal_type == 'breakfast' %}
+                            <span class="badge bg-success">Завтрак</span>
+                        {% elif order.card.meal_type == 'lunch' %}
+                            <span class="badge bg-primary">Обед</span>
+                        {% endif %}
+                    </div>
+                    <div class="order-status">
+                        {% if order.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Готовится</span>
+                        {% elif order.status == 'ready' %}
+                            <span class="badge bg-success">Готово</span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="order-details">
-              <div class="meal-info">
-                <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
-                {% if order.card.meal_type == 'breakfast' %}
-                  <span class="badge bg-success">Завтрак</span>
-                {% elif order.card.meal_type == 'lunch' %}
-                  <span class="badge bg-primary">Обед</span>
-                {% endif %}
-              </div>
-              <div class="order-status">
-                {% if order.status == 'pending' %}
-                  <span class="badge bg-warning text-dark">Готовится</span>
-                {% elif order.status == 'ready' %}
-                  <span class="badge bg-success">Готово</span>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <p class="text-muted">У вас пока нет заказов.</p>
-    {% endif %}
-  </section>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted">У вас пока нет заказов.</p>
+        {% endif %}
+    </section>
 </main>
-<style>
-.orders-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.order-item {
-  padding: 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #f9f9f9;
-}
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.order-time {
-  color: #666;
-  font-size: 0.9em;
-}
-.order-details {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.badge {
-  font-size: 0.85em;
-}
-</style>
 {% endblock %}

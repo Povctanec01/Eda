@@ -1700,3 +1700,33 @@ body {
 .card:hover {
   transform: translateY(-3px);
 }
+
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.order-item {
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.order-time {
+  color: #666;
+  font-size: 0.9em;
+}
+.order-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.badge {
+  font-size: 0.85em;
+}

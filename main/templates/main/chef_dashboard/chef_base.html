@@ -46,36 +46,36 @@
         </div>
 
 		<nav class="sidebar-menu">
-				<a href="{% url 'chef_dashboard/chef_home_page' %}" {% if request.resolver_match.url_name == 'chef_dashboard/chef_home_page' %}class="active"{% endif %}>
-					<i class="fas fa-tachometer-alt"></i>
-					<span>Главная</span>
-				</a>
-                <a href="{% url 'chef_orders' %}" {% if request.resolver_match.url_name == 'chef_orders' %}class="active"{% endif %}>
-                  <i class="fas fa-concierge-bell"></i>
-                  <span>Заказы</span>
-                  <span class="badge" id="ordersBadge">{{ chef_active_orders_count }}</span>
-                </a>
-				<a href="{% url 'chef_card_edit' %}" {% if request.resolver_match.url_name == 'chef_card_edit' %}class="active"{% endif %}>
-					<i class="fas fa-utensils"></i>
-					<span>Меню</span>
+            <a href="{% url 'chef_dashboard/chef_home_page' %}" {% if request.resolver_match.url_name == 'chef_dashboard/chef_home_page' %}class="active"{% endif %}>
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Главная</span>
+            </a>
+            <a href="{% url 'chef_orders' %}" {% if request.resolver_match.url_name == 'chef_orders' %}class="active"{% endif %}>
+              <i class="fas fa-concierge-bell"></i>
+              <span>Заказы</span>
+              <span class="badge" id="ordersBadge">{{ chef_active_orders_count }}</span>
+            </a>
+            <a href="{% url 'chef_card_edit' %}" {% if request.resolver_match.url_name == 'chef_card_edit' %}class="active"{% endif %}>
+                <i class="fas fa-utensils"></i>
+                <span>Меню</span>
 
-				</a>
-				<a href="{% url 'chef_remaining_product' %}" {% if request.resolver_match.url_name == 'chef_remaining_product' %}class="active"{% endif %}>
-					<i class="fas fa-boxes"></i>
-					<span>Остатки</span>
-				</a>
-				<a href="{% url 'chef_buys' %}" {% if request.resolver_match.url_name == 'chef_buys' %}class="active"{% endif %}>
-					<i class="fas fa-shopping-cart"></i>
-					<span>Закупки</span>
-				</a>
-				<a href="{% url 'chef_statistics' %}" {% if request.resolver_match.url_name == 'chef_statistics' %}class="active"{% endif %}>
-					<i class="fas fa-chart-bar"></i>
-					<span>Статистика</span>
-				</a>
-                <a href="{% url 'chef_settings' %}" {% if request.resolver_match.url_name == 'chef_settings' %}class="active"{% endif %}>
-                  <i class="fas fa-cog"></i>
-                  <span>Настройки</span>
-                </a>
+            </a>
+            <a href="{% url 'chef_remaining_product' %}" {% if request.resolver_match.url_name == 'chef_remaining_product' %}class="active"{% endif %}>
+                <i class="fas fa-boxes"></i>
+                <span>Остатки</span>
+            </a>
+            <a href="{% url 'chef_buys' %}" {% if request.resolver_match.url_name == 'chef_buys' %}class="active"{% endif %}>
+                <i class="fas fa-shopping-cart"></i>
+                <span>Закупки</span>
+            </a>
+            <a href="{% url 'chef_statistics' %}" {% if request.resolver_match.url_name == 'chef_statistics' %}class="active"{% endif %}>
+                <i class="fas fa-chart-bar"></i>
+                <span>Статистика</span>
+            </a>
+            <a href="{% url 'chef_settings' %}" {% if request.resolver_match.url_name == 'chef_settings' %}class="active"{% endif %}>
+              <i class="fas fa-cog"></i>
+              <span>Настройки</span>
+            </a>
 		</nav>
 
         <div class="sidebar-footer">
