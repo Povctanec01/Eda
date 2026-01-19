@@ -85,4 +85,78 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return cookieValue;
     }
+  const searchInput = document.getElementById('userSearch');
+  const selectAllCheckbox = document.getElementById('selectAll');
+  const userCheckboxes = document.querySelectorAll('.user-checkbox');
+  const deleteBtn = document.getElementById('deleteSelectedBtn');
+  const userRows = document.querySelectorAll('.user-row');
+
+  // Поиск по таблице
+  searchInput.addEventListener('input', function () {
+    const query = this.value.trim().toLowerCase();
+    userRows.forEach(row => {
+      const username = row.dataset.username;
+      if (username.includes(query)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+
+  // Выделить все/снять все
+  selectAllCheckbox.addEventListener('change', function () {
+    userCheckboxes.forEach(cb => cb.checked = this.checked);
+    updateDeleteButton();
+  });
+
+  // Обновление состояния кнопки удаления
+  function updateDeleteButton() {
+    const anyChecked = Array.from(userCheckboxes).some(cb => cb.checked);
+    deleteBtn.disabled = !anyChecked;
+  }
+
+  userCheckboxes.forEach(cb => {
+    cb.addEventListener('change', updateDeleteButton);
+  });
+
+  // Удаление выбранных пользователей
+  deleteBtn.addEventListener('click', function () {
+    const selectedUsernames = Array.from(userCheckboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value);
+
+    if (selectedUsernames.length === 0) return;
+
+    if (!confirm(`Вы уверены, что хотите удалить ${selectedUsernames.length} пользователей? Это действие нельзя отменить!`)) {
+      return;
+    }
+
+    // Отправка AJAX-запроса или редирект на страницу подтверждения
+    // В данном случае — отправим форму POST
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "admin_users_delete_selected" %}';
+
+    // CSRF токен
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+
+    // Имена пользователей
+    selectedUsernames.forEach(username => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'usernames';
+      input.value = username;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+  });
 });
+

@@ -1730,3 +1730,13 @@ body {
 .badge {
   font-size: 0.85em;
 }
+.border-left-primary { border-left: 4px solid #0d6efd !important; }
+.border-left-success { border-left: 4px solid #198754 !important; }
+.border-left-danger  { border-left: 4px solid #dc3545 !important; }
+.card { transition: transform 0.2s; }
+.card:hover { transform: translateY(-2px); }
+.field-error {
+    color: #f44336;
+    font-size: 0.85em;
+    margin-top: 5px;
+}
