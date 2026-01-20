@@ -6,12 +6,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from ..models import Card, Order, CardBuys, Profile
 from ..forms import CardForm, CardFormBuys
-from datetime import timedelta
+from datetime import timedelta, time
 from django.utils import timezone
 
 @login_required
 def chef_home_page(request):
-    if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
+    if not (hasattr(request.user, 'profile') and request.user.profile.role == 'chef'):
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'message': 'Доступ запрещён'}, status=403)
         return redirect('login')
 
     # Обработка POST-запросов
@@ -50,9 +52,8 @@ def chef_home_page(request):
 
 @login_required
 def chef_settings(request):
-    if not (hasattr(request.user, 'profile') or request.user.profile.role != 'chef'):
-        messages.error(request, "У вас нет доступа к этой странице.")
-        return redirect('chef_dashboard/chef_home_page')
+    if not request.user.is_authenticated or request.user.profile.role != 'chef':
+        return redirect('login')
 
     if request.method == 'POST':
         # Удаление аккаунта
@@ -81,7 +82,7 @@ def chef_orders(request):
 
 @login_required
 def chef_card_edit(request):
-    if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
+    if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
     if request.method == 'POST' and 'add' in request.POST:
         form = CardForm(request.POST)
@@ -106,7 +107,7 @@ def chef_card_edit(request):
 
 @login_required
 def chef_buys(request):
-    if not hasattr(request.user, 'profile') or request.user.profile.role != 'chef':
+    if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
     one_week_ago = timezone.now() - timedelta(days=7)
     buys_queryset = CardBuys.objects.filter(created_at__gte=one_week_ago)
@@ -143,12 +144,31 @@ def chef_buys(request):
 
 @login_required
 def chef_remaining_product(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
     return render(request, 'main/chef_dashboard/chef_remaining_product.html')
 
 @login_required
 def chef_statistics(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
-    return render(request, 'main/chef_dashboard/chef_statistics.html')
+
+    from django.utils import timezone
+    from datetime import timedelta
+
+    now = timezone.now()
+    today_start = timezone.make_aware(timezone.datetime.combine(now.date(), time.min))
+    today_end = timezone.make_aware(timezone.datetime.combine(now.date(), time.max))
+
+    # Все готовые, но не забранные заказы
+    unclaimed_orders = Order.objects.filter(
+        status='ready',
+        ordered_at__range=(today_start, today_end)
+    ).select_related('user', 'card').order_by('ordered_at')
+
+    unclaimed_count = unclaimed_orders.count()
+
+    return render(request, 'main/chef_dashboard/chef_statistics.html', {
+        'unclaimed_orders': unclaimed_orders,
+        'unclaimed_count': unclaimed_count,
+    })

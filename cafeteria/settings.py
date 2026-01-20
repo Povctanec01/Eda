@@ -16,7 +16,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.147.20.215']
 
 
 # Application definition
@@ -56,6 +56,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'main.context_processors.chef_orders_count',
                 'main.context_processors.admin_sidebar_context',
+                'main.context_processors.student_unclaimed_orders_count',
             ],
         },
     },

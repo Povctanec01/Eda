@@ -59,8 +59,8 @@ class StaffRegistrationForm(forms.Form):
 
 @login_required
 def admin_home_page(request):
-    if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
-        return redirect('auth_view')
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+        return redirect('login')
     student_count = Profile.objects.filter(role='student').count()
     return render(request, 'main/admin_dashboard/admin_home_page.html', {
         'student_count': student_count,
@@ -69,9 +69,8 @@ def admin_home_page(request):
 
 @login_required
 def admin_settings(request):
-    if not (hasattr(request.user, 'profile') or request.user.profile.role != 'admin'):
-        messages.error(request, "У вас нет доступа к этой странице.")
-        return redirect('student_dashboard/student_home_page')
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+        return redirect('login')
     if request.method == 'POST':
         user = request.user
         username = user.username
@@ -84,8 +83,8 @@ def admin_settings(request):
 
 @login_required
 def admin_card_edit(request):
-    if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
-        return redirect('auth_view')
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+        return redirect('login')
     if request.method == 'POST' and 'add' in request.POST:
         form = CardForm(request.POST)
         if form.is_valid():
@@ -110,8 +109,8 @@ def admin_card_edit(request):
 
 @login_required
 def admin_buys(request):
-    if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
-        return redirect('auth_view')
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+        return redirect('login')
     one_week_ago = timezone.now() - timedelta(days=7)
     buys_queryset = CardBuys.objects.filter(created_at__gte=one_week_ago)
     pending_count = buys_queryset.filter(status='pending').count()
@@ -169,9 +168,8 @@ from django.contrib.auth.models import User
 
 @login_required
 def admin_users_delete_selected(request):
-    if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
-        messages.error(request, "Доступ запрещён.")
-        return redirect('admin_users_statistics')
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+        return redirect('login')
 
     if request.method == 'POST':
         usernames = request.POST.getlist('usernames')
@@ -185,9 +183,8 @@ def admin_users_delete_selected(request):
 
 @login_required
 def admin_users_statistics(request):
-    if not (hasattr(request.user, 'profile') and request.user.profile.role == 'admin'):
-        messages.error(request, "Доступ запрещён.")
-        return redirect('auth_view')
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+        return redirect('login')
 
     # Обработка формы добавления персонала
     staff_form = StaffRegistrationForm()
@@ -258,6 +255,22 @@ def admin_statistics(request):
         ordered_at__gte=now - timedelta(days=30),
         status__in=ready_statuses
     )
+    # === ЗАБРАННЫЕ БЛЮДА (status = 'received') ===
+    orders_today_received = Order.objects.filter(
+        ordered_at__range=(today_start, today_end),
+        status='received'
+    )
+    orders_week_received = Order.objects.filter(
+        ordered_at__gte=now - timedelta(days=7),
+        status='received'
+    )
+    orders_month_received = Order.objects.filter(
+        ordered_at__gte=now - timedelta(days=30),
+        status='received'
+    )
+    total_received_today = orders_today_received.count()
+    total_received_week = orders_week_received.count()
+    total_received_month = orders_month_received.count()
 
     total_ready_today = orders_today_ready.count()
     total_ready_week = orders_week_ready.count()
@@ -280,4 +293,8 @@ def admin_statistics(request):
         'total_ready_today': total_ready_today,
         'total_ready_week': total_ready_week,
         'total_ready_month': total_ready_month,
+
+        'total_received_today': total_received_today,
+        'total_received_week': total_received_week,
+        'total_received_month': total_received_month,
     })

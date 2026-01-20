@@ -23,3 +23,11 @@ def admin_sidebar_context(request):
         ).count()
         return {'pending_count': pending_count}
     return {}
+
+
+def student_unclaimed_orders_count(request):
+    if request.user.is_authenticated and hasattr(request.user, 'profile') and request.user.profile.role == 'student':
+        from .models import Order
+        count = Order.objects.filter(user=request.user, status='ready').count()
+        return {'unclaimed_orders_count': count}
+    return {'unclaimed_orders_count': 0}

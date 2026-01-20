@@ -11,7 +11,7 @@ from django.contrib import messages
 
 @login_required
 def student_home_page(request):
-    if not hasattr(request.user, 'profile') or request.user.profile.role != 'student':
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
 
     # Определяем начало и конец текущего дня
@@ -57,9 +57,8 @@ def student_home_page(request):
 
 @login_required
 def student_settings(request):
-    if not hasattr(request.user, 'profile') or request.user.profile.role != 'student':
-        messages.error(request, "У вас нет доступа к этой странице.")
-        return redirect('student_dashboard/student_home_page')
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
 
     if request.method == 'POST':
         # Удаление аккаунта
@@ -75,9 +74,8 @@ def student_settings(request):
 
 @login_required
 def student_order_create(request, card_id):
-    if request.user.profile.role != 'student':
-        messages.error(request, "Только студенты могут делать заказы.")
-        return redirect('student_dashboard/student_home_page')
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
     card = get_object_or_404(Card, id=card_id)
     Order.objects.create(user=request.user, card=card)
     messages.success(request, f"Вы заказали: {card.title}!")
@@ -122,3 +120,12 @@ def student_my_orders(request):
         'orders': orders,
         'current_status': status_filter
     })
+
+@login_required
+def student_mark_received(request, order_id):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+    order = get_object_or_404(Order, id=order_id, user=request.user, status='ready')
+    order.status = 'received'
+    order.save()
+    return redirect(request.META.get('HTTP_REFERER', 'student_dashboard/student_home_page'))

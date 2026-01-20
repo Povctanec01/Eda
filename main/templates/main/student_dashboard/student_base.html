@@ -85,9 +85,11 @@
                 <span>Меню</span>
             </a>
             <a href="{% url 'student_my_orders' %}" {% if request.resolver_match.url_name == 'student_my_orders' %}class="active"{% endif %}>
-              <i class="fas fa-shopping-cart"></i>
-              <span>Мои заказы</span>
-              <span class="badge">{{ all_orders_count }}</span>
+                <i class="fas fa-shopping-cart"></i>
+                <span>Мои заказы</span>
+                {% if unclaimed_orders_count > 0 %}
+                    <span class="badge">{{ unclaimed_orders_count }}</span>
+                {% endif %}
             </a>
             <a href="{% url 'student_order_history' %}" {% if request.resolver_match.url_name == 'student_order_history' %}class="active"{% endif %}>
               <i class="fas fa-history"></i>

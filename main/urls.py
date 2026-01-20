@@ -16,6 +16,7 @@ urlpatterns = [
     path('student_order_history', student_views.student_order_history, name='student_order_history'),
     path('student_settings', student_views.student_settings, name='student_settings'),
     path('student/order/create/<int:card_id>/', student_views.student_order_create, name='student_order_create'),
+    path('student/order/<int:order_id>/mark-received/', student_views.student_mark_received, name='student_mark_received'),
 
     # Chef
     path('chef_dashboard/chef_home_page', chef_views.chef_home_page, name='chef_dashboard/chef_home_page'),

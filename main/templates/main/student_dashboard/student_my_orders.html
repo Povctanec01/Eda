@@ -21,6 +21,14 @@
           <span class="badge bg-secondary">Получен</span>
         {% endif %}
       </div>
+    {% if order.status == 'ready' %}
+        <form method="post" style="margin-top: 8px;" action="{% url 'student_mark_received' order.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-check-circle"></i> Я забрал
+            </button>
+        </form>
+    {% endif %}
     </div>
   {% endfor %}
 </div>
