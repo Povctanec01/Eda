@@ -2,14 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+
+# models.py
 class Profile(models.Model):
-    ROLE_CHOICES = (
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=20, choices=[
         ('student', 'Student'),
         ('chef', 'Chef'),
-        ('admin', 'Admin'),
-    )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
+        ('admin', 'Admin')])
+    auto_redirect_to_home = models.BooleanField(default=False)  # ← новое поле
 
 class Card(models.Model):
     MEAL_CHOICES = [

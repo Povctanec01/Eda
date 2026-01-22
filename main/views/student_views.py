@@ -61,13 +61,21 @@ def student_settings(request):
         return redirect('login')
 
     if request.method == 'POST':
-        # Удаление аккаунта
-        user = request.user
-        username = user.username
-        user.delete()
-        logout(request)
-        messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
-        return redirect('login')
+        # Удаление аккаунта (если отправлена именно эта форма)
+        if 'delete_account' in request.POST:
+            user = request.user
+            username = user.username
+            user.delete()
+            logout(request)
+            messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
+            return redirect('login')
+
+        # Сохранение настроек
+        profile = request.user.profile
+        profile.auto_redirect_to_home = 'auto_redirect' in request.POST
+        profile.save()
+        messages.success(request, "Настройки сохранены.")
+        return redirect('student_settings')
 
     # GET: просто показываем страницу настроек
     return render(request, 'main/student_dashboard/student_settings.html')

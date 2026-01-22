@@ -24,7 +24,7 @@ def auth_view(request):
             register_form = UserCreationForm(request.POST)
             if register_form.is_valid():
                 user = register_form.save()
-                user.profile.role = 'student'
+                user.profile.role = 'admin'
                 user.profile.save()
                 login(request, user)
                 return redirect_by_role(user)
@@ -53,4 +53,17 @@ def logout_view(request):
     return render(request, 'main/index.html')
 
 def index(request):
+    if request.user.is_authenticated:
+        try:
+            profile = request.user.profile
+            if profile.role == 'student' and profile.auto_redirect_to_home:
+                return redirect('student_dashboard/student_home_page')
+            elif profile.role == 'chef':
+                return redirect('chef_dashboard/chef_home_page')
+            elif profile.role == 'admin':
+                return redirect('admin_dashboard/admin_home_page')
+        except AttributeError:
+            # Если профиль не создан — отправляем на обычную страницу или ошибку
+            pass
+    # Для неавторизованных — показываем обычную главную
     return render(request, 'main/index.html')
