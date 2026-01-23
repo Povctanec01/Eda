@@ -3,13 +3,9 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 
-# models.py
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=20, choices=[
-        ('student', 'Student'),
-        ('chef', 'Chef'),
-        ('admin', 'Admin')])
+    role = models.CharField(max_length=20, choices=[('student', 'Student'), ('chef', 'Chef'), ('admin', 'Admin')])
     auto_redirect_to_home = models.BooleanField(default=False)  # ← новое поле
 
 class Card(models.Model):
@@ -85,3 +81,4 @@ class Order(models.Model):
         username = self.user.username if self.user else "Неизвестный"
         title = self.card.title if self.card else "[УДАЛЁННОЕ БЛЮДО]"
         return f"{username} → {title} ({self.get_status_display()})"
+

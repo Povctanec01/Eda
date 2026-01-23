@@ -1,16 +1,34 @@
 {% extends 'main/student_dashboard/student_base.html' %}
 {% load static %}
-{% block title %}{% endblock %}
+{% block title %}Настройки{% endblock %}
+
 {% block body %}
 <!-- Кнопка удаления аккаунта -->
 <div class="settings-section">
-    <h2 class="dinner">Опасные действия</h2>
-    <form method="post" action="{% url 'student_settings' %}"
+  <h3>Опасные действия</h3>
+  <form method="post" action="{% url 'student_settings' %}"
         onsubmit="return confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить!');">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">
-            <i class="fas fa-user-times"></i> Удалить аккаунт
-        </button>
-    </form>
+    {% csrf_token %}
+    <input type="hidden" name="delete_account" value="1">
+    <button type="submit" class="btn btn-danger">
+      <i class="fas fa-user-times"></i> Удалить аккаунт
+    </button>
+  </form>
+</div>
+
+<!-- Настройка автоперехода -->
+<div class="settings-section mt-4">
+  <h3>Поведение при входе</h3>
+  <form method="post" action="{% url 'student_settings' %}">
+    {% csrf_token %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="auto_redirect" name="auto_redirect"
+             {% if request.user.profile.auto_redirect_to_home %}checked{% endif %}>
+      <label class="form-check-label" for="auto_redirect">
+        Переключать при входе на сайт сразу на student_home_page, если пользователь авторизован
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Сохранить настройки</button>
+  </form>
 </div>
 {% endblock %}
