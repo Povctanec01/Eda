@@ -93,7 +93,6 @@ body {
 }
 
 .badge {
-    padding: 3px 8px;
     border-radius: 10px;
     font-size: 0.8rem;
     margin-left: auto;
@@ -115,14 +114,15 @@ body {
 .main-content {
     flex: 1;
     margin-left: 250px;
-    padding: 30px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 .top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     padding: 25px;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -540,7 +540,7 @@ body {
     .sidebar-footer span {
         display: none;
     }
-    
+
     .main-content {
         margin-left: 70px;
     }
@@ -1139,7 +1139,7 @@ body {
 .preferences-form textarea {
     width: 100%;
     padding: 15px;
-    border: 2px solid;
+    border: 1px solid;
     border-radius: 10px;
     margin-bottom: 20px;
     font-family: inherit;
@@ -1300,6 +1300,8 @@ body {
     border-radius: 15px;
     padding: 30px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .menu-actions {
@@ -1402,7 +1404,7 @@ body {
 }
 
 .btn-primary {
-    color: white;
+    padding-left: 15px;
 }
 
 .btn-primary:hover {
@@ -1427,17 +1429,8 @@ body {
   border: 1px solid #c3e6cb;
 }
 
-.main-content.no-vertical-padding {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
 .messages {
   margin-bottom: 25px;
-}
-
-.menu-management {
-  margin-bottom: 30px;
 }
 
 .error-messages {
@@ -1739,4 +1732,37 @@ body {
     color: #f44336;
     font-size: 0.85em;
     margin-top: 5px;
+}
+.dinner {
+    position: relative;
+    top: -15px
+}
+.stat {
+    position: relative;
+    top: 30px;
+}
+.dinner2 {
+    position: relative;
+    top: -10px;
+}
+.settings-section {
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-top: 30px;
+}
+.bdf {
+    display: block;
+}
+.chest {
+    padding-top: 30px;
+}
+.tb {
+    border-collapse: separate;
+    border-spacing: 20px 0px;
+    position: relative;
+    top: -10px;
+}
+.tbh {
+    text-align: left;
 }

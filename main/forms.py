@@ -10,8 +10,8 @@ class CardForm(forms.ModelForm):
         model = Card
         fields = ['title', 'description', 'meal_type']
         widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'Название блюда'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Описание', 'rows': 4}),
+            'title': forms.TextInput(attrs={'placeholder': 'Название блюда', 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Описание', 'rows': 4, 'class': 'form-control'}),
             'meal_type': forms.Select(attrs={'class': 'form-control'}),
         }
 
@@ -27,8 +27,8 @@ class CardFormBuys(forms.ModelForm):
         model = CardBuys
         fields = ['title', 'description']
         widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'Название блюда'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Описание', 'rows': 4}),
+            'title': forms.TextInput(attrs={'placeholder': 'Название блюда', 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Описание', 'rows': 4, 'class': 'form-control'}),
         }
 
     def clean_meal_type(self):

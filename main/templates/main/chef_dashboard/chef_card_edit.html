@@ -42,12 +42,21 @@
 </section>
 <!-- Список для удаления -->
 <section class="menu-management" style="margin-top: 30px;">
-    <h2>Блюда</h2>
+    <h2 class="dinner">Блюда</h2>
     {% if cards %}
         <div class="dishes-filters">
-            <button class="btn btn-primary rounded-pill px-3"  type="button" onclick="showMeals('Все')">Все</button>
-            <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Обед')">Обеды</button>
-            <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Завтрак')">Завтраки</button>
+            <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Все')">
+                <i class="fas fa-spoon"></i>
+                Все
+            </button>
+            <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Обед')">
+                <i class="fas fa-plate-wheat"></i>
+                Обеды
+            </button>
+            <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Завтрак')">
+                <i class="fas fa-mug-saucer"></i>
+                Завтраки
+            </button>
         </div>
         <div class="dishes-list">
             {% for card in cards %}

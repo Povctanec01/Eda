@@ -13,7 +13,7 @@
     --card-bg: #ffffff;
     --sidebar-bg: #ffffff;
     --sidebar-border: #e0e0e0;
-    --primary-color: #667eea;
+    --primary-color: #f0f0f0;
     --success-color: #28a745;
     --danger-color: #dc3545;
     --warning-color: #ffc107;
@@ -142,6 +142,8 @@ body {
 .reports-section,
 .orders-section,
 .inventory-section,
+.settings-section,
+.label,
 .purchase-requests {
     background: var(--card-bg);
     color: var(--text-primary);
@@ -389,6 +391,7 @@ input:checked + .theme-slider:after {
 
 /* Стили для кнопок в тёмной теме */
 [data-theme="dark"] .btn-primary {
+    color: var(--text-primary);
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
@@ -396,6 +399,7 @@ input:checked + .theme-slider:after {
 [data-theme="dark"] .btn-success {
     background-color: var(--success-color);
     border-color: var(--success-color);
+    color: var(--text-primary);
 }
 
 [data-theme="dark"] .btn-danger {
@@ -410,6 +414,7 @@ input:checked + .theme-slider:after {
 }
 
 [data-theme="light"] .btn-primary {
+    color: var(--text-primary);
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }

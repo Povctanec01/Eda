@@ -14,16 +14,16 @@
     </div>
 {% endif %}
 
-<section class="menu-management" style="margin-top: 30px">
-    <h2>Блюда</h2>
+<section class="menu-management">
+    <h2 class="dinner">Блюда</h2>
     <!-- Счётчики за последнюю неделю -->
-    <div class="status-counters mb-3">
+    <div class="status-counters mb-3 card border-left-warning h-100 shadow-sm">
         <span class="status-badge bg-warning text-dark">В рассмотрении: {{ pending_count }}</span>
     </div>
-    <div class="status-counters mb-3">
+    <div class="status-counters mb-3 card border-left-danger h-100 shadow-sm">
         <span class="status-badge bg-danger text-white">Отклонено: {{ rejected_count }}</span>
     </div>
-    <div class="status-counters mb-3">
+    <div class="status-counters mb-3 card border-left-success h-100 shadow-sm">
         <span class="status-badge bg-success text-white">Принято: {{ approved_count }}</span>
     </div>
     {% if buys %}

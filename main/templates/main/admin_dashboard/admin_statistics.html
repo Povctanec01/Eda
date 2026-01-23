@@ -2,14 +2,14 @@
 {% load static %}
 {% block title %}Статистика заказов{% endblock %}
 {% block body %}
-<div class="menu-management">
+<div class="menu-management" style="padding-bottom: 0px;">
     <div class="dashboard-grid">
         <!-- Сводка по периодам -->
         <div class="row g-4 mt-4">
             <!-- Заказанные -->
-            <h2>Все заказы заказы</h2>
+            <h2 class="dinner">Все заказы</h2>
             <div class="col-md-4">
-                <div class="card border-left-warning h-100 shadow-sm">
+                <div class="status-counters mb-3 card border-left-warning h-100 shadow-sm">
                     <div class="card-body text-center">
                         <h5 class="card-title text-muted">📥 Заказано сегодня</h5>
                         <h2 class="display-5 fw-bold text-warning">{{ total_ordered_today }}</h2>
@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-left-info h-100 shadow-sm">
+                <div class="status-counters mb-3 card border-left-info h-100 shadow-sm">
                     <div class="card-body text-center">
                         <h5 class="card-title text-muted">📥 За последние 7 дней</h5>
                         <h2 class="display-5 fw-bold text-info">{{ total_ordered_week }}</h2>
@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-left-secondary h-100 shadow-sm">
+                <div class="status-counters mb-3 card border-left-secondary h-100 shadow-sm">
                     <div class="card-body text-center">
                         <h5 class="card-title text-muted">📥 За последние 30 дней</h5>
                         <h2 class="display-5 fw-bold text-secondary">{{ total_ordered_month }}</h2>
@@ -35,9 +35,9 @@
         </div>
         <!-- Готовые -->
         <div class="row g-4 mt-4">
-            <h2>Выданные заказы</h2>
+            <h2 class="dinner" >Выданные заказы</h2>
             <div class="col-md-4">
-                <div class="card border-left-success h-100 shadow-sm">
+                <div class="status-counters mb-3 card border-left-success h-100 shadow-sm">
                     <div class="card-body text-center">
                         <h5 class="card-title text-muted">✅ Готово сегодня</h5>
                         <h2 class="display-5 fw-bold text-success">{{ total_ready_today }}</h2>
@@ -45,7 +45,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-left-success h-100 shadow-sm">
+                <div class="status-counters mb-3 card border-left-success h-100 shadow-sm">
                     <div class="card-body text-center">
                         <h5 class="card-title text-muted">✅ За последние 7 дней</h5>
                         <h2 class="display-5 fw-bold text-success">{{ total_ready_week }}</h2>
@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-left-success h-100 shadow-sm">
+                <div class="status-counters mb-3 card border-left-success h-100 shadow-sm">
                     <div class="card-body text-center">
                         <h5 class="card-title text-muted">✅ За последние 30 дней</h5>
                         <h2 class="display-5 fw-bold text-success">{{ total_ready_month }}</h2>

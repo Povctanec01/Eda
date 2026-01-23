@@ -2,15 +2,15 @@
 {% load static %}
 {% block title %}История заказов{% endblock %}
 {% block body %}
-<main class="main-content">
-    <header class="top-bar">
-        <div class="top-bar-left">
-            <h1>История заказов</h1>
+<main>
+    <header >
+        <div class="menu-management">
+            <h1 class="dinner">История заказов</h1>
             <p>Все ваши заказы за всё время</p>
         </div>
     </header>
     <section class="orders-section">
-        {% if orders %}
+        <div class="dinner2">{% if orders %}</div>
         <div class="orders-list">
             {% for order in orders %}
             <div class="order-item">

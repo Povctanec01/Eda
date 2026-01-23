@@ -2,28 +2,28 @@
 {% load static %}
 {% block title %}Статистика повара{% endblock %}
 {% block body %}
-<h2><i class="fas fa-chart-bar"></i> Статистика</h2>
-
-<div class="alert alert-info">
-    <strong>Не забранные заказы сегодня:</strong> {{ unclaimed_count }}
-</div>
-
-{% if unclaimed_orders %}
-<div class="mt-4">
-    <h4>Список незабранных заказов:</h4>
-    <div class="orders-list">
-        {% for order in unclaimed_orders %}
-        <div class="order-item">
-            <div class="order-info">
-                <h5>{{ order.card.title|default:"[Удалено]" }}</h5>
-                <p class="text-muted">Студент: {{ order.user.username }} | {{ order.ordered_at|date:"d.m.Y H:i" }}</p>
-            </div>
-            <span class="badge bg-success">Готов</span>
-        </div>
-        {% endfor %}
+<div class="menu-management">
+    <h2 class="dinner"><i class="fas fa-chart-bar"></i> Статистика</h2>
+    <div class="alert alert-info">
+        <strong>Не забранные заказы сегодня:</strong> {{ unclaimed_count }}
     </div>
+    {% if unclaimed_orders %}
+    <div class="mt-4">
+        <h4>Список незабранных заказов:</h4>
+        <div class="orders-list">
+            {% for order in unclaimed_orders %}
+            <div class="order-item">
+                <div class="order-info">
+                    <h5>{{ order.card.title|default:"[Удалено]" }}</h5>
+                    <p class="text-muted">Студент: {{ order.user.username }} | {{ order.ordered_at|date:"d.m.Y H:i" }}</p>
+                </div>
+                <span class="badge bg-success">Готов</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <p class="text-muted">Все заказы на сегодня забраны.</p>
+    {% endif %}
 </div>
-{% else %}
-<p class="text-muted">Все заказы на сегодня забраны.</p>
-{% endif %}
 {% endblock %}
