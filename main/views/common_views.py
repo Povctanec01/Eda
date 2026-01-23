@@ -24,7 +24,7 @@ def auth_view(request):
             register_form = UserCreationForm(request.POST)
             if register_form.is_valid():
                 user = register_form.save()
-                user.profile.role = 'admin'
+                user.profile.role = 'student'
                 user.profile.save()
                 login(request, user)
                 return redirect_by_role(user)
