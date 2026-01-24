@@ -31,7 +31,19 @@
                 <div class="dish-actions">
                 </div>
             </div>
+            {% if card.allergens.exists %}
+              <div class="allergens-list mt-1">
+                <small class="text-danger">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  Аллергены:
+                  {% for allergen in card.allergens.all %}
+                    <span class="badge bg-danger">{{ allergen.name }}</span>
+                  {% endfor %}
+                </small>
+              </div>
+            {% endif %}
         {% endfor %}
+
     </div>
     {% else %}
         <p style="color: #666; font-style: italic;">Пока нет добавленных блюд</p>
