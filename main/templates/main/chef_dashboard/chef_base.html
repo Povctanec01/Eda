@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
-    <link rel="stylesheet" href="{% static 'main/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/chef_dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'main/css/themes.css' %}" />
     <script src="{% static 'main/js/chef_dashboard.js' %}"></script>
 	<script src="{% static 'main/js/dashboard.js' %}"></script>
@@ -58,7 +58,10 @@
             <a href="{% url 'chef_card_edit' %}" {% if request.resolver_match.url_name == 'chef_card_edit' %}class="active"{% endif %}>
                 <i class="fas fa-utensils"></i>
                 <span>Меню</span>
-
+            </a>
+            <a href="{% url 'chef_allergens' %}" {% if request.resolver_match.url_name == 'chef_allergens' %}class="active"{% endif %}>
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Аллергены</span>
             </a>
             <a href="{% url 'chef_remaining_product' %}" {% if request.resolver_match.url_name == 'chef_remaining_product' %}class="active"{% endif %}>
                 <i class="fas fa-boxes"></i>

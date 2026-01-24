@@ -8,14 +8,24 @@ class Profile(models.Model):
     role = models.CharField(max_length=20, choices=[('student', 'Student'), ('chef', 'Chef'), ('admin', 'Admin')])
     auto_redirect_to_home = models.BooleanField(default=False)  # ← новое поле
 
+class Allergen(models.Model):
+    name = models.CharField('Название аллергена', max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Аллерген"
+        verbose_name_plural = "Аллергены"
+
+
 class Card(models.Model):
     MEAL_CHOICES = [
         ('select', 'Выберите'),
         ('breakfast', 'Завтрак'),
         ('lunch', 'Обед'),
     ]
-    ingredients = models.TextField('Ингредиенты', blank=True, null=True)
-    allergens = models.CharField('Аллергены', max_length=255, blank=True, null=True)
+
     title = models.CharField(max_length=200, verbose_name="Название блюда")
     description = models.TextField(verbose_name="Описание")
     meal_type = models.CharField(
@@ -24,6 +34,9 @@ class Card(models.Model):
         default='select',
         verbose_name="Тип приёма пищи"
     )
+    ingredients = models.TextField('Ингредиенты', blank=True, null=True)
+    # Заменяем CharField на ManyToManyField
+    allergens = models.ManyToManyField(Allergen, blank=True, verbose_name="Аллергены")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

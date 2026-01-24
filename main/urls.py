@@ -1,7 +1,7 @@
 # main/urls.py
 from django.urls import path
 from .views import common_views, student_views, chef_views, admin_views
-
+from .views.chef_views import chef_allergens
 urlpatterns = [
     path('', common_views.index, name='index'),
     path('index.html', common_views.index),
@@ -26,6 +26,9 @@ urlpatterns = [
     path('chef_statistics', chef_views.chef_statistics, name='chef_statistics'),
     path('chef_orders', chef_views.chef_orders, name='chef_orders'),
     path('chef_settings', chef_views.chef_settings, name='chef_settings'),
+    path('chef/allergens/', chef_views.chef_allergens, name='chef_allergens'),
+    path('chef/allergens/', chef_allergens, name='chef_allergens'),
+    path('chef/get-allergens/', chef_views.get_allergens, name='get_allergens'),
 
     # Admin
     path('admin_dashboard/admin_home_page', admin_views.admin_home_page, name='admin_dashboard/admin_home_page'),

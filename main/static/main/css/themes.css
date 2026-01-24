@@ -418,3 +418,241 @@ input:checked + .theme-slider:after {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
+
+/* === СТИЛИ ДЛЯ АЛЛЕРГЕНОВ === */
+
+/* Контейнер со скроллом для аллергенов */
+.allergens-scrollable {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+/* Карточки аллергенов */
+.allergen-card {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.allergen-card:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+}
+
+/* Название аллергена */
+.allergen-name {
+    color: var(--text-primary);
+}
+
+/* ID аллергена */
+.allergen-id {
+    color: var(--text-secondary);
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+/* Сообщение "нет аллергенов" */
+.no-allergens {
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+.no-allergens i {
+    color: var(--text-muted);
+}
+
+/* Стили скроллбара для аллергенов в темной теме */
+[data-theme="dark"] .allergens-scrollable::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .allergens-scrollable::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .allergens-scrollable::-webkit-scrollbar-thumb:hover {
+    background: var(--border-color);
+}
+
+/* Пагинация */
+.flat-pagination {
+    border-top-color: var(--border-color);
+    border-bottom-color: var(--border-color);
+}
+
+.pagination-arrow,
+.page-number {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.pagination-arrow:hover,
+.page-number:hover {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.current-page {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--bg-primary);
+}
+
+.page-ellipsis {
+    color: var(--text-muted);
+}
+
+.pagination-top .page-btn {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.pagination-top .page-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+}
+
+.pagination-top .page-info,
+.pagination-bottom-info {
+    color: var(--text-muted);
+}
+
+/* Поисковая форма */
+.search-input,
+input[type="text"],
+input[type="search"] {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.search-input:focus,
+input[type="text"]:focus,
+input[type="search"]:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+/* Стили для textarea */
+textarea {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+textarea:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+/* Стили для select */
+select,
+.period-select {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+select:focus,
+.period-select:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+/* Стили для секций с контентом */
+.section-header {
+    color: var(--text-primary);
+}
+
+.section-header h2,
+.section-header h3 {
+    color: var(--text-primary);
+}
+
+/* Дополнительные стили для всех h1-h6 */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+}
+
+/* Стили для параграфов */
+p {
+    color: var(--text-primary);
+}
+
+/* Placeholder для темной темы */
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Стили для списка аллергенов */
+.allergens-scrollable-list {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.allergen-item {
+    border-bottom-color: var(--border-color);
+    background-color: var(--card-bg);
+}
+
+.allergen-item:hover {
+    background-color: var(--bg-secondary);
+}
+
+.allergen-info .allergen-name {
+    color: var(--text-primary);
+}
+
+.allergen-info .allergen-id {
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+}
+
+.allergens-count {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.allergens-count span {
+    color: var(--primary-color);
+}
+
+.list-info {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.list-info i {
+    color: var(--primary-color);
+}
+
+/* Стили для поиска */
+.search-group .search-input {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.search-results-info {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--primary-color);
+}
+
+/* Чекбоксы в темной теме */
+.form-check label {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
