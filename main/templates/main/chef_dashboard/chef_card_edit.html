@@ -37,9 +37,21 @@
             <label for="{{ form.meal_type.id_for_label }}">Тип приёма пищи:</label>
             {{ form.meal_type }}
         </div>
+        <div class="form-group">
+            <label for="{{ form.allergens.id_for_label }}">Аллергены:</label>
+            <select name="allergens" id="id_allergens" class="form-control" multiple="multiple">
+                {% for allergen in form.allergens.field.queryset %}
+                    <option value="{{ allergen.id }}">{{ allergen.name }}</option>
+                {% endfor %}
+            </select>
+            <small class="form-text text-muted">
+                Начните вводить название аллергена для поиска
+            </small>
+        </div>
         <button type="submit" class="btn-success">Добавить карточку</button>
     </form>
 </section>
+
 <!-- Список для удаления -->
 <section class="menu-management" style="margin-top: 30px;">
     <h2 class="dinner">Блюда</h2>
@@ -69,6 +81,21 @@
                         <span class="dish-price">ID: {{ card.id }}</span>
                     </div>
                     <p class="dish-desc">{{ card.description|default:"Без описания" }}</p>
+
+                    <!-- Отображение аллергенов -->
+                    <div class="allergens-list" style="margin: 10px 0;">
+                        {% if card.allergens.all %}
+                            <strong>Аллергены:</strong>
+                            {% for allergen in card.allergens.all %}
+                                <span class="allergen-tag" style="background: #ff6b6b; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin: 0 5px 5px 0; display: inline-block;">
+                                    {{ allergen.name }}
+                                </span>
+                            {% endfor %}
+                        {% else %}
+                            <span style="color: #666; font-style: italic;">Аллергены не указаны</span>
+                        {% endif %}
+                    </div>
+
                     <div class="dish-actions">
                         <form method="post" onsubmit="return confirm('Удалить блюдо «{{ card.title }}»?');" style="display: inline;">
                             {% csrf_token %}
@@ -84,4 +111,82 @@
         <p style="color: #666; font-style: italic;">Нет карточек для удаления.</p>
     {% endif %}
 </section>
+
+<!-- Подключаем Select2 -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/i18n/ru.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Инициализация Select2 для поля аллергенов
+    $('#id_allergens').select2({
+        placeholder: "Выберите аллергены",
+        allowClear: true,
+        language: "ru",
+        width: '100%',
+        dropdownParent: $('.menu-management'),
+        // Закрытие при клике вне поля (это поведение по умолчанию в Select2)
+        closeOnSelect: false // Оставляем dropdown открытым после выбора
+    });
+
+    // Select2 автоматически закрывает dropdown при клике вне элемента
+    // но мы можем добавить дополнительную обработку
+    $(document).on('click', function(e) {
+        // Если клик был не по Select2 и не внутри его dropdown
+        if (!$(e.target).closest('.select2-container').length) {
+            // Закрываем все открытые Select2 dropdown
+            $('.select2-container--open').removeClass('select2-container--open');
+            $('.select2-dropdown').hide();
+        }
+    });
+});
+
+// Функция для фильтрации блюд по типу
+function showMeals(type) {
+    const items = document.querySelectorAll('.dish-item');
+
+    items.forEach(item => {
+        if (type === 'Все') {
+            item.style.display = 'block';
+        } else {
+            const mealType = item.getAttribute('data-meal-type');
+            item.style.display = mealType === type ? 'block' : 'none';
+        }
+    });
+}
+</script>
+
+<style>
+/* Стили для тегов аллергенов в списке блюд */
+.allergen-tag {
+    background: #ff6b6b;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    margin: 0 5px 5px 0;
+    display: inline-block;
+    font-weight: 500;
+}
+
+/* Стили для Select2 */
+.select2-container--default .select2-selection--multiple {
+    min-height: 40px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+</style>
 {% endblock %}

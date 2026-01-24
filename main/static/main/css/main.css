@@ -466,3 +466,271 @@ body {
 .btn-danger:hover {
     background-color: #c82333;
 }
+
+.form-check {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.form-check label {
+    margin-bottom: 0;
+    padding: 5px 10px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+.form-check input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+
+/* Стили для поиска */
+.search-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(124, 147, 255, 0.1);
+}
+
+.search-btn {
+    white-space: nowrap;
+    padding: 10px 20px;
+}
+
+.search-results-info {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    color: var(--primary-color);
+    font-size: 14px;
+    border: 1px solid var(--border-color);
+}
+
+.search-results-info i {
+    margin-right: 8px;
+}
+
+/* Стили для списка */
+.allergens-scrollable-list {
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--card-bg);
+    margin-top: 15px;
+}
+
+.allergen-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.allergen-item:last-child {
+    border-bottom: none;
+}
+
+.allergen-item:hover {
+    background-color: var(--bg-secondary);
+}
+
+.allergen-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.allergen-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+.allergen-name .highlight {
+    background-color: var(--warning-color);
+    color: var(--text-primary);
+    padding: 1px 2px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+.allergen-id {
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.btn-delete {
+    background: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.btn-delete:hover {
+    background: var(--danger-color);
+    opacity: 0.8;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.allergens-count {
+    background: var(--bg-secondary);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.allergens-count span {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.list-info {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.list-info i {
+    color: var(--primary-color);
+    margin-right: 8px;
+}
+
+.no-allergens {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+    margin-top: 20px;
+}
+
+.no-allergens i {
+    font-size: 48px;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    display: block;
+}
+
+.no-allergens .btn {
+    margin-top: 15px;
+}
+
+/* Кастомный скроллбар */
+.allergens-scrollable-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.allergens-scrollable-list::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.allergens-scrollable-list::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+.allergens-scrollable-list::-webkit-scrollbar-thumb:hover {
+    background: var(--border-color);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .allergens-container {
+        padding: 15px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .allergens-count {
+        align-self: flex-start;
+    }
+
+    .allergen-item {
+        padding: 10px 15px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .allergen-form {
+        align-self: flex-end;
+    }
+
+    .search-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-input {
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .allergen-info {
+        width: 100%;
+    }
+
+    .allergen-name {
+        font-size: 14px;
+    }
+
+    .btn-delete {
+        padding: 6px 10px;
+        font-size: 12px;
+        width: 100%;
+    }
+
+    .allergen-form {
+        width: 100%;
+    }
+}

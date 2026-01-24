@@ -1,13 +1,16 @@
-# main/views/chef_views.py
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
 from ..models import Card, Order, CardBuys, Profile
 from ..forms import CardForm, CardFormBuys
 from datetime import timedelta, time
 from django.utils import timezone
+from ..models import Allergen
+from django import forms
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from django.core.paginator import Paginator  # Добавляем пагинацию
 
 @login_required
 def chef_home_page(request):
@@ -48,6 +51,56 @@ def chef_home_page(request):
         'all_orders_count': all_orders_count,
         'form_buys': form_buys,
         'buys': buys
+    })
+
+
+class AllergenForm(forms.ModelForm):
+    class Meta:
+        model = Allergen
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Название аллергена'})
+        }
+
+@login_required
+def chef_allergens(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'chef':
+        return redirect('login')
+
+    query = request.GET.get('q', '').strip()
+    allergens = Allergen.objects.all().order_by('name')
+
+    if query:
+        allergens = allergens.filter(name__icontains=query)
+
+    # Пагинация - 10 элементов на страницу
+    paginator = Paginator(allergens, 10)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    if request.method == 'POST':
+        if 'add' in request.POST:
+            form = AllergenForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Аллерген добавлен!")
+                return redirect('chef_allergens')
+            else:
+                for error in form.errors.values():
+                    messages.error(request, f"Ошибка: {error}")
+        elif 'delete' in request.POST:
+            allergen_id = request.POST.get('allergen_id')
+            allergen = get_object_or_404(Allergen, id=allergen_id)
+            allergen.delete()
+            messages.success(request, f"Аллерген «{allergen.name}» удалён.")
+            return redirect('chef_allergens')
+
+    form = AllergenForm()
+    return render(request, 'main/chef_dashboard/chef_allergens.html', {
+        'form': form,
+        'allergens': page_obj,  # Используем page_obj вместо полного queryset
+        'page_obj': page_obj,   # Для пагинации в шаблоне
+        'query': query
     })
 
 @login_required
@@ -171,4 +224,32 @@ def chef_statistics(request):
     return render(request, 'main/chef_dashboard/chef_statistics.html', {
         'unclaimed_orders': unclaimed_orders,
         'unclaimed_count': unclaimed_count,
+    })
+
+
+@require_GET
+@login_required
+def get_allergens(request):
+    query = request.GET.get('q', '').strip()
+    page = int(request.GET.get('page', 1))
+    limit = 30
+    offset = (page - 1) * limit
+
+    allergens = Allergen.objects.all()
+    if query:
+        allergens = allergens.filter(name__icontains=query)
+
+    total_count = allergens.count()
+    allergens = allergens[offset:offset + limit]
+
+    results = []
+    for a in allergens:
+        results.append({
+            'id': a.id,
+            'text': a.name
+        })
+
+    return JsonResponse({
+        'items': results,
+        'total_count': total_count
     })
