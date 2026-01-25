@@ -30,3 +30,20 @@ function showMeals(mealType) {
 document.addEventListener('DOMContentLoaded', () => {
   showMeals('Все');
 });
+// Проверка совпадения паролей
+document.getElementById('passwordForm').addEventListener('submit', function(e) {
+  const password1 = document.getElementById('new_password1').value;
+  const password2 = document.getElementById('new_password2').value;
+
+  if (password1 !== password2) {
+    e.preventDefault();
+    alert('Новые пароли не совпадают!');
+    return false;
+  }
+
+  if (password1.length < 8) {
+    e.preventDefault();
+    alert('Пароль должен содержать минимум 8 символов!');
+    return false;
+  }
+});

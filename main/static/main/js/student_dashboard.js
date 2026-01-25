@@ -45,3 +45,43 @@ function markAllPrepared() {
         });
     });
 }
+// Функция для переключения чекбокса при клике по всей карточке
+function toggleCheckbox(checkboxId) {
+    const checkbox = document.getElementById(checkboxId);
+    checkbox.checked = !checkbox.checked;
+    // Имитируем событие изменения, чтобы обновить счетчик
+    checkbox.dispatchEvent(new Event('change'));
+}
+
+// Функция для обновления счетчика
+function updateCount(type, isChecked) {
+    const countElement = document.getElementById(`${type}-count`);
+    let currentCount = parseInt(countElement.textContent.split(': ')[1]);
+    if (isChecked) {
+        currentCount++;
+    } else {
+        currentCount--;
+    }
+    countElement.textContent = `Всего: ${currentCount}`;
+}
+
+// Инициализация счетчиков при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    // Подсчитываем начальное количество выбранных аллергенов
+    let criticalCount = 0;
+    let noncriticalCount = 0;
+
+    // Для критических
+    document.querySelectorAll('input[name="critical_allergens"]').forEach(cb => {
+        if (cb.checked) criticalCount++;
+    });
+
+    // Для некритичных
+    document.querySelectorAll('input[name="non_critical_allergens"]').forEach(cb => {
+        if (cb.checked) noncriticalCount++;
+    });
+
+    // Обновляем отображение
+    document.getElementById('critical-count').textContent = `Всего: ${criticalCount}`;
+    document.getElementById('noncritical-count').textContent = `Всего: ${noncriticalCount}`;
+});

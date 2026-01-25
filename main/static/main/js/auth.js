@@ -51,8 +51,4 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
-
-  // === Обработка отправки форм (опционально — без AJAX) ===
-  // Убран preventDefault, чтобы формы работали нормально с Django
-  // Если нужна AJAX — реализуйте отдельно
 });

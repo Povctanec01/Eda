@@ -44,15 +44,21 @@
                 </div>
             </div>
         </header>
-        {% block body %}
-        {% endblock %}
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                {% block body %}
+                {% endblock %}
+            </div>
+        </div>
     </main>
     <aside class="sidebar">  <!--Боковой бар-->
         <div class="sidebar-header">
-            <div class="logo">
-                <i class="fas fa-utensils"></i>
-                <span>Школьная Столовая</span>
-            </div>
+            <a href="{% url 'index' %}">
+                <div class="logo">
+                    <i class="fas fa-utensils"></i>
+                    <span>Школьная Столовая</span>
+                </div>
+            </a>
             <button class="sidebar-toggle" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
@@ -91,9 +97,9 @@
                     <span class="badge">{{ unclaimed_orders_count }}</span>
                 {% endif %}
             </a>
-            <a href="{% url 'student_order_history' %}" {% if request.resolver_match.url_name == 'student_order_history' %}class="active"{% endif %}>
-              <i class="fas fa-history"></i>
-              <span>История заказов</span>
+            <a href="{% url 'student_allergens' %}" {% if request.resolver_match.url_name == 'student_allergens' %}class="active"{% endif %}>
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>Аллергены</span>
             </a>
             <a href="#" onclick="showSection('preferences')">
                 <i class="fas fa-heart"></i>
@@ -102,6 +108,10 @@
             <a href="{% url 'student_feedback' %}" {% if request.resolver_match.url_name == 'student_feedback' %}class="active"{% endif %}>
                 <i class="fas fa-star"></i>
                 <span>Отзывы</span>
+            </a>
+            <a href="{% url 'student_order_history' %}" {% if request.resolver_match.url_name == 'student_order_history' %}class="active"{% endif %}>
+              <i class="fas fa-history"></i>
+              <span>История заказов</span>
             </a>
             <a href="{% url 'student_settings' %}" {% if request.resolver_match.url_name == 'student_settings' %}class="active"{% endif %}>
               <i class="fas fa-cog"></i>

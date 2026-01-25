@@ -3,15 +3,31 @@
 {% block title %}Настройки{% endblock %}
 
 {% block body %}
-<!-- Кнопка удаления аккаунта -->
+<!-- Изменение пароля -->
 <div class="settings-section">
-  <h3>Опасные действия</h3>
-  <form method="post" action="{% url 'student_settings' %}"
-        onsubmit="return confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить!');">
+  <h3>Изменение пароля</h3>
+  <form method="post" action="{% url 'student_settings' %}" id="passwordForm">
     {% csrf_token %}
-    <input type="hidden" name="delete_account" value="1">
-    <button type="submit" class="btn btn-danger">
-      <i class="fas fa-user-times"></i> Удалить аккаунт
+    <input type="hidden" name="change_password" value="1">
+
+    <div class="mb-3">
+      <label for="current_password" class="form-label">Текущий пароль</label>
+      <input type="password" class="form-control" id="current_password" name="current_password" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="new_password1" class="form-label">Новый пароль</label>
+      <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+      <div class="form-text">Пароль должен содержать минимум 8 символов.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="new_password2" class="form-label">Подтвердите новый пароль</label>
+      <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-key"></i> Изменить пароль
     </button>
   </form>
 </div>
@@ -29,6 +45,19 @@
       </label>
     </div>
     <button type="submit" class="btn btn-primary mt-2">Сохранить настройки</button>
+  </form>
+</div>
+
+<!-- Опасные действия -->
+<div class="settings-section mt-4">
+  <h3 class="text-danger">Опасные действия</h3>
+  <form method="post" action="{% url 'student_settings' %}"
+        onsubmit="return confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить!');">
+    {% csrf_token %}
+    <input type="hidden" name="delete_account" value="1">
+    <button type="submit" class="btn btn-danger">
+      <i class="fas fa-user-times"></i> Удалить аккаунт
+    </button>
   </form>
 </div>
 {% endblock %}
