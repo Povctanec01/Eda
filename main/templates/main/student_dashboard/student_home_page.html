@@ -1,97 +1,122 @@
+<!-- student_home_page.html -->
 {% extends 'main/student_dashboard/student_base.html' %}
 {% load static %}
 {% block title %}Панель ученика - Школьная Столовая{% endblock %}
 {% block body %}
 <section class="today-menu">
-  <div class="section-header">
-    <h2 class="dinner"><i class="fas fa-concierge-bell"></i> Меню на сегодня</h2>
-  </div>
+    <div class="section-header">
+        <h2 class="dinner"><i class="fas fa-concierge-bell"></i> Меню на сегодня</h2>
+    </div>
     <div class="meal-filters mb-3 dinner">
-      <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Все')">
-        <i class="fas fa-spoon"></i>
-        Все
-      </button>
-      <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Обед')">
-        <i class="fas fa-plate-wheat"></i>
-        Обеды
-      </button>
-      <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Завтрак')">
-        <i class="fas fa-mug-saucer"></i>
-        Завтраки
-      </button>
+        <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Все')">
+            <i class="fas fa-spoon"></i>
+            Все
+        </button>
+        <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Обед')">
+            <i class="fas fa-plate-wheat"></i>
+            Обеды
+        </button>
+        <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Завтрак')">
+            <i class="fas fa-mug-saucer"></i>
+            Завтраки
+        </button>
     </div>
-
-  <!-- Список блюд -->
-  <div class="menu-items">
-    {% for card in today_cards %}
-    <div class="menu-item" data-meal-type="{{ card.meal_type }}">
-      <h4>{{ card.title }}</h4>
-      <p class="text-muted">{{ card.description|default:"Без описания" }}</p>
-        <span class="badge {{ card.badge_class }}">
-          {{ card.get_meal_type_display }}
-        </span>
-        <!-- Отображение аллергенов -->
-        {% if card.allergens.exists %}
-          <div class="allergens-list mt-1">
-            <small class="text-danger">
-              <i class="fas fa-exclamation-triangle"></i>
-              Аллергены:
-              {% for allergen in card.allergens.all %}
-                <span class="badge bg-danger">{{ allergen.name }}</span>
-              {% endfor %}
-            </small>
-          </div>
-        {% endif %}
-      <a href="{% url 'student_order_create' card.id %}" class="btn btn-sm btn-outline-primary mt-2">
-        Заказать
-      </a>
-    </div>
-    {% empty %}
-    <p class="text-muted">Сегодня меню не загружено.</p>
-    {% endfor %}
-  </div>
-</section>
-
-<section class="menu-management">
-  <h2 class="dinner2" ><i class="fas fa-history"></i> Последние заказы</h2>
-  {% if orders %}
-    <div class="orders-list">
-      {% for order in orders %}
-        <div class="order-item">
-          <div class="order-info">
-            <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
-            <p class="text-muted">{{ order.ordered_at|date:"d.m.Y H:i" }}</p>
-          </div>
-          <div class="order-status">
-            {% if order.status == 'pending' %}
-              <span class="badge bg-warning">Готовится</span>
-            {% elif order.status == 'ready' %}
-              <span class="badge bg-success">Готов! Заберите в столовой</span>
-            {% elif order.status == 'received' %}
-              <span class="badge bg-secondary">Получен</span>
+    <!-- Список блюд -->
+    <div class="menu-items">
+        {% for card in today_cards %}
+        <div class="menu-item" data-meal-type="{{ card.meal_type }}">
+            <h4>{{ card.title }}</h4>
+            <p class="text-muted">{{ card.description|default:"Без описания" }}</p>
+            <span class="badge {{ card.badge_class }}">
+                {{ card.get_meal_type_display }}
+            </span>
+            <!-- Отображение аллергенов -->
+            {% if card.allergens.exists %}
+            <div class="allergens-list mt-1">
+                <small class="text-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Аллергены:
+                    {% for allergen in card.allergens.all %}
+                    <span class="badge bg-danger">{{ allergen.name }}</span>
+                    {% endfor %}
+                </small>
+            </div>
             {% endif %}
-          </div>
+            <a href="{% url 'student_order_create' card.id %}" class="btn btn-sm btn-outline-primary mt-2">
+                Заказать
+            </a>
+        </div>
+        {% empty %}
+        <p class="text-muted">Сегодня меню не загружено.</p>
+        {% endfor %}
+    </div>
+</section>
+<section class="menu-management">
+    <h2 class="dinner2" ><i class="fas fa-history"></i> Последние заказы</h2>
+    {% if orders %}
+    <div class="orders-list">
+        {% for order in orders %}
+        <div class="order-item">
+            <div class="order-info">
+                <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
+                <p class="text-muted">{{ order.ordered_at|date:"d.m.Y H:i" }}</p>
+            </div>
+            <div class="order-status">
+                {% if order.status == 'pending' %}
+                <span class="badge bg-warning">Готовится</span>
+                {% elif order.status == 'ready' %}
+                <span class="badge bg-success">Готов! Заберите в столовой</span>
+                {% elif order.status == 'received' %}
+                <span class="badge bg-secondary">Получен</span>
+                {% endif %}
+            </div>
             {% if order.status == 'ready' %}
-                <form method="post" style="margin-top: 8px;" action="{% url 'student_mark_received' order.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-success">
-                        <i class="fas fa-check-circle"></i> Я забрал
-                    </button>
-                </form>
+            <form method="post" style="margin-top: 8px;" action="{% url 'student_mark_received' order.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-check-circle"></i> Я забрал
+                </button>
+            </form>
             {% endif %}
         </div>
-      {% endfor %}
+        {% endfor %}
     </div>
     {% if all_orders_count > 3 %}
-      <div class="mt-3 text-center">
+    <div class="mt-3 text-center">
         <a href="{% url 'student_my_orders' %}" class="btn btn-outline-secondary">
-          Перейти ко всем заказам
+            Перейти ко всем заказам
         </a>
-      </div>
+    </div>
     {% endif %}
-  {% else %}
+    {% else %}
     <p class="text-muted">У вас пока нет заказов.</p>
-  {% endif %}
+    {% endif %}
 </section>
+
+<!-- Скрипт для фильтрации блюд -->
+<script>
+    // Определение функции showMeals
+    function showMeals(filterType) {
+        const menuItems = document.querySelectorAll('.menu-item');
+        // Приводим переданный тип к значению, которое используется в data-meal-type
+        let actualFilter = filterType.toLowerCase();
+        if (actualFilter === 'все') {
+             actualFilter = 'all';
+        } else if (actualFilter === 'завтрак') {
+             actualFilter = 'breakfast';
+        } else if (actualFilter === 'обед') {
+             actualFilter = 'lunch';
+        }
+
+        menuItems.forEach(item => {
+            const mealType = item.getAttribute('data-meal-type');
+            if (actualFilter === 'all' || mealType === actualFilter) {
+                item.style.display = 'block'; // Показываем элемент
+            } else {
+                item.style.display = 'none'; // Скрываем элемент
+            }
+        });
+    }
+</script>
 
 {% endblock %}
