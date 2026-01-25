@@ -1,13 +1,15 @@
 # main/views/student_views.py
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
-from ..models import Card, Order
+from ..models import Card, Order, Allergen
 from django.utils import timezone
 from datetime import time, datetime
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.contrib import messages
 
+
+# Обновить student_home_page в student_views.py
 
 @login_required
 def student_home_page(request):
@@ -32,8 +34,37 @@ def student_home_page(request):
         ordered_at__range=(start_of_day, end_of_day)
     ).count()
 
+    # Получаем все блюда на сегодня
     today_cards = Card.objects.exclude(meal_type='select').order_by('meal_type', 'title')
+
+    # Получаем аллергены пользователя
+    profile = request.user.profile
+    critical_allergens = profile.critical_allergens.all()
+    non_critical_allergens = profile.non_critical_allergens.all()
+
+    # Фильтруем блюда с критическими аллергенами
+    if critical_allergens.exists():
+        today_cards = today_cards.exclude(
+            allergens__in=critical_allergens
+        ).distinct()
+
+    # Добавляем информацию об аллергенах для каждого блюда
+    filtered_cards = []
     for card in today_cards:
+        # Проверяем некритические аллергены
+        card_non_critical_allergens = card.allergens.filter(
+            id__in=non_critical_allergens.values_list('id', flat=True)
+        )
+
+        # Добавляем признак наличия некритических аллергенов
+        if card_non_critical_allergens.exists():
+            card.has_non_critical_allergens = True
+            card.non_critical_allergens_list = list(card_non_critical_allergens)
+        else:
+            card.has_non_critical_allergens = False
+            card.non_critical_allergens_list = []
+
+        # Добавляем badge class для типа блюда
         if card.meal_type == 'breakfast':
             card.badge_class = 'bg-success'
         elif card.meal_type == 'lunch':
@@ -41,15 +72,17 @@ def student_home_page(request):
         else:
             card.badge_class = 'bg-secondary'
 
+        filtered_cards.append(card)
+
     all_orders_count = Order.objects.filter(user=request.user).count()
     recent_orders = Order.objects.filter(user=request.user).order_by('-ordered_at')[:3]
 
     return render(request, 'main/student_dashboard/student_home_page.html', {
-        'today_cards': today_cards,
+        'today_cards': filtered_cards,
         'orders': recent_orders,
         'all_orders_count': all_orders_count,
-        'pending_orders_count': pending_orders_count,   # ← Добавлено
-        'ready_orders_count': ready_orders_count,       # ← Добавлено
+        'pending_orders_count': pending_orders_count,
+        'ready_orders_count': ready_orders_count,
     })
 
 
@@ -167,3 +200,73 @@ def student_mark_received(request, order_id):
     order.status = 'received'
     order.save()
     return redirect(request.META.get('HTTP_REFERER', 'student_dashboard/student_home_page'))
+
+
+# Добавить в student_views.py
+
+@login_required
+def student_allergens(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+
+    # Получаем все аллергены
+    all_allergens = Allergen.objects.all().order_by('name')
+
+    # Получаем аллергены студента из профиля
+    profile = request.user.profile
+    critical_allergens = profile.critical_allergens.all()
+    non_critical_allergens = profile.non_critical_allergens.all()
+
+    return render(request, 'main/student_dashboard/student_allergens.html', {
+        'all_allergens': all_allergens,
+        'critical_allergens': critical_allergens,
+        'non_critical_allergens': non_critical_allergens,
+    })
+
+
+@login_required
+def update_critical_allergens(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+
+    if request.method == 'POST':
+        profile = request.user.profile
+        selected_allergen_ids = request.POST.getlist('critical_allergens')
+
+        # Обновляем критические аллергены
+        profile.critical_allergens.clear()
+        for allergen_id in selected_allergen_ids:
+            try:
+                allergen = Allergen.objects.get(id=allergen_id)
+                profile.critical_allergens.add(allergen)
+            except Allergen.DoesNotExist:
+                continue
+
+        profile.save()
+        messages.success(request, "Критические аллергены обновлены!")
+
+    return redirect('student_allergens')
+
+
+@login_required
+def update_non_critical_allergens(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+
+    if request.method == 'POST':
+        profile = request.user.profile
+        selected_allergen_ids = request.POST.getlist('non_critical_allergens')
+
+        # Обновляем некритичные аллергены
+        profile.non_critical_allergens.clear()
+        for allergen_id in selected_allergen_ids:
+            try:
+                allergen = Allergen.objects.get(id=allergen_id)
+                profile.non_critical_allergens.add(allergen)
+            except Allergen.DoesNotExist:
+                continue
+
+        profile.save()
+        messages.success(request, "Некритичные аллергены обновлены!")
+
+    return redirect('student_allergens')

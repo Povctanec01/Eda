@@ -2,6 +2,7 @@
 from django.urls import path
 from .views import common_views, student_views, chef_views, admin_views
 from .views.chef_views import chef_allergens
+from main.views.student_views import update_critical_allergens, update_non_critical_allergens
 urlpatterns = [
     path('', common_views.index, name='index'),
     path('index.html', common_views.index),
@@ -18,6 +19,9 @@ urlpatterns = [
     path('student_settings', student_views.student_settings, name='student_settings'),
     path('student/order/create/<int:card_id>/', student_views.student_order_create, name='student_order_create'),
     path('student/order/<int:order_id>/mark-received/', student_views.student_mark_received, name='student_mark_received'),
+    path('student_allergens', student_views.student_allergens, name='student_allergens'),
+    path('student/allergens/critical/update/', update_critical_allergens, name='update_critical_allergens'),
+    path('student/allergens/non-critical/update/', update_non_critical_allergens, name='update_non_critical_allergens'),
 
     # Chef
     path('chef_dashboard/chef_home_page', chef_views.chef_home_page, name='chef_dashboard/chef_home_page'),
