@@ -7,6 +7,7 @@ urlpatterns = [
     path('index.html', common_views.index),
     path('logout/', common_views.logout_view, name='logout'),
     path('login/', common_views.auth_view, name='login'),
+    path('enter-profile/', common_views.enter_profile, name='enter_profile'),
 
     # Student
     path('student_dashboard/student_home_page', student_views.student_home_page,name='student_dashboard/student_home_page'),
