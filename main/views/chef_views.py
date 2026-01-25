@@ -103,19 +103,59 @@ def chef_allergens(request):
         'query': query
     })
 
+
 @login_required
 def chef_settings(request):
     if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
 
     if request.method == 'POST':
-        # Удаление аккаунта
-        user = request.user
-        username = user.username
-        user.delete()
-        logout(request)
-        messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
-        return redirect('login')
+        # Изменение пароля
+        if 'change_password' in request.POST:
+            current_password = request.POST.get('current_password')
+            new_password1 = request.POST.get('new_password1')
+            new_password2 = request.POST.get('new_password2')
+
+            # Проверка текущего пароля
+            if not request.user.check_password(current_password):
+                messages.error(request, "Текущий пароль указан неверно.")
+                return redirect('chef_settings')
+
+            # Проверка совпадения новых паролей
+            if new_password1 != new_password2:
+                messages.error(request, "Новые пароли не совпадают.")
+                return redirect('chef_settings')
+
+            # Проверка длины пароля
+            if len(new_password1) < 8:
+                messages.error(request, "Пароль должен содержать минимум 8 символов.")
+                return redirect('chef_settings')
+
+            # Изменение пароля
+            request.user.set_password(new_password1)
+            request.user.save()
+
+            # Обновляем сессию, чтобы пользователь не разлогинился
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, request.user)
+
+            messages.success(request, "Пароль успешно изменён!")
+            return redirect('chef_settings')
+
+        if 'delete_account' in request.POST:
+            user = request.user
+            username = user.username
+            user.delete()
+            logout(request)
+            messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
+            return redirect('login')
+
+        # Сохранение настроек автоперехода (добавьте этот блок)
+        profile = request.user.profile
+        profile.auto_redirect_to_home = 'auto_redirect' in request.POST
+        profile.save()
+        messages.success(request, "Настройки сохранены.")
+        return redirect('chef_settings')
 
     # GET: просто показываем страницу настроек
     return render(request, 'main/chef_dashboard/chef_settings.html')

@@ -1,7 +1,7 @@
 # main/views/student_views.py
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from ..models import Card, Order, Profile
+from django.shortcuts import render, get_object_or_404
+from ..models import Card, Order
 from django.utils import timezone
 from datetime import time, datetime
 from django.contrib.auth import logout
@@ -53,14 +53,44 @@ def student_home_page(request):
     })
 
 
-
-
 @login_required
 def student_settings(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
 
     if request.method == 'POST':
+        # Изменение пароля
+        if 'change_password' in request.POST:
+            current_password = request.POST.get('current_password')
+            new_password1 = request.POST.get('new_password1')
+            new_password2 = request.POST.get('new_password2')
+
+            # Проверка текущего пароля
+            if not request.user.check_password(current_password):
+                messages.error(request, "Текущий пароль указан неверно.")
+                return redirect('student_settings')
+
+            # Проверка совпадения новых паролей
+            if new_password1 != new_password2:
+                messages.error(request, "Новые пароли не совпадают.")
+                return redirect('student_settings')
+
+            # Проверка длины пароля
+            if len(new_password1) < 8:
+                messages.error(request, "Пароль должен содержать минимум 8 символов.")
+                return redirect('student_settings')
+
+            # Изменение пароля
+            request.user.set_password(new_password1)
+            request.user.save()
+
+            # Обновляем сессию, чтобы пользователь не разлогинился
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, request.user)
+
+            messages.success(request, "Пароль успешно изменён!")
+            return redirect('student_settings')
+
         # Удаление аккаунта (если отправлена именно эта форма)
         if 'delete_account' in request.POST:
             user = request.user
@@ -70,7 +100,7 @@ def student_settings(request):
             messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
             return redirect('login')
 
-        # Сохранение настроек
+        # Сохранение настроек автоперехода
         profile = request.user.profile
         profile.auto_redirect_to_home = 'auto_redirect' in request.POST
         profile.save()
