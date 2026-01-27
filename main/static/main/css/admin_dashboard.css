@@ -1030,3 +1030,196 @@ body {
         gap: 10px;
     }
 }
+/* Заголовок списка пользователей */
+.user-list-header {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+/* Поисковая группа */
+.search-group {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Информация о результатах поиска */
+.search-results-info {
+    display: none;
+}
+
+/* Контейнер со скроллом для списка пользователей */
+.allergens-scroll-container {
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    padding: 0 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.allergens-scrollable {
+    overflow-y: auto;
+    max-height: 500px;
+    padding: 10px 0;
+}
+
+/* Карточки пользователей (стиль аллергенов) */
+.allergen-item.user-item {
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px;
+    background: var(--card-bg);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.allergen-item.user-item:hover {
+    background: var(--bg-secondary);
+    border-color: var(--primary-color);
+}
+
+.allergen-item.user-item.selected {
+    background: rgba(102, 126, 234, 0.1);
+    border-left: 4px solid var(--primary-color);
+}
+
+.user-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.user-checkbox {
+    cursor: pointer;
+}
+
+.allergen-info {
+    flex: 1;
+}
+
+.allergen-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.allergen-id {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+/* Бейдж роли пользователя */
+.user-role-badge {
+    margin-left: 15px;
+    flex-shrink: 0;
+}
+
+.user-role-badge .badge {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 12px;
+}
+
+/* Сообщение "нет пользователей" */
+.no-users-placeholder {
+    width: 100%;
+    color: var(--text-secondary);
+}
+
+.no-users-placeholder i {
+    font-size: 48px;
+}
+
+/* Стили для скроллбара */
+.allergens-scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.allergens-scroll-container::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+.allergens-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+.allergens-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: var(--border-color);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .allergen-name {
+        font-size: 1rem;
+    }
+
+    .search-group {
+        min-width: 100%;
+    }
+
+    .user-role-badge {
+        margin-left: 10px;
+    }
+
+    .user-role-badge .badge {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+/* СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ */
+.alert {
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert i {
+    font-size: 1.2rem;
+    margin-right: 10px;
+}
+
+.alert ul {
+    padding-left: 20px;
+    margin-bottom: 0;
+}
+
+.alert li {
+    margin-bottom: 3px;
+}
+
+/* Стили для ошибок под полями */
+.text-danger.small {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.text-danger.small i {
+    font-size: 0.8rem;
+    margin-right: 5px;
+}

@@ -9,7 +9,7 @@ from django.utils import timezone
 from datetime import time, datetime, timedelta
 from ..models import Card, Order, CardBuys, Profile
 from ..forms import CardForm, CardFormBuys
-from datetime import timedelta
+
 
 class StaffRegistrationForm(forms.Form):
     username = forms.CharField(
@@ -51,7 +51,21 @@ class StaffRegistrationForm(forms.Form):
         username = self.cleaned_data['username']
         password = self.cleaned_data['password1']
         role = self.cleaned_data['role']
+
+        # Создаем пользователя
         user = User.objects.create_user(username=username, password=password)
+
+        # Если роль 'admin', делаем суперпользователем
+        if role == 'admin':
+            user.is_staff = True
+            user.is_superuser = True
+            user.save()
+            print(f"Создан суперпользователь: {username}")  # Для отладки
+
+        # Убедимся, что роль не пустая
+        if not role:
+            role = 'student'
+
         user.profile.role = role
         user.profile.save()
         return user
@@ -59,8 +73,10 @@ class StaffRegistrationForm(forms.Form):
 
 @login_required
 def admin_home_page(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        messages.error(request, "У вас нет прав для доступа к этой странице.")
         return redirect('login')
+
     student_count = Profile.objects.filter(role='student').count()
     return render(request, 'main/admin_dashboard/admin_home_page.html', {
         'student_count': student_count,
@@ -69,7 +85,8 @@ def admin_home_page(request):
 
 @login_required
 def admin_settings(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        messages.error(request, "У вас нет прав для доступа к этой странице.")
         return redirect('login')
 
     if request.method == 'POST':
@@ -113,7 +130,7 @@ def admin_settings(request):
             messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
             return redirect('login')
 
-        # Сохранение настроек автоперехода (добавьте этот блок)
+        # Сохранение настроек автоперехода
         profile = request.user.profile
         profile.auto_redirect_to_home = 'auto_redirect' in request.POST
         profile.save()
@@ -125,8 +142,10 @@ def admin_settings(request):
 
 @login_required
 def admin_card_edit(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        messages.error(request, "У вас нет прав для доступа к этой странице.")
         return redirect('login')
+
     if request.method == 'POST' and 'add' in request.POST:
         form = CardForm(request.POST)
         if form.is_valid():
@@ -139,25 +158,30 @@ def admin_card_edit(request):
                     messages.error(request, f"Ошибка: {error}")
     else:
         form = CardForm()
+
     if request.method == 'POST' and 'delete' in request.POST:
         card_id = request.POST.get('card_id')
         card = get_object_or_404(Card, id=card_id)
         card.delete()
         messages.success(request, "Блюдо удалено.")
         return redirect('admin_card_edit')
+
     cards = Card.objects.all().order_by('meal_type', 'title')
     return render(request, 'main/admin_dashboard/admin_card_edit.html', {'form': form, 'cards': cards})
 
 
 @login_required
 def admin_buys(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        messages.error(request, "У вас нет прав для доступа к этой странице.")
         return redirect('login')
+
     one_week_ago = timezone.now() - timedelta(days=7)
     buys_queryset = CardBuys.objects.filter(created_at__gte=one_week_ago)
     pending_count = buys_queryset.filter(status='pending').count()
     rejected_count = buys_queryset.filter(status='rejected').count()
     approved_count = buys_queryset.filter(status='approved').count()
+
     if request.method == 'POST':
         if 'action' in request.POST:
             buy_id = request.POST.get('buy_id')
@@ -171,12 +195,14 @@ def admin_buys(request):
                 messages.warning(request, f"Запрос «{buy.title}» отклонён.")
             buy.save()
             return redirect('admin_buys')
+
         if 'delete' in request.POST:
             card_id_buys = request.POST.get('card_id_buys')
             buy = get_object_or_404(CardBuys, id=card_id_buys)
             buy.delete()
             messages.success(request, "Блюдо удалено.")
             return redirect('admin_buys')
+
         if 'add' in request.POST:
             form_buys = CardFormBuys(request.POST)
             if form_buys.is_valid():
@@ -189,6 +215,7 @@ def admin_buys(request):
                         messages.error(request, f"Ошибка: {error}")
     else:
         form_buys = CardFormBuys()
+
     buys = CardBuys.objects.all().order_by('-created_at')
     return render(request, 'main/admin_dashboard/admin_buys.html', {
         'form_buys': form_buys,
@@ -201,31 +228,62 @@ def admin_buys(request):
 
 @login_required
 def admin_finance(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        messages.error(request, "У вас нет прав для доступа к этой странице.")
         return redirect('login')
+
     return render(request, 'main/admin_dashboard/admin_finance.html')
 
 
-from django.contrib.auth.models import User
-
 @login_required
 def admin_users_delete_selected(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        messages.error(request, "У вас нет прав для выполнения этого действия.")
         return redirect('login')
 
     if request.method == 'POST':
-        usernames = request.POST.getlist('usernames')
-        if usernames:
-            deleted_count = User.objects.filter(username__in=usernames).exclude(id=request.user.id).delete()[0]
+        # Используем getlist() для получения списка значений
+        usernames = request.POST.getlist('usernames[]')  # Ключевое изменение: getlist('usernames[]')
+
+        print(f"Получены usernames для удаления: {usernames}")  # Для отладки
+        print(f"Все данные POST: {request.POST}")  # Для отладки
+
+        if not usernames:
+            messages.warning(request, "Не выбрано ни одного пользователя.")
+            return redirect('admin_users_statistics')
+
+        deleted_count = 0
+        for username in usernames:
+            try:
+                user = User.objects.get(username=username)
+                # Не удаляем текущего пользователя и суперпользователей
+                if user.id == request.user.id:
+                    print(f"Пропускаем удаление себя: {username}")
+                    continue
+                if user.is_superuser and user.id != request.user.id:
+                    print(f"Пропускаем удаление суперпользователя: {username}")
+                    continue
+
+                user.delete()
+                deleted_count += 1
+                print(f"Удален пользователь: {username}")
+            except User.DoesNotExist:
+                print(f"Пользователь не найден: {username}")
+                continue
+
+        if deleted_count > 0:
             messages.success(request, f"Успешно удалено {deleted_count} пользователей.")
         else:
-            messages.warning(request, "Не выбрано ни одного пользователя.")
+            messages.warning(request,
+                             "Нет пользователей для удаления (возможно, вы пытались удалить себя или суперпользователя).")
 
     return redirect('admin_users_statistics')
 
+
 @login_required
 def admin_users_statistics(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        messages.error(request, "У вас нет прав для доступа к этой странице.")
         return redirect('login')
 
     # Обработка формы добавления персонала
@@ -235,7 +293,17 @@ def admin_users_statistics(request):
         if staff_form.is_valid():
             try:
                 user = staff_form.save()
-                messages.success(request, f"Пользователь '{user.username}' успешно создан как {user.profile.get_role_display()}.")
+                # Проверяем, что роль не пустая
+                if user.profile.role:
+                    role_display = user.profile.get_role_display()
+                else:
+                    role_display = "Не указана"
+
+                # Добавляем информацию о суперпользователе
+                if user.is_superuser:
+                    role_display += " (Суперпользователь)"
+
+                messages.success(request, f"Пользователь '{user.username}' успешно создан как {role_display}.")
                 return redirect('admin_users_statistics')
             except Exception as e:
                 messages.error(request, f"Ошибка при создании пользователя: {str(e)}")
@@ -244,16 +312,28 @@ def admin_users_statistics(request):
     users_with_roles = []
     for user in User.objects.all():
         try:
-            role = user.profile.role
+            role = user.profile.role or 'student'  # Если роль пустая, ставим 'student'
         except Profile.DoesNotExist:
             role = 'student'
+
         users_with_roles.append({
             'username': user.username,
-            'role': role
+            'role': role,
+            'is_superuser': user.is_superuser,
+            'is_staff': user.is_staff,
+            'id': user.id,
         })
+    role_priority = {'admin': 1, 'chef': 2, 'student': 3}
+    users_with_roles.sort(key=lambda x: role_priority.get(x['role'], 1))
     role_counts = {'student': 0, 'chef': 0, 'admin': 0}
     for ur in users_with_roles:
-        role_counts[ur['role']] += 1
+        # Убедимся, что роль не пустая
+        role = ur['role'] or 'student'
+        if role in role_counts:
+            role_counts[role] += 1
+        else:
+            # Если роль какая-то нестандартная, считаем как студента
+            role_counts['student'] += 1
 
     return render(request, 'main/admin_dashboard/admin_users_statistics.html', {
         'users_with_roles': users_with_roles,
@@ -264,11 +344,9 @@ def admin_users_statistics(request):
 
 @login_required
 def admin_statistics(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        messages.error(request, "У вас нет прав для доступа к этой странице.")
         return redirect('login')
-
-    from datetime import timedelta
-    from django.utils import timezone
 
     now = timezone.now()
     today_start = timezone.make_aware(timezone.datetime.combine(now.date(), time.min))
@@ -297,6 +375,7 @@ def admin_statistics(request):
         ordered_at__gte=now - timedelta(days=30),
         status__in=ready_statuses
     )
+
     # === ЗАБРАННЫЕ БЛЮДА (status = 'received') ===
     orders_today_received = Order.objects.filter(
         ordered_at__range=(today_start, today_end),
@@ -310,6 +389,7 @@ def admin_statistics(request):
         ordered_at__gte=now - timedelta(days=30),
         status='received'
     )
+
     total_received_today = orders_today_received.count()
     total_received_week = orders_week_received.count()
     total_received_month = orders_month_received.count()

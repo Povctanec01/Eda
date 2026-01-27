@@ -1,5 +1,4 @@
 // main/static/main/js/admin_dashboard.js
-
 document.addEventListener('DOMContentLoaded', function () {
     // === 1. Переключение темы ===
     const themeToggle = document.getElementById('themeToggle');
@@ -8,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         themeToggle.checked = (savedTheme === 'dark');
-
         themeToggle.addEventListener('change', function () {
             const newTheme = this.checked ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', newTheme);
@@ -85,78 +83,170 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return cookieValue;
     }
-  const searchInput = document.getElementById('userSearch');
-  const selectAllCheckbox = document.getElementById('selectAll');
-  const userCheckboxes = document.querySelectorAll('.user-checkbox');
-  const deleteBtn = document.getElementById('deleteSelectedBtn');
-  const userRows = document.querySelectorAll('.user-row');
 
-  // Поиск по таблице
-  searchInput.addEventListener('input', function () {
-    const query = this.value.trim().toLowerCase();
-    userRows.forEach(row => {
-      const username = row.dataset.username;
-      if (username.includes(query)) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
+    // === 6. Управление списком пользователей (поиск, выбор, удаление) ===
+    const searchInput = document.getElementById('userSearch');
+    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    const userItems = document.querySelectorAll('.allergen-item.user-item');
+    const resultsCount = document.getElementById('resultsCount');
+    const searchResultsInfo = document.getElementById('searchResultsInfo');
+    const totalUsersCount = document.getElementById('totalUsersCount');
+
+    // Сохраняем оригинальные данные пользователей для поиска
+    const userData = [];
+    userItems.forEach(item => {
+        const username = item.querySelector('.allergen-name').textContent.trim();
+        userData.push({
+            element: item,
+            username: username.toLowerCase()
+        });
+        // Изначально все элементы видимы
+        item.style.display = 'flex';
     });
-  });
 
-  // Выделить все/снять все
-  selectAllCheckbox.addEventListener('change', function () {
-    userCheckboxes.forEach(cb => cb.checked = this.checked);
-    updateDeleteButton();
-  });
+    // Функция фильтрации
+    function filterUsers(query) {
+        if (!query.trim()) {
+            // Если поиск пустой — показываем всех
+            userData.forEach(user => {
+                user.element.style.display = 'flex';
+            });
+            searchResultsInfo.style.display = 'none';
+            resultsCount.textContent = totalUsersCount.textContent;
+            return;
+        }
 
-  // Обновление состояния кнопки удаления
-  function updateDeleteButton() {
-    const anyChecked = Array.from(userCheckboxes).some(cb => cb.checked);
-    deleteBtn.disabled = !anyChecked;
-  }
+        const searchTerm = query.toLowerCase().trim();
+        let visibleCount = 0;
 
-  userCheckboxes.forEach(cb => {
-    cb.addEventListener('change', updateDeleteButton);
-  });
+        userData.forEach(user => {
+            if (user.username.includes(searchTerm)) {
+                user.element.style.display = 'flex';
+                visibleCount++;
+            } else {
+                user.element.style.display = 'none';
+            }
+        });
 
-  // Удаление выбранных пользователей
-  deleteBtn.addEventListener('click', function () {
-    const selectedUsernames = Array.from(userCheckboxes)
-      .filter(cb => cb.checked)
-      .map(cb => cb.value);
+        // Обновляем счётчик и показываем результаты
+        resultsCount.textContent = visibleCount;
+        searchResultsInfo.style.display = 'block';
 
-    if (selectedUsernames.length === 0) return;
+        // Если нет результатов — показываем сообщение
+        const noResults = document.querySelector('.no-results-placeholder');
+        if (visibleCount === 0) {
+            if (!noResults) {
+                const noResultsMsg = document.createElement('div');
+                noResultsMsg.className = 'no-results-placeholder';
+                noResultsMsg.innerHTML = '<i class="fas fa-search"></i> Пользователи не найдены';
+                document.querySelector('.allergens-scrollable').appendChild(noResultsMsg);
+            }
+        } else if (noResults) {
+            noResults.remove();
+        }
 
-    if (!confirm(`Вы уверены, что хотите удалить ${selectedUsernames.length} пользователей? Это действие нельзя отменить!`)) {
-      return;
+        updateDeleteButton();
     }
 
-    // Отправка AJAX-запроса или редирект на страницу подтверждения
-    // В данном случае — отправим форму POST
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '{% url "admin_users_delete_selected" %}';
+    // Обработчик ввода
+    if (searchInput) {
+        searchInput.addEventListener('input', function (e) {
+            filterUsers(e.target.value);
+        });
+    }
 
-    // CSRF токен
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = 'csrfmiddlewaretoken';
-    csrfInput.value = csrfToken;
-    form.appendChild(csrfInput);
-
-    // Имена пользователей
-    selectedUsernames.forEach(username => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'usernames';
-      input.value = username;
-      form.appendChild(input);
+    // Клик по карточке пользователя — переключает чекбокс
+    userItems.forEach(item => {
+        item.addEventListener('click', function (e) {
+            // Не переключаем чекбокс, если кликнули по самому чекбоксу или роли
+            if (e.target.classList.contains('user-checkbox') ||
+                e.target.closest('.user-role-badge')) {
+                return;
+            }
+            const checkbox = this.querySelector('.user-checkbox');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                updateUserItemSelection(this, checkbox.checked);
+                updateDeleteButton();
+            }
+        });
     });
 
-    document.body.appendChild(form);
-    form.submit();
-  });
-});
+    // Синхронизация чекбокса и выделения карточки
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('user-checkbox')) {
+            const item = e.target.closest('.user-item');
+            if (item) {
+                updateUserItemSelection(item, e.target.checked);
+                updateDeleteButton();
+            }
+        }
+    });
 
+    // Функция обновления выделения карточки
+    function updateUserItemSelection(item, isSelected) {
+        if (isSelected) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    }
+
+    // Функция обновления состояния кнопки удаления
+    function updateDeleteButton() {
+        const checkboxes = document.querySelectorAll('.user-checkbox:checked');
+        if (deleteBtn) {
+            deleteBtn.disabled = checkboxes.length === 0;
+        }
+    }
+
+
+    // Удаление выбранных пользователей
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const selectedUsernames = Array.from(document.querySelectorAll('.user-checkbox:checked'))
+                .map(cb => cb.value);
+
+            if (selectedUsernames.length === 0) {
+                alert('Пожалуйста, выберите хотя бы одного пользователя для удаления.');
+                return;
+            }
+
+            if (!confirm(`Вы уверены, что хотите удалить ${selectedUsernames.length} пользователей? Это действие нельзя отменить!`)) {
+                return;
+            }
+
+            const deleteUrl = deleteBtn.dataset.deleteUrl;
+            const csrfToken = getCookie('csrftoken');
+            if (!csrfToken) {
+                alert('Ошибка CSRF токена. Пожалуйста, обновите страницу.');
+                return;
+            }
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = deleteUrl;
+
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+
+            selectedUsernames.forEach(username => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'usernames[]';
+                input.value = username;
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+        });
+    }
+
+    // Изначальное состояние
+    updateDeleteButton();
+});

@@ -3,6 +3,7 @@ from django.urls import path
 from .views import common_views, student_views, chef_views, admin_views
 from .views.chef_views import chef_allergens
 from main.views.student_views import update_critical_allergens, update_non_critical_allergens
+
 urlpatterns = [
     path('', common_views.index, name='index'),
     path('index.html', common_views.index),
@@ -11,7 +12,7 @@ urlpatterns = [
     path('enter-profile/', common_views.enter_profile, name='enter_profile'),
 
     # Student
-    path('student_dashboard/student_home_page', student_views.student_home_page,name='student_dashboard/student_home_page'),
+    path('student_dashboard/student_home_page', student_views.student_home_page, name='student_dashboard/student_home_page'),
     path('student_feedback', student_views.student_feedback, name='student_feedback'),
     path('student_menu', student_views.student_menu, name='student_menu'),
     path('student_my_orders', student_views.student_my_orders, name='student_my_orders'),
@@ -35,14 +36,14 @@ urlpatterns = [
     path('chef/allergens/', chef_allergens, name='chef_allergens'),
     path('chef/get-allergens/', chef_views.get_allergens, name='get_allergens'),
 
-    # Admin
+    # Admin - ИЗМЕНИТЕ ПРЕФИКС С 'admin_' на 'admin_dashboard/'
     path('admin_dashboard/admin_home_page', admin_views.admin_home_page, name='admin_dashboard/admin_home_page'),
-    path('admin_buys', admin_views.admin_buys, name='admin_buys'),
-    path('admin_finance', admin_views.admin_finance, name='admin_finance'),
-    path('admin_statistics', admin_views.admin_statistics, name='admin_statistics'),
-    path('admin_users_statistics', admin_views.admin_users_statistics, name='admin_users_statistics'),
-    path('admin_settings', admin_views.admin_settings, name='admin_settings'),
-    path('admin_card_edit/', admin_views.admin_card_edit, name='admin_card_edit'),
-    path('delete/<int:card_id>/', common_views.index, name='card_delete'),  # заменил на index временно
-    path('admin/users/delete-selected/', admin_views.admin_users_delete_selected, name='admin_users_delete_selected'),
+    path('admin_dashboard/buys', admin_views.admin_buys, name='admin_buys'),
+    path('admin_dashboard/finance', admin_views.admin_finance, name='admin_finance'),
+    path('admin_dashboard/statistics', admin_views.admin_statistics, name='admin_statistics'),
+    path('admin_dashboard/users_statistics', admin_views.admin_users_statistics, name='admin_users_statistics'),
+    path('admin_dashboard/settings', admin_views.admin_settings, name='admin_settings'),
+    path('admin_dashboard/card_edit/', admin_views.admin_card_edit, name='admin_card_edit'),
+    path('delete/<int:card_id>/', common_views.index, name='card_delete'),
+    path('admin_dashboard/users/delete-selected/', admin_views.admin_users_delete_selected, name='admin_users_delete_selected'),
 ]

@@ -47,6 +47,19 @@ class Profile(models.Model):
         """Проверить, является ли аллерген некритическим для пользователя"""
         return self.non_critical_allergens.filter(id=allergen.id).exists()
 
+    # models.py - в класс Profile
+    def get_role_display(self):
+        """Получить отображаемое имя роли"""
+        role_display = {
+            'student': 'Студент',
+            'chef': 'Повар',
+            'admin': 'Администратор'
+        }
+        # Если роль пустая или None, возвращаем значение по умолчанию
+        if not self.role:
+            return 'Студент'
+        return role_display.get(self.role, self.role)
+
 
 class Allergen(models.Model):
     name = models.CharField('Название аллергена', max_length=100, unique=True)
