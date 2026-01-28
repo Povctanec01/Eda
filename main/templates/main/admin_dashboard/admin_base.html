@@ -43,7 +43,7 @@
                 </div>
             </div>
             <nav class="sidebar-menu">
-              <a href="{% url 'admin_dashboard/admin_home_page' %}" {% if request.resolver_match.url_name == 'admin_dashboard/admin_home_page' %}class="active"{% endif %}>
+              <a href="{% url 'admin_home_page' %}" {% if request.resolver_match.url_name == 'admin_home_page' %}class="active"{% endif %}>
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Дашборд</span>
               </a>

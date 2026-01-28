@@ -82,7 +82,7 @@
         </div>
 
         <nav class="sidebar-menu">
-            <a href="{% url 'student_dashboard/student_home_page' %}" {% if request.resolver_match.url_name == 'student_dashboard/student_home_page' %}class="active"{% endif %}>
+            <a href="{% url 'student_home_page' %}" {% if request.resolver_match.url_name == 'student_home_page' %}class="active"{% endif %}>
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </a>

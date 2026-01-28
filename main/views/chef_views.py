@@ -27,7 +27,7 @@ def chef_home_page(request):
             buy = get_object_or_404(CardBuys, id=card_id_buys)
             buy.delete()
             messages.success(request, "Заявка удалена.")
-            return redirect('chef_dashboard/chef_home_page')
+            return redirect('chef_home_page')
 
         # Отметка заказа как готового
         order_id = request.POST.get('order_id')
@@ -38,7 +38,7 @@ def chef_home_page(request):
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': True})
             else:
-                return redirect('chef_dashboard/chef_home_page')
+                return redirect('chef_home_page')
 
     # GET-часть
     form_buys = CardFormBuys()

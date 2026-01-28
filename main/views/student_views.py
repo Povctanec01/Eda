@@ -150,7 +150,7 @@ def student_order_create(request, card_id):
     card = get_object_or_404(Card, id=card_id)
     Order.objects.create(user=request.user, card=card)
     messages.success(request, f"Вы заказали: {card.title}!")
-    return redirect('student_dashboard/student_home_page')
+    return redirect('student_home_page')
 
 def student_menu(request):
     from ..forms import CardForm
@@ -199,7 +199,7 @@ def student_mark_received(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user, status='ready')
     order.status = 'received'
     order.save()
-    return redirect(request.META.get('HTTP_REFERER', 'student_dashboard/student_home_page'))
+    return redirect(request.META.get('HTTP_REFERER', 'student_home_page'))
 
 
 # Добавить в student_views.py

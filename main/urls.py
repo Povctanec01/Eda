@@ -12,7 +12,7 @@ urlpatterns = [
     path('enter-profile/', common_views.enter_profile, name='enter_profile'),
 
     # Student
-    path('student_dashboard/student_home_page', student_views.student_home_page, name='student_dashboard/student_home_page'),
+    path('student_home_page', student_views.student_home_page, name='student_home_page'),
     path('student_feedback', student_views.student_feedback, name='student_feedback'),
     path('student_menu', student_views.student_menu, name='student_menu'),
     path('student_my_orders', student_views.student_my_orders, name='student_my_orders'),
@@ -25,7 +25,7 @@ urlpatterns = [
     path('student/allergens/non-critical/update/', update_non_critical_allergens, name='update_non_critical_allergens'),
 
     # Chef
-    path('chef_dashboard/chef_home_page', chef_views.chef_home_page, name='chef_dashboard/chef_home_page'),
+    path('chef_home_page', chef_views.chef_home_page, name='chef_home_page'),
     path('chef_card_edit/', chef_views.chef_card_edit, name='chef_card_edit'),
     path('chef_remaining_product', chef_views.chef_remaining_product, name='chef_remaining_product'),
     path('chef_buys', chef_views.chef_buys, name='chef_buys'),
@@ -37,7 +37,7 @@ urlpatterns = [
     path('chef/get-allergens/', chef_views.get_allergens, name='get_allergens'),
 
     # Admin - ИЗМЕНИТЕ ПРЕФИКС С 'admin_' на 'admin_dashboard/'
-    path('admin_dashboard/admin_home_page', admin_views.admin_home_page, name='admin_dashboard/admin_home_page'),
+    path('admin_dashboard/admin_home_page', admin_views.admin_home_page, name='admin_home_page'),
     path('admin_dashboard/buys', admin_views.admin_buys, name='admin_buys'),
     path('admin_dashboard/finance', admin_views.admin_finance, name='admin_finance'),
     path('admin_dashboard/statistics', admin_views.admin_statistics, name='admin_statistics'),
@@ -46,4 +46,5 @@ urlpatterns = [
     path('admin_dashboard/card_edit/', admin_views.admin_card_edit, name='admin_card_edit'),
     path('delete/<int:card_id>/', common_views.index, name='card_delete'),
     path('admin_dashboard/users/delete-selected/', admin_views.admin_users_delete_selected, name='admin_users_delete_selected'),
+
 ]

@@ -57,18 +57,26 @@ def redirect_to_profile(user):
 
         match role:
             case 'chef':
-                return redirect('chef_dashboard/chef_home_page')
+                # Проверяем, является ли поваром
+                if profile.role == 'chef':
+                    return redirect('chef_home_page')
             case 'admin':
-                return redirect('admin_dashboard/admin_home_page')
+                # Проверяем, является ли администратором (суперпользователем)
+                if user.is_superuser or profile.role == 'admin':
+                    return redirect('admin_home_page')
             case 'student':
-                return redirect('student_dashboard/student_home_page')
+                if profile.role == 'student':
+                    return redirect('student_home_page')
             case _:
                 return redirect('index')
 
     except Profile.DoesNotExist:
         # Если профиль не создан - создаем его
         Profile.objects.create(user=user, role='student')
-        return redirect('student_dashboard/student_home_page')
+        return redirect('student_home_page')
+
+    # Если роль не определена или что-то пошло не так
+    return redirect('index')
 
 
 def logout_view(request):

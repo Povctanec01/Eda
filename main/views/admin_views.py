@@ -2,6 +2,7 @@
 from django import forms
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.http import request
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -60,7 +61,6 @@ class StaffRegistrationForm(forms.Form):
             user.is_staff = True
             user.is_superuser = True
             user.save()
-            print(f"Создан суперпользователь: {username}")  # Для отладки
 
         # Убедимся, что роль не пустая
         if not role:
@@ -71,12 +71,19 @@ class StaffRegistrationForm(forms.Form):
         return user
 
 
+def check_admin(user):
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+        return redirect('login')
+    """Проверка, является ли пользователь администратором"""
+    return user.is_authenticated and (user.is_superuser or 
+                                     (hasattr(user, 'profile') and user.profile.role == 'admin'))
+
+
 @login_required
 def admin_home_page(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        messages.error(request, "У вас нет прав для доступа к этой странице.")
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-
+    # Убираем дублирующую проверку, так как уже есть login_required
     student_count = Profile.objects.filter(role='student').count()
     return render(request, 'main/admin_dashboard/admin_home_page.html', {
         'student_count': student_count,
@@ -85,10 +92,8 @@ def admin_home_page(request):
 
 @login_required
 def admin_settings(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        messages.error(request, "У вас нет прав для доступа к этой странице.")
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-
     if request.method == 'POST':
         # Изменение пароля
         if 'change_password' in request.POST:
@@ -142,10 +147,8 @@ def admin_settings(request):
 
 @login_required
 def admin_card_edit(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        messages.error(request, "У вас нет прав для доступа к этой странице.")
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-
     if request.method == 'POST' and 'add' in request.POST:
         form = CardForm(request.POST)
         if form.is_valid():
@@ -172,10 +175,8 @@ def admin_card_edit(request):
 
 @login_required
 def admin_buys(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        messages.error(request, "У вас нет прав для доступа к этой странице.")
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-
     one_week_ago = timezone.now() - timedelta(days=7)
     buys_queryset = CardBuys.objects.filter(created_at__gte=one_week_ago)
     pending_count = buys_queryset.filter(status='pending').count()
@@ -228,25 +229,18 @@ def admin_buys(request):
 
 @login_required
 def admin_finance(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        messages.error(request, "У вас нет прав для доступа к этой странице.")
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-
     return render(request, 'main/admin_dashboard/admin_finance.html')
 
 
 @login_required
 def admin_users_delete_selected(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        messages.error(request, "У вас нет прав для выполнения этого действия.")
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-
     if request.method == 'POST':
         # Используем getlist() для получения списка значений
-        usernames = request.POST.getlist('usernames[]')  # Ключевое изменение: getlist('usernames[]')
-
-        print(f"Получены usernames для удаления: {usernames}")  # Для отладки
-        print(f"Все данные POST: {request.POST}")  # Для отладки
+        usernames = request.POST.getlist('usernames[]')
 
         if not usernames:
             messages.warning(request, "Не выбрано ни одного пользователя.")
@@ -258,17 +252,13 @@ def admin_users_delete_selected(request):
                 user = User.objects.get(username=username)
                 # Не удаляем текущего пользователя и суперпользователей
                 if user.id == request.user.id:
-                    print(f"Пропускаем удаление себя: {username}")
                     continue
                 if user.is_superuser and user.id != request.user.id:
-                    print(f"Пропускаем удаление суперпользователя: {username}")
                     continue
 
                 user.delete()
                 deleted_count += 1
-                print(f"Удален пользователь: {username}")
             except User.DoesNotExist:
-                print(f"Пользователь не найден: {username}")
                 continue
 
         if deleted_count > 0:
@@ -282,10 +272,8 @@ def admin_users_delete_selected(request):
 
 @login_required
 def admin_users_statistics(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        messages.error(request, "У вас нет прав для доступа к этой странице.")
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-
     # Обработка формы добавления персонала
     staff_form = StaffRegistrationForm()
     if request.method == 'POST':
@@ -344,10 +332,8 @@ def admin_users_statistics(request):
 
 @login_required
 def admin_statistics(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        messages.error(request, "У вас нет прав для доступа к этой странице.")
+    if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-
     now = timezone.now()
     today_start = timezone.make_aware(timezone.datetime.combine(now.date(), time.min))
     today_end = timezone.make_aware(timezone.datetime.combine(now.date(), time.max))
