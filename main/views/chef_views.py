@@ -177,6 +177,7 @@ def chef_orders(request):
 def chef_card_edit(request):
     if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
+
     if request.method == 'POST' and 'add' in request.POST:
         form = CardForm(request.POST)
         if form.is_valid():
@@ -189,14 +190,32 @@ def chef_card_edit(request):
                     messages.error(request, f"Ошибка: {error}")
     else:
         form = CardForm()
+
     if request.method == 'POST' and 'delete' in request.POST:
         card_id = request.POST.get('card_id')
         card = get_object_or_404(Card, id=card_id)
         card.delete()
         messages.success(request, "Блюдо удалено.")
         return redirect('chef_card_edit')
+
+    if request.method == 'POST' and 'toggle_visibility' in request.POST:
+        card_id = request.POST.get('card_id')
+        card = get_object_or_404(Card, id=card_id)
+        card.is_hidden = not card.is_hidden  # Переключаем статус
+        card.save()
+
+        action = "скрыто" if card.is_hidden else "отображено"
+        messages.success(request, f"Блюдо «{card.title}» {action}.")
+        return redirect('chef_card_edit')
+
+
+    # Получаем все блюда, включая скрытые
     cards = Card.objects.all().order_by('meal_type', 'title')
-    return render(request, 'main/chef_dashboard/chef_card_edit.html', {'form': form, 'cards': cards})
+    return render(request, 'main/chef_dashboard/chef_card_edit.html', {
+        'form': form,
+        'cards': cards
+    })
+
 
 @login_required
 def chef_buys(request):

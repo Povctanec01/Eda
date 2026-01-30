@@ -37,7 +37,7 @@
 </section>
 
 <section class="menu-management" style="margin-top: 30px">
-    <h2 class="dinner">Блюда</h2>
+    <h2 class="dinner">Управление блюдами</h2>
 
     {% if cards %}
         <div class="dishes-filters">
@@ -53,15 +53,24 @@
                 <i class="fas fa-mug-saucer"></i>
                 Завтраки
             </button>
+            <button class="btn btn-info rounded-pill px-3" type="button" onclick="toggleVisibilityFilter()">
+                <i class="fas fa-eye-slash"></i>
+                <span id="visibilityToggleText">Показать скрытые</span>
+            </button>
         </div>
 
         <div class="dishes-list">
             {% for card in cards %}
-                <div class="dish-item" data-meal-type="{{ card.get_meal_type_display }}">
+                <div class="dish-item" data-meal-type="{{ card.get_meal_type_display }}" data-hidden="{{ card.is_hidden|yesno:'true,false' }}">
                     <div class="dish-header">
                         <div>
                             <h3>{{ card.title }}</h3>
                             <span class="badge" style="background: #667eea; color: white">{{ card.get_meal_type_display }}</span>
+                            {% if card.is_hidden %}
+                                <span class="badge bg-warning text-dark" style="margin-left: 5px;">
+                                    <i class="fas fa-eye-slash"></i> Скрыто
+                                </span>
+                            {% endif %}
                         </div>
                         <span class="dish-price">ID: {{ card.id }}</span>
                     </div>
@@ -73,12 +82,22 @@
                             <input type="hidden" name="card_id" value="{{ card.id }}" />
                             <button type="submit" class="btn-danger btn-sm">Удалить</button>
                         </form>
+                        <form method="post" onsubmit="return confirm('{{ card.is_hidden|yesno:'Показать,Скрыть' }} блюдо «{{ card.title }}»?');" style="display: inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="toggle_visibility" value="1" />
+                            <input type="hidden" name="card_id" value="{{ card.id }}" />
+                            <button type="submit" class="{{ card.is_hidden|yesno:'btn-success,btn-warning' }} btn-sm">
+                                <i class="fas {{ card.is_hidden|yesno:'fa-eye,fa-eye-slash' }}"></i>
+                                {{ card.is_hidden|yesno:'Показать,Скрыть' }}
+                            </button>
+                        </form>
                     </div>
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <p style="color: #666; font-style: italic">Нет запросов</p>
+        <p style="color: #666; font-style: italic">Нет блюд</p>
     {% endif %}
 </section>
+
 {% endblock %}

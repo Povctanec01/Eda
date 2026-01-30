@@ -15,6 +15,13 @@
     <h2 class="dinner">Блюда</h2>
 
     {% if cards %}
+        {% if not cards %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                На данный момент блюд нет в наличии. Попробуйте позже.
+            </div>
+        {% endif %}
+
         <div class="dishes-filters">
             <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Все')">
                 <i class="fa-solid fa-spoon"></i> Все
@@ -40,9 +47,15 @@
 
                     <!-- Кнопка Заказать -->
                     <div class="dish-actions">
-                        <a href="{% url 'student_order_create' card.id %}" class="btn btn-sm btn-outline-primary mt-2">
-                            Заказать
-                        </a>
+                        {% if not card.is_hidden %}
+                            <a href="{% url 'student_order_create' card.id %}" class="btn btn-sm btn-outline-primary mt-2">
+                                Заказать
+                            </a>
+                        {% else %}
+                            <span class="text-danger">
+                                <i class="fas fa-ban"></i> Блюдо временно не доступно
+                            </span>
+                        {% endif %}
                     </div>
 
                     <!-- Отображение аллергенов (если есть) -->
@@ -57,11 +70,14 @@
                             </small>
                         </div>
                     {% endif %}
-                </div> <!-- Закрывающий div для dish-item -->
+                </div>
             {% endfor %}
         </div>
     {% else %}
-        <p style="color: #666; font-style: italic;">Пока нет добавленных блюд</p>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            На сегодня блюд нет в наличии. Ожидайте добавления новых блюд.
+        </div>
     {% endif %}
 </section>
 {% endblock %}

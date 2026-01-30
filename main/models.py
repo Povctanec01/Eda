@@ -72,7 +72,7 @@ class Allergen(models.Model):
         verbose_name_plural = "Аллергены"
 
 
-# Остальные модели остаются без изменений
+# В класс Card добавляем поле is_hidden
 class Card(models.Model):
     MEAL_CHOICES = [
         ('select', 'Выберите'),
@@ -89,16 +89,18 @@ class Card(models.Model):
         verbose_name="Тип приёма пищи"
     )
     ingredients = models.TextField('Ингредиенты', blank=True, null=True)
-    # Заменяем CharField на ManyToManyField
     allergens = models.ManyToManyField(Allergen, blank=True, verbose_name="Аллергены")
     created_at = models.DateTimeField(auto_now_add=True)
+    is_hidden = models.BooleanField(default=False, verbose_name="Скрыто")  # Добавляем это поле
 
     def __str__(self):
-        return f"{self.title} ({self.get_meal_type_display()})"
+        hidden_status = " (скрыто)" if self.is_hidden else ""
+        return f"{self.title} ({self.get_meal_type_display()}){hidden_status}"
 
     class Meta:
         verbose_name = "Блюдо"
         verbose_name_plural = "Блюда"
+
 
 
 class CardBuys(models.Model):

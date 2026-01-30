@@ -67,7 +67,53 @@ function markAllPrepared() {
         .catch(err => console.error(err));
     });
 }
+$(document).ready(function() {
+    // Инициализация Select2 для поля аллергенов
+    $('#id_allergens').select2({
+        placeholder: "Выберите аллергены",
+        allowClear: true,
+        language: "ru",
+        width: '100%',
+        dropdownParent: $('.menu-management'),
+        // Закрытие при клике вне поля (это поведение по умолчанию в Select2)
+        closeOnSelect: false // Оставляем dropdown открытым после выбора
+    });
 
+    // Select2 автоматически закрывает dropdown при клике вне элемента
+    // но мы можем добавить дополнительную обработку
+    $(document).on('click', function(e) {
+        // Если клик был не по Select2 и не внутри его dropdown
+        if (!$(e.target).closest('.select2-container').length) {
+            // Закрываем все открытые Select2 dropdown
+            $('.select2-container--open').removeClass('select2-container--open');
+            $('.select2-dropdown').hide();
+        }
+    });
+});
+
+// Функция для фильтрации блюд по типу
+function showMeals(type) {
+    const items = document.querySelectorAll('.dish-item');
+
+    items.forEach(item => {
+        if (type === 'Все') {
+            item.style.display = 'block';
+        } else {
+            const mealType = item.getAttribute('data-meal-type');
+            item.style.display = mealType === type ? 'block' : 'none';
+        }
+    });
+}
+// Функция для фильтрации скрытых блюд
+function toggleVisibilityFilter() {
+    const items = document.querySelectorAll('.dish-item');
+    const showHiddenOnly = true; // или реализуйте переключение
+
+    items.forEach(item => {
+        const isHidden = item.getAttribute('data-hidden') === 'true';
+        item.style.display = showHiddenOnly ? (isHidden ? 'block' : 'none') : 'block';
+    });
+}
 // === Обновление счётчика в боковом меню ===
 function updateOrdersBadge(delta) {
     const badge = document.getElementById('ordersBadge');

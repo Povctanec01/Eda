@@ -127,7 +127,7 @@ def admin_settings(request):
             messages.success(request, "Пароль успешно изменён!")
             return redirect('admin_settings')
 
-        if 'delete_account' in request.POST:
+        if  request.method == 'POST' and 'delete_account' in request.POST:
             user = request.user
             username = user.username
             user.delete()
@@ -168,6 +168,17 @@ def admin_card_edit(request):
         card.delete()
         messages.success(request, "Блюдо удалено.")
         return redirect('admin_card_edit')
+
+    if request.method == 'POST' and 'toggle_visibility' in request.POST :
+        card_id = request.POST.get('card_id')
+        card = get_object_or_404(Card, id=card_id)
+        card.is_hidden = not card.is_hidden
+        card.save()
+
+        action = "скрыто" if card.is_hidden else "отображено"
+        messages.success(request, f"Блюдо «{card.title}» {action}.")
+        return redirect('admin_card_edit')
+
 
     cards = Card.objects.all().order_by('meal_type', 'title')
     return render(request, 'main/admin_dashboard/admin_card_edit.html', {'form': form, 'cards': cards})

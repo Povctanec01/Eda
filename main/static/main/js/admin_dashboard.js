@@ -249,4 +249,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Изначальное состояние
     updateDeleteButton();
+
 });
+// Функция для фильтрации скрытых блюд
+function toggleVisibilityFilter() {
+    const items = document.querySelectorAll('.dish-item');
+    const showHiddenOnly = true; // или реализуйте переключение
+
+    items.forEach(item => {
+        const isHidden = item.getAttribute('data-hidden') === 'true';
+        item.style.display = showHiddenOnly ? (isHidden ? 'block' : 'none') : 'block';
+    });
+}

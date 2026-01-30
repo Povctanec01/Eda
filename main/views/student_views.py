@@ -9,8 +9,6 @@ from django.shortcuts import redirect
 from django.contrib import messages
 
 
-# Обновить student_home_page в student_views.py
-
 @login_required
 def student_home_page(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
@@ -34,8 +32,10 @@ def student_home_page(request):
         ordered_at__range=(start_of_day, end_of_day)
     ).count()
 
-    # Получаем все блюда на сегодня
-    today_cards = Card.objects.exclude(meal_type='select').order_by('meal_type', 'title')
+    # Получаем все НЕ скрытые блюда на сегодня
+    today_cards = Card.objects.filter(
+        is_hidden=False  # Только не скрытые блюда
+    ).exclude(meal_type='select').order_by('meal_type', 'title')
 
     # Получаем аллергены пользователя
     profile = request.user.profile
@@ -143,22 +143,39 @@ def student_settings(request):
     # GET: просто показываем страницу настроек
     return render(request, 'main/student_dashboard/student_settings.html')
 
+
 @login_required
 def student_order_create(request, card_id):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
+
     card = get_object_or_404(Card, id=card_id)
+
+    # Проверяем, не скрыто ли блюдо
+    if card.is_hidden:
+        messages.error(request, "Это блюдо временно недоступно для заказа.")
+        return redirect('student_home_page')
+
     Order.objects.create(user=request.user, card=card)
     messages.success(request, f"Вы заказали: {card.title}!")
     return redirect('student_home_page')
 
+@login_required
 def student_menu(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
     from ..forms import CardForm
     form = CardForm(request.POST)
-    cards = Card.objects.all().order_by('meal_type', 'title')
-    return render(request, 'main/student_dashboard/student_menu.html', {'form': form, 'cards': cards})
+    # Показываем только не скрытые блюда
+    cards = Card.objects.filter(is_hidden=False).order_by('meal_type', 'title')
+    return render(request, 'main/student_dashboard/student_menu.html', {
+        'form': form,
+        'cards': cards
+    })
 
 def student_feedback(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
     if not request.user.is_authenticated:
         return redirect('login')
     return render(request, 'main/student_dashboard/student_feedback.html')
