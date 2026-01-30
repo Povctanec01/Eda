@@ -57,8 +57,9 @@
             </div>
             <div class="card-content">
                 <h3>Заказов сегодня</h3>
-                <p class="card-value">156</p>
-                <p class="card-desc">84 завтрака, 72 обеда</p>
+                <p class="card-value">{{ total_ordered_today }}</p>
+                <p class="card-desc"> Завтраков: {{ breakfast_today }} </p>
+                <p class="card-desc"> Обедов: {{ lunch_today }}</p>
             </div>
         </div>
     </section>

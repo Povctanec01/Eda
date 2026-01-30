@@ -83,10 +83,22 @@ def check_admin(user):
 def admin_home_page(request):
     if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
+    now = timezone.now()
+    today_start = timezone.make_aware(timezone.datetime.combine(now.date(), time.min))
+    today_end = timezone.make_aware(timezone.datetime.combine(now.date(), time.max))
+    orders_today_all = Order.objects.filter(ordered_at__range=(today_start, today_end))
+    breakfast_today = orders_today_all.filter(card__meal_type='breakfast').count()
+    lunch_today = orders_today_all.filter(card__meal_type='lunch').count()
+
+    total_ordered_today = orders_today_all.count()
+
     # Убираем дублирующую проверку, так как уже есть login_required
     student_count = Profile.objects.filter(role='student').count()
     return render(request, 'main/admin_dashboard/admin_home_page.html', {
         'student_count': student_count,
+        'total_ordered_today': total_ordered_today,
+        'breakfast_today': breakfast_today,
+        'lunch_today': lunch_today,
     })
 
 
@@ -149,18 +161,7 @@ def admin_settings(request):
 def admin_card_edit(request):
     if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
-    if request.method == 'POST' and 'add' in request.POST:
-        form = CardForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Блюдо добавлено!")
-            return redirect('admin_card_edit')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"Ошибка: {error}")
-    else:
-        form = CardForm()
+    form = CardForm()
 
     if request.method == 'POST' and 'delete' in request.POST:
         card_id = request.POST.get('card_id')
@@ -345,14 +346,25 @@ def admin_users_statistics(request):
 def admin_statistics(request):
     if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
+
     now = timezone.now()
     today_start = timezone.make_aware(timezone.datetime.combine(now.date(), time.min))
     today_end = timezone.make_aware(timezone.datetime.combine(now.date(), time.max))
 
-    # === ЗАКАЗАННЫЕ БЛЮДА (все заказы) ===
+    # === ВСЕ ЗАКАЗЫ ===
     orders_today_all = Order.objects.filter(ordered_at__range=(today_start, today_end))
     orders_week_all = Order.objects.filter(ordered_at__gte=now - timedelta(days=7))
     orders_month_all = Order.objects.filter(ordered_at__gte=now - timedelta(days=30))
+
+    # Статистика по типам приема пищи для всех заказов
+    breakfast_today = orders_today_all.filter(card__meal_type='breakfast').count()
+    lunch_today = orders_today_all.filter(card__meal_type='lunch').count()
+
+    breakfast_week = orders_week_all.filter(card__meal_type='breakfast').count()
+    lunch_week = orders_week_all.filter(card__meal_type='lunch').count()
+
+    breakfast_month = orders_month_all.filter(card__meal_type='breakfast').count()
+    lunch_month = orders_month_all.filter(card__meal_type='lunch').count()
 
     total_ordered_today = orders_today_all.count()
     total_ordered_week = orders_week_all.count()
@@ -360,6 +372,7 @@ def admin_statistics(request):
 
     # === ГОТОВЫЕ БЛЮДА (status = 'ready' или 'received') ===
     ready_statuses = ['ready', 'received']
+
     orders_today_ready = Order.objects.filter(
         ordered_at__range=(today_start, today_end),
         status__in=ready_statuses
@@ -373,47 +386,44 @@ def admin_statistics(request):
         status__in=ready_statuses
     )
 
-    # === ЗАБРАННЫЕ БЛЮДА (status = 'received') ===
-    orders_today_received = Order.objects.filter(
-        ordered_at__range=(today_start, today_end),
-        status='received'
-    )
-    orders_week_received = Order.objects.filter(
-        ordered_at__gte=now - timedelta(days=7),
-        status='received'
-    )
-    orders_month_received = Order.objects.filter(
-        ordered_at__gte=now - timedelta(days=30),
-        status='received'
-    )
+    # Статистика по типам приема пищи для готовых заказов
+    breakfast_ready_today = orders_today_ready.filter(card__meal_type='breakfast').count()
+    lunch_ready_today = orders_today_ready.filter(card__meal_type='lunch').count()
 
-    total_received_today = orders_today_received.count()
-    total_received_week = orders_week_received.count()
-    total_received_month = orders_month_received.count()
+    breakfast_ready_week = orders_week_ready.filter(card__meal_type='breakfast').count()
+    lunch_ready_week = orders_week_ready.filter(card__meal_type='lunch').count()
+
+    breakfast_ready_month = orders_month_ready.filter(card__meal_type='breakfast').count()
+    lunch_ready_month = orders_month_ready.filter(card__meal_type='lunch').count()
 
     total_ready_today = orders_today_ready.count()
     total_ready_week = orders_week_ready.count()
     total_ready_month = orders_month_ready.count()
 
-    # Для совместимости с текущим шаблоном (завтрак/обед)
-    breakfast_count = orders_today_all.filter(card__meal_type='breakfast').count()
-    lunch_count = orders_today_all.filter(card__meal_type='lunch').count()
-
     return render(request, 'main/admin_dashboard/admin_statistics.html', {
-        'breakfast_count': breakfast_count,
-        'lunch_count': lunch_count,
-        'total_today': total_ordered_today,
-
-        # Новые данные
+        # Статистика по всем заказам
         'total_ordered_today': total_ordered_today,
         'total_ordered_week': total_ordered_week,
         'total_ordered_month': total_ordered_month,
 
+        # Детализация по типам приема пищи (все заказы)
+        'breakfast_today': breakfast_today,
+        'lunch_today': lunch_today,
+        'breakfast_week': breakfast_week,
+        'lunch_week': lunch_week,
+        'breakfast_month': breakfast_month,
+        'lunch_month': lunch_month,
+
+        # Статистика по готовым заказам
         'total_ready_today': total_ready_today,
         'total_ready_week': total_ready_week,
         'total_ready_month': total_ready_month,
 
-        'total_received_today': total_received_today,
-        'total_received_week': total_received_week,
-        'total_received_month': total_received_month,
+        # Детализация по типам приема пищи (готовые заказы)
+        'breakfast_ready_today': breakfast_ready_today,
+        'lunch_ready_today': lunch_ready_today,
+        'breakfast_ready_week': breakfast_ready_week,
+        'lunch_ready_week': lunch_ready_week,
+        'breakfast_ready_month': breakfast_ready_month,
+        'lunch_ready_month': lunch_ready_month,
     })

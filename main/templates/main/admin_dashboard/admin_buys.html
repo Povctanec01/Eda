@@ -15,7 +15,7 @@
 {% endif %}
 
 <section class="menu-management">
-    <h2 class="dinner">Блюда</h2>
+    <h2 class="dinner">Запросы на закупку</h2>
     <!-- Счётчики за последнюю неделю -->
     <div class="status-counters mb-3 card border-left-warning h-100 shadow-sm">
         <span class="status-badge bg-warning text-dark">В рассмотрении: {{ pending_count }}</span>
@@ -70,7 +70,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <p style="color: #666; font-style: italic">Нет карточек для удаления.</p>
+        <p style="color: #666; font-style: italic">Пока запросов на покупку нет.</p>
     {% endif %}
 </section>
 
