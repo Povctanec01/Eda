@@ -1,10 +1,8 @@
-# main/views/common_views.py
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
-from ..models import Profile
-
+from main.models import Profile
 
 # main/views/common_views.py (добавьте эту функцию)
 

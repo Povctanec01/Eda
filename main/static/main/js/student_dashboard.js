@@ -84,4 +84,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // Обновляем отображение
     document.getElementById('critical-count').textContent = `Всего: ${criticalCount}`;
     document.getElementById('noncritical-count').textContent = `Всего: ${noncriticalCount}`;
+        // 1. Сворачивание/разворачивание сайдбара для студента
+    const sidebarCollapseBtn = document.querySelector('.sidebar-collapse-btn');
+    const sidebar = document.querySelector('.sidebar');
+    const body = document.body;
+
+    if (sidebarCollapseBtn && sidebar) {
+        // Проверяем сохранённое состояние
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+        // Устанавливаем начальное состояние
+        if (isCollapsed) {
+            sidebar.classList.add('collapsed');
+            body.classList.add('sidebar-collapsed');
+        }
+
+        // Обработчик клика по стрелочке
+        sidebarCollapseBtn.addEventListener('click', function () {
+            sidebar.classList.toggle('collapsed');
+            body.classList.toggle('sidebar-collapsed');
+
+            // Сохраняем состояние в localStorage
+            const isNowCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+        });
+    }
 });

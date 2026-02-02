@@ -16,7 +16,7 @@
     /* ИСПРАВЛЕНО: primary-color должен быть видимым в светлой теме */
     --primary-color: #667eea; /* Фиолетовый/синий вместо почти белого */
     --success-color: #28a745;
-    --danger-color: #dc3545;
+    --danger-color: #1444e1;
     --warning-color: #ffc107;
     --info-color: #17a2b8;
 }
@@ -37,7 +37,7 @@
     /* ИСПРАВЛЕНО: Более яркий цвет для темной темы */
     --primary-color: #7c93ff;
     --success-color: #2ecc71;
-    --danger-color: #e74c3c;
+    --danger-color: #6c0edf;
     --warning-color: #f39c12;
     --info-color: #3498db;
 }
@@ -211,7 +211,7 @@ body {
     --sidebar-border: #e0e0e0;
     --primary-color: #667eea;
     --success-color: #28a745;
-    --danger-color: #dc3545;
+    --danger-color: #8512e1;
     --warning-color: #ffc107;
     --info-color: #17a2b8;
 }

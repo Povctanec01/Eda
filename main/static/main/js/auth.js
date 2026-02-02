@@ -1,4 +1,3 @@
-// main/js/auth.js
 document.addEventListener('DOMContentLoaded', function () {
   // Показать всплывающую ошибку
   function showFloatingError(element) {
@@ -17,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 5000);
   }
 
-  // === ПОКАЗ СЕРВЕРНЫХ ОШИБОК ПРИ ЗАГРУЗКЕ ===
+  // Сами ошибки
   const serverErrors = document.querySelectorAll('.floating-error.hidden');
   serverErrors.forEach(err => {
     showFloatingError(err);
@@ -34,11 +33,16 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('loginTab')?.addEventListener('click', () => showTab('login'));
   document.getElementById('registerTab')?.addEventListener('click', () => showTab('register'));
 
-  // === Показ/скрытие пароля (если реализовано) ===
-  const showPasswordBtn = document.querySelector('.show-password');
-  if (showPasswordBtn) {
-    showPasswordBtn.addEventListener('click', function () {
-      const passwordInput = document.getElementById('password');
+  // === УНИВЕРСАЛЬНЫЙ ПОКАЗ/СКРЫТИЕ ПАРОЛЯ ===
+  // Простой и надежный подход: ищем поле пароля рядом с кнопкой
+  document.querySelectorAll('.show-password').forEach(button => {
+    button.addEventListener('click', function() {
+      // Находим поле ввода пароля в том же password-wrapper
+      const passwordWrapper = this.closest('.password-wrapper');
+      const passwordInput = passwordWrapper.querySelector('input');
+
+      if (!passwordInput) return;
+
       const icon = this.querySelector('i');
       if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
@@ -50,5 +54,5 @@ document.addEventListener('DOMContentLoaded', function () {
         icon.classList.add('fa-eye');
       }
     });
-  }
+  });
 });

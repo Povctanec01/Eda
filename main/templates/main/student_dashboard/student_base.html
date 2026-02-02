@@ -14,31 +14,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.css">
 </head>
 <body>
-    <main class="main-content">  <!--Основной контент (вверх)-->
-        <header class="top-bar">
-        <div class="top-bar-left">
-            <h1>Добро пожаловать, {{ user.username }}!</h1>
-            <p>Сегодня: <span id="currentDate">Загрузка...</span></p>
-        </div>
-            <div class="top-bar-right">
-
-                <div class="balance-info">
-                    <i class="fas fa-wallet"></i>
-                    <span>Баланс: <strong id="balanceAmount">540</strong> руб.</span>
-                    <button class="btn btn-sm btn-outline" onclick="topUpBalance()">
-                        <i class="fas fa-plus"></i> Пополнить
-                    </button>
-
-                </div>
-            </div>
-        </header>
-        <div class="content-wrapper">
-            <div class="container-fluid">
-                {% block body %}
-                {% endblock %}
-            </div>
-        </div>
-    </main>
     <aside class="sidebar">  <!--Боковой бар-->
         <div class="sidebar-header">
             <a href="{% url 'index' %}">
@@ -114,5 +89,31 @@
             </a>
         </div>
     </aside>
+    
+    <main class="main-content">  <!--Основной контент (вверх)-->
+        <header class="top-bar">
+        <div class="top-bar-left">
+            <h1>Добро пожаловать, {{ user.username }}!</h1>
+            <p>Сегодня: <span id="currentDate">Загрузка...</span></p>
+        </div>
+            <div class="top-bar-right">
+
+                <div class="balance-info">
+                    <i class="fas fa-wallet"></i>
+                    <span>Баланс: <strong id="balanceAmount">540</strong> руб.</span>
+                    <button class="btn btn-sm btn-outline" onclick="topUpBalance()">
+                        <i class="fas fa-plus"></i> Пополнить
+                    </button>
+
+                </div>
+            </div>
+        </header>
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                {% block body %}
+                {% endblock %}
+            </div>
+        </div>
+    </main>
 </body>
 </html>

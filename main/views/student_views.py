@@ -1,13 +1,10 @@
-# main/views/student_views.py
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
-from ..models import Card, Order, Allergen
+from django.shortcuts import render, get_object_or_404, redirect
+from main.models import Card, Order, Allergen
 from django.utils import timezone
 from datetime import time, datetime
 from django.contrib.auth import logout
-from django.shortcuts import redirect
 from django.contrib import messages
-
 
 @login_required
 def student_home_page(request):

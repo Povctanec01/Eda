@@ -1,15 +1,13 @@
-# main/views/admin_views.py
 from django import forms
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.http import request
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import time, datetime, timedelta
-from ..models import Card, Order, CardBuys, Profile
-from ..forms import CardForm, CardFormBuys
+from main.models import Card, Order, CardBuys, Profile
+from main.forms import CardForm, CardFormBuys
 
 
 class StaffRegistrationForm(forms.Form):
@@ -69,15 +67,6 @@ class StaffRegistrationForm(forms.Form):
         user.profile.role = role
         user.profile.save()
         return user
-
-
-def check_admin(user):
-    if not request.user.is_authenticated or request.user.profile.role != 'admin':
-        return redirect('login')
-    """Проверка, является ли пользователь администратором"""
-    return user.is_authenticated and (user.is_superuser or 
-                                     (hasattr(user, 'profile') and user.profile.role == 'admin'))
-
 
 @login_required
 def admin_home_page(request):
@@ -245,13 +234,12 @@ def admin_finance(request):
         return redirect('login')
     return render(request, 'main/admin_dashboard/admin_finance.html')
 
-
 @login_required
 def admin_users_delete_selected(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'admin':
+    if not hasattr(request.user, 'profile') or request.user.profile.role != 'admin':
         return redirect('login')
+
     if request.method == 'POST':
-        # Используем getlist() для получения списка значений
         usernames = request.POST.getlist('usernames[]')
 
         if not usernames:
@@ -262,22 +250,33 @@ def admin_users_delete_selected(request):
         for username in usernames:
             try:
                 user = User.objects.get(username=username)
-                # Не удаляем текущего пользователя и суперпользователей
+
+                # ЗАПРЕТИТЬ удаление:
+                # 1. Себя самого
                 if user.id == request.user.id:
+                    messages.warning(request, "Нельзя удалить свой собственный аккаунт!")
                     continue
-                if user.is_superuser and user.id != request.user.id:
+
+                # 2. Других администраторов (кроме суперпользователя)
+                if hasattr(user, 'profile') and user.profile.role == 'admin':
+                    messages.warning(request, f"Нельзя удалить администратора {username}!")
+                    continue
+
+                # 3. Суперпользователей (если удаляющий не суперпользователь)
+                if user.is_superuser and not request.user.is_superuser:
+                    messages.warning(request, f"Нельзя удалить суперпользователя {username}!")
                     continue
 
                 user.delete()
                 deleted_count += 1
+
             except User.DoesNotExist:
                 continue
 
         if deleted_count > 0:
             messages.success(request, f"Успешно удалено {deleted_count} пользователей.")
         else:
-            messages.warning(request,
-                             "Нет пользователей для удаления (возможно, вы пытались удалить себя или суперпользователя).")
+            messages.warning(request, "Нет пользователей для удаления.")
 
     return redirect('admin_users_statistics')
 

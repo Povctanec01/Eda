@@ -2,6 +2,7 @@ from django.apps import apps
 from django.utils import timezone
 from datetime import timedelta
 from .models import CardBuys
+
 def chef_orders_count(request):
     try:
         if request.user.is_authenticated:

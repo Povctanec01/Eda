@@ -1,4 +1,3 @@
-# models.py - дополненный код Profile
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -36,30 +35,23 @@ class Profile(models.Model):
         verbose_name_plural = "Профили"
 
     def get_all_allergens(self):
-        """Получить все аллергены пользователя"""
         return self.critical_allergens.all() | self.non_critical_allergens.all()
 
     def has_critical_allergen(self, allergen):
-        """Проверить, является ли аллерген критическим для пользователя"""
         return self.critical_allergens.filter(id=allergen.id).exists()
 
     def has_non_critical_allergen(self, allergen):
-        """Проверить, является ли аллерген некритическим для пользователя"""
         return self.non_critical_allergens.filter(id=allergen.id).exists()
 
-    # models.py - в класс Profile
     def get_role_display(self):
-        """Получить отображаемое имя роли"""
         role_display = {
             'student': 'Студент',
             'chef': 'Повар',
             'admin': 'Администратор'
         }
-        # Если роль пустая или None, возвращаем значение по умолчанию
         if not self.role:
             return 'Студент'
         return role_display.get(self.role, self.role)
-
 
 class Allergen(models.Model):
     name = models.CharField('Название аллергена', max_length=100, unique=True)
@@ -71,8 +63,6 @@ class Allergen(models.Model):
         verbose_name = "Аллерген"
         verbose_name_plural = "Аллергены"
 
-
-# В класс Card добавляем поле is_hidden
 class Card(models.Model):
     MEAL_CHOICES = [
         ('select', 'Выберите'),
@@ -100,8 +90,6 @@ class Card(models.Model):
     class Meta:
         verbose_name = "Блюдо"
         verbose_name_plural = "Блюда"
-
-
 
 class CardBuys(models.Model):
     STATUS_CHOICES = [
@@ -155,8 +143,6 @@ class Order(models.Model):
         title = self.card.title if self.card else "[УДАЛЁННОЕ БЛЮДО]"
         return f"{username} → {title} ({self.get_status_display()})"
 
-
-# Сигнал для автоматического создания профиля при создании пользователя
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

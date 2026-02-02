@@ -2,15 +2,14 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from ..models import Card, Order, CardBuys, Profile
-from ..forms import CardForm, CardFormBuys
+from main.models import Card, Order, CardBuys, Profile, Allergen
+from main.forms import CardForm, CardFormBuys
 from datetime import timedelta, time
 from django.utils import timezone
-from ..models import Allergen
 from django import forms
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
-from django.core.paginator import Paginator  # Добавляем пагинацию
+from django.core.paginator import Paginator
 
 @login_required
 def chef_home_page(request):

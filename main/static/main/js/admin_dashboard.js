@@ -1,6 +1,5 @@
-// main/static/main/js/admin_dashboard.js
 document.addEventListener('DOMContentLoaded', function () {
-    // === 1. Переключение темы ===
+    //1Переключение темы
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         // Загружаем сохранённую тему
@@ -14,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // === 2. Генерация отчётов ===
+    //2 Генерация отчётов
     const reportBtns = document.querySelectorAll('.report-btn');
     if (reportBtns.length > 0) {
         reportBtns.forEach(btn => {
@@ -44,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // === 3. Просмотр деталей дня ===
+    //3 Просмотр деталей дня
     const viewDetailsBtns = document.querySelectorAll('.view-details-btn');
     if (viewDetailsBtns.length > 0) {
         viewDetailsBtns.forEach(btn => {
@@ -55,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // === 4. Закрытие модальных окон (если есть) ===
+    //4 Закрытие модальных окон
     const closeModalButtons = document.querySelectorAll('.close-modal, .modal-close');
     if (closeModalButtons.length > 0) {
         closeModalButtons.forEach(btn => {
@@ -68,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // === 5. Вспомогательная функция для CSRF ===
+    //5 Вспомогательная функция для CSRF
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -84,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return cookieValue;
     }
 
-    // === 6. Управление списком пользователей (поиск, выбор, удаление) ===
+    //6 Управление списком пользователей
     const searchInput = document.getElementById('userSearch');
     const deleteBtn = document.getElementById('deleteSelectedBtn');
     const userItems = document.querySelectorAll('.allergen-item.user-item');
@@ -100,14 +99,13 @@ document.addEventListener('DOMContentLoaded', function () {
             element: item,
             username: username.toLowerCase()
         });
-        // Изначально все элементы видимы
         item.style.display = 'flex';
     });
 
-    // Функция фильтрации
+    //Фильтрация
     function filterUsers(query) {
         if (!query.trim()) {
-            // Если поиск пустой — показываем всех
+            //Если поиск пустой — показываем всех
             userData.forEach(user => {
                 user.element.style.display = 'flex';
             });
@@ -128,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Обновляем счётчик и показываем результаты
+        //Счётчик
         resultsCount.textContent = visibleCount;
         searchResultsInfo.style.display = 'block';
 
@@ -148,14 +146,12 @@ document.addEventListener('DOMContentLoaded', function () {
         updateDeleteButton();
     }
 
-    // Обработчик ввода
+    //Обработчик ввода
     if (searchInput) {
         searchInput.addEventListener('input', function (e) {
             filterUsers(e.target.value);
         });
     }
-
-    // Клик по карточке пользователя — переключает чекбокс
     userItems.forEach(item => {
         item.addEventListener('click', function (e) {
             // Не переключаем чекбокс, если кликнули по самому чекбоксу или роли
@@ -172,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Синхронизация чекбокса и выделения карточки
+    //Синхронизация чекбокса и выделения карточки
     document.addEventListener('change', function (e) {
         if (e.target.classList.contains('user-checkbox')) {
             const item = e.target.closest('.user-item');
@@ -183,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Функция обновления выделения карточки
+    //Обновления выделения карточки
     function updateUserItemSelection(item, isSelected) {
         if (isSelected) {
             item.classList.add('selected');
@@ -192,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Функция обновления состояния кнопки удаления
+    //Обновления состояния кнопки удаления
     function updateDeleteButton() {
         const checkboxes = document.querySelectorAll('.user-checkbox:checked');
         if (deleteBtn) {
@@ -210,6 +206,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (selectedUsernames.length === 0) {
                 alert('Пожалуйста, выберите хотя бы одного пользователя для удаления.');
+                return;
+            }
+
+            // ПРОВЕРКА: нельзя удалить себя
+            if (selectedUsernames.includes('{{ request.user.username }}')) {
+                alert('Нельзя удалить свой собственный аккаунт!');
+                return;
+            }
+            if (!confirmUserDeletion(selectedUsernames)) {
                 return;
             }
 
@@ -247,17 +252,39 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Изначальное состояние
     updateDeleteButton();
 
 });
-// Функция для фильтрации скрытых блюд
-function toggleVisibilityFilter() {
+
+function toggleVisibilityFilter() { //функция для фильтрации скрытых блюд
     const items = document.querySelectorAll('.dish-item');
-    const showHiddenOnly = true; // или реализуйте переключение
+    const showHiddenOnly = true;
 
     items.forEach(item => {
         const isHidden = item.getAttribute('data-hidden') === 'true';
         item.style.display = showHiddenOnly ? (isHidden ? 'block' : 'none') : 'block';
     });
+}
+function confirmUserDeletion(selectedUsernames) {
+    const adminUsernames = [];
+    const superuserUsernames = [];
+
+    // Проверить, нет ли среди выбранных администраторов
+    selectedUsernames.forEach(username => {
+        const userItem = document.querySelector(`.user-item[data-username="${username}"]`);
+        if (userItem) {
+            const roleBadge = userItem.querySelector('.badge');
+            if (roleBadge && roleBadge.textContent.includes('Администратор')) {
+                adminUsernames.push(username);
+            }
+        }
+    });
+
+    let message = `Вы уверены, что хотите удалить ${selectedUsernames.length} пользователей?`;
+
+    if (adminUsernames.length > 0) {
+        message += `\n\n⚠️ Внимание! Среди выбранных есть администраторы:\n${adminUsernames.join(', ')}\n\nИх удаление может нарушить работу системы.`;
+    }
+
+    return confirm(message);
 }
