@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from main.models import Card, Order, Allergen
 from django.utils import timezone
@@ -176,6 +177,58 @@ def student_feedback(request):
     if not request.user.is_authenticated:
         return redirect('login')
     return render(request, 'main/student_dashboard/student_feedback.html')
+
+
+@login_required
+def student_likes(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+
+    # Получаем все НЕ скрытые блюда
+    all_cards = Card.objects.filter(is_hidden=False).exclude(meal_type='select').order_by('meal_type', 'title')
+
+    # Получаем лайкнутые блюда пользователя
+    profile = request.user.profile
+    liked_cards = profile.liked_cards.all()
+
+    # Сортируем: лайкнутые в начале
+    sorted_cards = []
+    # Сначала лайкнутые
+    for card in all_cards:
+        if card in liked_cards:
+            card.is_liked = True
+            sorted_cards.append(card)
+    # Потом нелайкнутые
+    for card in all_cards:
+        if card not in liked_cards:
+            card.is_liked = False
+            sorted_cards.append(card)
+
+    return render(request, 'main/student_dashboard/student_likes.html', {
+        'cards': sorted_cards,
+        'liked_cards': liked_cards
+    })
+
+
+@login_required
+def toggle_like(request, card_id):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+
+    card = get_object_or_404(Card, id=card_id)
+    profile = request.user.profile
+
+    if card in profile.liked_cards.all():
+        # Убираем лайк
+        profile.liked_cards.remove(card)
+        messages.success(request, f"Убрано из избранного: {card.title}")
+    else:
+        # Добавляем лайк
+        profile.liked_cards.add(card)
+        messages.success(request, f"Добавлено в избранное: {card.title}")
+
+    profile.save()
+    return redirect('student_likes')
 
 
 @login_required

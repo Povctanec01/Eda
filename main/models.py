@@ -27,6 +27,15 @@ class Profile(models.Model):
         help_text="Блюда с этими аллергенами будут отображаться с предупреждением"
     )
 
+    # ДОБАВЬТЕ ЭТО ПОЛЕ ДЛЯ ЛАЙКОВ
+    liked_cards = models.ManyToManyField(
+        'Card',
+        related_name='liked_by_profiles',
+        blank=True,
+        verbose_name="Понравившиеся блюда",
+        help_text="Блюда, отмеченные пользователем как понравившиеся"
+    )
+
     def __str__(self):
         return f"{self.user.username} - {self.role}"
 
