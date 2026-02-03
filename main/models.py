@@ -9,6 +9,13 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=[('student', 'Student'), ('chef', 'Chef'), ('admin', 'Admin')])
     auto_redirect_to_home = models.BooleanField(default=False)
+    # Баланс
+    balance = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Баланс",
+        default=0.00
+    )
 
     # Аллергены студента
     critical_allergens = models.ManyToManyField(

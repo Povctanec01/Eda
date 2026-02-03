@@ -1,5 +1,4 @@
 from decimal import Decimal
-
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -181,6 +180,7 @@ def chef_orders(request):
     orders = Order.objects.filter(status='pending').select_related('user', 'card').order_by('ordered_at')
     return render(request, 'main/chef_dashboard/chef_orders.html', {'orders': orders})
 
+
 @login_required
 def chef_card_edit(request):
     if not request.user.is_authenticated or request.user.profile.role != 'chef':
@@ -209,19 +209,40 @@ def chef_card_edit(request):
     if request.method == 'POST' and 'toggle_visibility' in request.POST:
         card_id = request.POST.get('card_id')
         card = get_object_or_404(Card, id=card_id)
-        card.is_hidden = not card.is_hidden  # Переключаем статус
+        card.is_hidden = not card.is_hidden
         card.save()
 
         action = "скрыто" if card.is_hidden else "отображено"
         messages.success(request, f"Блюдо «{card.title}» {action}.")
         return redirect('chef_card_edit')
 
+    # Обработка редактирования блюда
+    if request.method == 'POST' and 'edit_card' in request.POST:
+        card_id = request.POST.get('card_id')
+        card = get_object_or_404(Card, id=card_id)
+
+        # Создаем форму с экземпляром карточки
+        form = CardForm(request.POST, instance=card)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Блюдо «{card.title}» успешно обновлено!")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Ошибка в поле '{field}': {error}")
+
+        return redirect('chef_card_edit')
 
     # Получаем все блюда, включая скрытые
     cards = Card.objects.all().order_by('meal_type', 'title')
+
+    # Считаем количество скрытых блюд
+    hidden_count = cards.filter(is_hidden=True).count()
+
     return render(request, 'main/chef_dashboard/chef_card_edit.html', {
         'form': form,
-        'cards': cards
+        'cards': cards,
+        'hidden_count': hidden_count
     })
 
 

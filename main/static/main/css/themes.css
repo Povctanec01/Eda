@@ -922,3 +922,116 @@ p {
 .try {
     width: 172px;
 }
+/* main/static/main/css/themes.css */
+/* Добавьте в конец файла */
+
+/* Стили для всплывающих уведомлений */
+.floating-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 350px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 15px;
+    margin-bottom: 10px;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    border-left: 4px solid;
+}
+
+.floating-notification.show {
+    transform: translateX(0);
+}
+
+.floating-notification.success {
+    border-left-color: #28a745;
+}
+
+.floating-notification.error {
+    border-left-color: #dc3545;
+}
+
+.floating-notification.warning {
+    border-left-color: #ffc107;
+}
+
+.floating-notification.info {
+    border-left-color: #17a2b8;
+}
+
+.floating-notification .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.floating-notification .notification-title {
+    font-weight: 600;
+    margin: 0;
+}
+
+.floating-notification .notification-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-notification .notification-content {
+    margin: 0;
+    font-size: 14px;
+}
+
+.floating-notification.fade-out {
+    opacity: 0;
+    transform: translateX(400px) scale(0.9);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Адаптация для темной темы */
+[data-theme="dark"] .floating-notification {
+    background: #2d3748;
+    color: #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .floating-notification .notification-close {
+    color: #a0aec0;
+}
+
+/* Для сообщений Django */
+.messages {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10000;
+    max-width: 350px;
+}
+
+.messages .alert {
+    margin-bottom: 10px;
+    animation: slideInRight 0.3s ease forwards;
+    transform: translateX(400px);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

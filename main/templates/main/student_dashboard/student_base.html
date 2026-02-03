@@ -37,6 +37,11 @@
                 <h3>{{ user.username }}</h3>
                 <p class="user-role">Ученик</p>
                 <p class="user-email">student@school.ru</p>
+                <!-- Добавляем отображение баланса в сайдбар -->
+                <p class="user-balance" style="margin-top: 5px;">
+                    <i class="fas fa-wallet" style="color: #4CAF50;"></i>
+                    <strong>{{ user.profile.balance|floatformat:2 }}</strong> руб.
+                </p>
             </div>
             <div class="theme-toggle" style="margin-top: 15px">
                 <label class="theme-switch">
@@ -91,7 +96,7 @@
             </a>
         </div>
     </aside>
-    
+
     <main class="main-content">  <!--Основной контент (вверх)-->
         <header class="top-bar">
         <div class="top-bar-left">
@@ -99,14 +104,12 @@
             <p>Сегодня: <span id="currentDate">Загрузка...</span></p>
         </div>
             <div class="top-bar-right">
-
                 <div class="balance-info">
                     <i class="fas fa-wallet"></i>
-                    <span>Баланс: <strong id="balanceAmount">540</strong> руб.</span>
-                    <button class="btn btn-sm btn-outline" onclick="topUpBalance()">
+                    <span>Баланс: <strong id="balanceAmount">{{ user.profile.balance|floatformat:2 }}</strong> руб.</span>
+                    <button class="btn btn-sm btn-outline" onclick="showTopUpModal()">
                         <i class="fas fa-plus"></i> Пополнить
                     </button>
-
                 </div>
             </div>
         </header>
@@ -117,5 +120,80 @@
             </div>
         </div>
     </main>
+
+    <!-- Модальное окно для пополнения баланса -->
+    <div id="topUpModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Пополнение баланса</h3>
+                <button class="close-btn" onclick="closeTopUpModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="topUpAmount">Сумма пополнения (руб):</label>
+                    <input type="number"
+                           id="topUpAmount"
+                           class="form-control"
+                           min="10"
+                           max="10000"
+                           step="10"
+                           placeholder="Введите сумму">
+                    <small class="form-text text-muted">Минимальная сумма: 10 руб, максимальная: 10000 руб</small>
+                </div>
+                <div class="quick-amounts" style="margin: 15px 0;">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="setAmount(50)">50 руб</button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="setAmount(100)">100 руб</button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="setAmount(500)">500 руб</button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="setAmount(1000)">1000 руб</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeTopUpModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="topUpBalance()">Пополнить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Добавляем CSRF токен для AJAX запросов -->
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+    </script>
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas
+                {% if message.tags == 'success' %}fa-check-circle
+                {% elif message.tags == 'error' %}fa-times-circle
+                {% elif message.tags == 'warning' %}fa-exclamation-triangle
+                {% else %}fa-info-circle{% endif %}
+                me-2"></i>
+            <div>{{ message }}</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 </body>
+<script>
+// Функции для работы с балансом
+
+</script>
 </html>

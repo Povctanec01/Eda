@@ -24,6 +24,7 @@ urlpatterns = [
     path('student_allergens',student_views.student_allergens, name='student_allergens'),
     path('student/allergens/critical/update/',update_critical_allergens, name='update_critical_allergens'),
     path('student/allergens/non-critical/update/',update_non_critical_allergens, name='update_non_critical_allergens'),
+    path('student/top-up-balance/', student_views.top_up_balance, name='student_top_up_balance'),
 
 #chef
     path('chef_home_page',chef_views.chef_home_page, name='chef_home_page'),

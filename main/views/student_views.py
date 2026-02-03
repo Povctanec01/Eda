@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -81,8 +83,41 @@ def student_home_page(request):
         'all_orders_count': all_orders_count,
         'pending_orders_count': pending_orders_count,
         'ready_orders_count': ready_orders_count,
+        'balance': profile.balance,  # Добавляем баланс в контекст
     })
 
+
+@login_required
+def top_up_balance(request):
+    """Обработчик пополнения баланса"""
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return JsonResponse({'success': False, 'error': 'Доступ запрещен'}, status=403)
+
+    if request.method == 'POST':
+        try:
+            amount = Decimal(request.POST.get('amount', '0'))
+
+            if amount <= 0:
+                return JsonResponse({'success': False, 'error': 'Сумма должна быть положительной'})
+
+            if amount > 10000:  # Ограничение на максимальное пополнение
+                return JsonResponse({'success': False, 'error': 'Максимальная сумма пополнения - 10000 руб'})
+
+            # Пополняем баланс
+            profile = request.user.profile
+            profile.balance += amount
+            profile.save()
+
+            return JsonResponse({
+                'success': True,
+                'new_balance': float(profile.balance),
+                'message': f'Баланс успешно пополнен на {amount} руб.'
+            })
+
+        except (ValueError, TypeError) as e:
+            return JsonResponse({'success': False, 'error': 'Неверная сумма'})
+
+    return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
 
 @login_required
 def student_settings(request):
@@ -154,8 +189,21 @@ def student_order_create(request, card_id):
         messages.error(request, "Это блюдо временно недоступно для заказа.")
         return redirect('student_home_page')
 
+    # ПРОВЕРЯЕМ БАЛАНС СТУДЕНТА
+    profile = request.user.profile
+    if profile.balance < card.price:
+        messages.error(request,
+                       f"Недостаточно средств на счете. Требуется: {card.price} руб., доступно: {profile.balance} руб.")
+        return redirect('student_home_page')
+
+    # Списываем средства
+    profile.balance -= card.price
+    profile.save()
+
+    # Создаем заказ
     Order.objects.create(user=request.user, card=card)
-    messages.success(request, f"Вы заказали: {card.title}!")
+
+    messages.success(request, f"Вы заказали: {card.title} за {card.price} руб.!")
     return redirect('student_home_page')
 
 @login_required
