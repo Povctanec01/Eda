@@ -4,48 +4,43 @@
 {% block body %}
 <!-- Изменение пароля -->
 <div class="settings-section">
-  <h3>Изменение пароля</h3>
-  <form method="post" action="{% url 'admin_settings' %}" id="passwordForm">
-    {% csrf_token %}
-    <input type="hidden" name="change_password" value="1">
-
-    <div class="mb-3">
-      <label for="current_password" class="form-label">Текущий пароль</label>
-      <input type="password" class="form-control" id="current_password" name="current_password" required>
-    </div>
-
-    <div class="mb-3">
-      <label for="new_password1" class="form-label">Новый пароль</label>
-      <input type="password" class="form-control" id="new_password1" name="new_password1" required>
-      <div class="form-text">Пароль должен содержать минимум 8 символов.</div>
-    </div>
-
-    <div class="mb-3">
-      <label for="new_password2" class="form-label">Подтвердите новый пароль</label>
-      <input type="password" class="form-control" id="new_password2" name="new_password2" required>
-    </div>
-
-    <button type="submit" class="btn btn-primary">
-      <i class="fas fa-key"></i> Изменить пароль
-    </button>
-  </form>
+    <h3>Изменение пароля</h3>
+    <form method="post" action="{% url 'admin_settings' %}" id="passwordForm">
+        {% csrf_token %}
+        <input type="hidden" name="change_password" value="1">
+        <div class="mb-3">
+            <label for="current_password" class="form-label">Текущий пароль</label>
+            <input type="password" class="form-control" id="current_password" name="current_password" required>
+        </div>
+        <div class="mb-3">
+            <label for="new_password1" class="form-label">Новый пароль</label>
+            <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+            <div class="form-text">Пароль должен содержать минимум 8 символов.</div>
+        </div>
+        <div class="mb-3">
+            <label for="new_password2" class="form-label">Подтвердите новый пароль</label>
+            <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+        </div>
+        <button type="submit" class="btn btn-primary">
+        <i class="fas fa-key"></i> Изменить пароль
+        </button>
+    </form>
 </div>
-
 <div class="settings-section mt-4">
-  <h3>Поведение при входе</h3>
-  <form method="post" action="{% url 'admin_settings' %}">  <!-- Изменено с student_settings на admin_settings -->
-    {% csrf_token %}
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="auto_redirect" name="auto_redirect"
-             {% if request.user.profile.auto_redirect_to_home %}checked{% endif %}>
-      <label class="form-check-label" for="auto_redirect">
-        Переключать при входе на сайт сразу на admin_home_page, если пользователь авторизован  <!-- Исправлено на admin_home_page -->
-      </label>
-    </div>
-    <button type="submit" class="btn btn-primary mt-2">Сохранить настройки</button>
-  </form>
+    <h3>Поведение при входе</h3>
+    <form method="post" action="{% url 'admin_settings' %}">
+        <!-- Изменено с student_settings на admin_settings -->
+        {% csrf_token %}
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="auto_redirect" name="auto_redirect"
+            {% if request.user.profile.auto_redirect_to_home %}checked{% endif %}>
+            <label class="form-check-label" for="auto_redirect">
+                Переключать при входе на сайт сразу на admin_home_page, если пользователь авторизован  <!-- Исправлено на admin_home_page -->
+            </label>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Сохранить настройки</button>
+    </form>
 </div>
-
 <!-- Опасные действия -->
 <div class="settings-section mt-4">
     <h3 class="text-danger">Опасные действия</h3>
@@ -57,5 +52,4 @@
         </button>
     </form>
 </div>
-
 {% endblock %}

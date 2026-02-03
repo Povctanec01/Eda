@@ -1,7 +1,6 @@
 {% extends 'main/chef_dashboard/chef_base.html' %}
 {% load static %}
 {% block title %}Остатки продуктов{% endblock %}
-
 {% block body %}
 <div class="dashboard-header">
     <h1><i class="fas fa-boxes"></i> Остатки продуктов</h1>
@@ -26,7 +25,6 @@
         </div>
     </div>
 </div>
-
 <div class="dashboard-content">
     <!-- Форма добавления продукта -->
     <div class="card mb-4">
@@ -37,7 +35,6 @@
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="add_product" value="true">
-
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
@@ -68,7 +65,7 @@
                         <div class="form-group">
                             <label>&nbsp;</label>
                             <button type="submit" class="btn btn-primary btn-block">
-                                <i class="fas fa-plus"></i> Добавить
+                            <i class="fas fa-plus"></i> Добавить
                             </button>
                         </div>
                     </div>
@@ -76,14 +73,13 @@
             </form>
         </div>
     </div>
-
     <!-- Список продуктов -->
     <div class="card">
         <div class="card-header">
             <h3><i class="fas fa-list"></i> Список продуктов ({{ products.count }})</h3>
             <div class="search-box">
                 <input type="text" id="productSearch" placeholder="Поиск продуктов..." class="form-control"
-                       onkeyup="filterProducts()">
+                    onkeyup="filterProducts()">
             </div>
         </div>
         <div class="card-body">
@@ -117,53 +113,50 @@
                             <td>
                                 {% if product.is_low_stock %}
                                 <span class="badge badge-warning">
-                                    <i class="fas fa-exclamation-triangle"></i> Низкий запас
+                                <i class="fas fa-exclamation-triangle"></i> Низкий запас
                                 </span>
                                 {% else %}
                                 <span class="badge badge-success">
-                                    <i class="fas fa-check"></i> Достаточно
+                                <i class="fas fa-check"></i> Достаточно
                                 </span>
                                 {% endif %}
                             </td>
                             <td>
                                 <small class="text-muted">
-                                    {{ product.updated_at|date:"d.m.Y H:i" }}
+                                {{ product.updated_at|date:"d.m.Y H:i" }}
                                 </small>
                             </td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <!-- Кнопка для быстрого изменения количества -->
                                     <button type="button"
-                                            class="btn btn-sm btn-outline-primary"
-                                            onclick="showQuantityForm('{{ product.id }}')"
-                                            title="Изменить количество">
-                                        <i class="fas fa-edit"></i>
+                                        class="btn btn-sm btn-outline-primary"
+                                        onclick="showQuantityForm('{{ product.id }}')"
+                                        title="Изменить количество">
+                                    <i class="fas fa-edit"></i>
                                     </button>
-
                                     <!-- Кнопка для полного редактирования -->
                                     <button type="button"
-                                            class="btn btn-sm btn-outline-secondary"
-                                            onclick="showEditForm('{{ product.id }}')"
-                                            title="Редактировать продукт">
-                                        <i class="fas fa-cog"></i>
+                                        class="btn btn-sm btn-outline-secondary"
+                                        onclick="showEditForm('{{ product.id }}')"
+                                        title="Редактировать продукт">
+                                    <i class="fas fa-cog"></i>
                                     </button>
-
                                     <!-- Кнопка удаления с красной иконкой -->
                                     <form method="POST" class="d-inline">
                                         {% csrf_token %}
                                         <input type="hidden" name="product_id" value="{{ product.id }}">
                                         <input type="hidden" name="delete_product" value="true">
                                         <button type="submit"
-                                                class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Удалить продукт «{{ product.name }}»?')"
-                                                title="Удалить продукт">
-                                            <i class="fas fa-trash" style="color: #dc3545 !important;"></i>
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Удалить продукт «{{ product.name }}»?')"
+                                            title="Удалить продукт">
+                                        <i class="fas fa-trash" style="color: #dc3545 !important;"></i>
                                         </button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
-
                         <!-- Скрытая форма для быстрого изменения количества -->
                         <tr id="quantity-form-{{ product.id }}" style="display: none;" class="edit-form-row">
                             <td colspan="6" class="bg-light">
@@ -171,7 +164,6 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="product_id" value="{{ product.id }}">
                                     <input type="hidden" name="update_quantity" value="true">
-
                                     <div class="row align-items-center">
                                         <div class="col-md-4">
                                             <h5>Изменить количество: {{ product.name }}</h5>
@@ -180,12 +172,12 @@
                                             <div class="form-group mb-0">
                                                 <label>Новое количество:</label>
                                                 <input type="number"
-                                                       name="new_quantity"
-                                                       class="form-control"
-                                                       value="{{ product.quantity }}"
-                                                       step="0.01"
-                                                       min="0"
-                                                       required>
+                                                    name="new_quantity"
+                                                    class="form-control"
+                                                    value="{{ product.quantity }}"
+                                                    step="0.01"
+                                                    min="0"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="col-md-2">
@@ -196,18 +188,17 @@
                                         </div>
                                         <div class="col-md-3">
                                             <button type="submit" class="btn btn-primary mr-2">
-                                                <i class="fas fa-save"></i> Сохранить
+                                            <i class="fas fa-save"></i> Сохранить
                                             </button>
                                             <button type="button" class="btn btn-secondary"
-                                                    onclick="hideQuantityForm('{{ product.id }}')">
-                                                Отмена
+                                                onclick="hideQuantityForm('{{ product.id }}')">
+                                            Отмена
                                             </button>
                                         </div>
                                     </div>
                                 </form>
                             </td>
                         </tr>
-
                         <!-- Скрытая форма для полного редактирования -->
                         <tr id="edit-form-{{ product.id }}" style="display: none;" class="edit-form-row">
                             <td colspan="6" class="bg-light">
@@ -215,40 +206,38 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="product_id" value="{{ product.id }}">
                                     <input type="hidden" name="edit_product" value="true">
-
                                     <h5>Редактировать продукт: {{ product.name }}</h5>
-
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Название продукта:</label>
                                                 <input type="text"
-                                                       name="name"
-                                                       class="form-control"
-                                                       value="{{ product.name }}"
-                                                       required>
+                                                    name="name"
+                                                    class="form-control"
+                                                    value="{{ product.name }}"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label>Количество:</label>
                                                 <input type="number"
-                                                       name="quantity"
-                                                       class="form-control"
-                                                       value="{{ product.quantity }}"
-                                                       step="0.01"
-                                                       required>
+                                                    name="quantity"
+                                                    class="form-control"
+                                                    value="{{ product.quantity }}"
+                                                    step="0.01"
+                                                    required>
                                             </div>
                                         </div>
                                         <div class="col-md-2">
                                             <div class="form-group">
                                                 <label>Единица измерения:</label>
                                                 <select name="unit" class="form-control">
-                                                    <option value="кг" {% if product.unit == 'кг' %}selected{% endif %}>Килограммы</option>
-                                                    <option value="г" {% if product.unit == 'г' %}selected{% endif %}>Граммы</option>
-                                                    <option value="л" {% if product.unit == 'л' %}selected{% endif %}>Литр</option>
-                                                    <option value="шт" {% if product.unit == 'шт' %}selected{% endif %}>Штуки</option>
-                                                    <option value="уп" {% if product.unit == 'уп' %}selected{% endif %}>Упаковка</option>
+                                                <option value="кг" {% if product.unit == 'кг' %}selected{% endif %}>Килограммы</option>
+                                                <option value="г" {% if product.unit == 'г' %}selected{% endif %}>Граммы</option>
+                                                <option value="л" {% if product.unit == 'л' %}selected{% endif %}>Литр</option>
+                                                <option value="шт" {% if product.unit == 'шт' %}selected{% endif %}>Штуки</option>
+                                                <option value="уп" {% if product.unit == 'уп' %}selected{% endif %}>Упаковка</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -256,35 +245,33 @@
                                             <div class="form-group">
                                                 <label>Минимальный запас:</label>
                                                 <input type="number"
-                                                       name="min_quantity"
-                                                       class="form-control"
-                                                       value="{{ product.min_quantity }}"
-                                                       step="0.01">
+                                                    name="min_quantity"
+                                                    class="form-control"
+                                                    value="{{ product.min_quantity }}"
+                                                    step="0.01">
                                                 <small class="form-text text-muted">При достижении появится предупреждение</small>
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="row">
                                         <div class="col-md-6">
                                             <small class="text-muted">
-                                                <strong>Дата создания:</strong> {{ product.created_at|date:"d.m.Y H:i" }}
+                                            <strong>Дата создания:</strong> {{ product.created_at|date:"d.m.Y H:i" }}
                                             </small>
                                         </div>
                                         <div class="col-md-6">
                                             <small class="text-muted">
-                                                <strong>Последнее обновление:</strong> {{ product.updated_at|date:"d.m.Y H:i" }}
+                                            <strong>Последнее обновление:</strong> {{ product.updated_at|date:"d.m.Y H:i" }}
                                             </small>
                                         </div>
                                     </div>
-
                                     <div class="mt-3">
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save"></i> Сохранить изменения
+                                        <i class="fas fa-save"></i> Сохранить изменения
                                         </button>
                                         <button type="button" class="btn btn-secondary"
-                                                onclick="hideEditForm('{{ product.id }}')">
-                                            Отмена
+                                            onclick="hideEditForm('{{ product.id }}')">
+                                        Отмена
                                         </button>
                                     </div>
                                 </form>
@@ -304,270 +291,4 @@
         </div>
     </div>
 </div>
-
-<!-- Простой JavaScript для показа/скрытия форм и поиска -->
-<script>
-// Функция для поиска продуктов
-function filterProducts() {
-    const input = document.getElementById('productSearch');
-    const filter = input.value.toLowerCase();
-    const rows = document.getElementsByClassName('product-row');
-
-    for (let i = 0; i < rows.length; i++) {
-        const productName = rows[i].getElementsByTagName('td')[0].innerText.toLowerCase();
-        if (productName.includes(filter)) {
-            rows[i].style.display = '';
-        } else {
-            rows[i].style.display = 'none';
-        }
-    }
-}
-
-// Функция для показа формы изменения количества
-function showQuantityForm(productId) {
-    // Скрываем все другие формы редактирования
-    hideAllEditForms();
-
-    // Показываем нужную форму
-    const formRow = document.getElementById('quantity-form-' + productId);
-    const productRow = document.getElementById('product-row-' + productId);
-
-    if (formRow && productRow) {
-        formRow.style.display = 'table-row';
-        productRow.style.display = 'none';
-    }
-}
-
-// Функция для скрытия формы изменения количества
-function hideQuantityForm(productId) {
-    const formRow = document.getElementById('quantity-form-' + productId);
-    const productRow = document.getElementById('product-row-' + productId);
-
-    if (formRow && productRow) {
-        formRow.style.display = 'none';
-        productRow.style.display = '';
-    }
-}
-
-// Функция для показа формы полного редактирования
-function showEditForm(productId) {
-    // Скрываем все другие формы редактирования
-    hideAllEditForms();
-
-    // Показываем нужную форму
-    const formRow = document.getElementById('edit-form-' + productId);
-    const productRow = document.getElementById('product-row-' + productId);
-
-    if (formRow && productRow) {
-        formRow.style.display = 'table-row';
-        productRow.style.display = 'none';
-    }
-}
-
-// Функция для скрытия формы полного редактирования
-function hideEditForm(productId) {
-    const formRow = document.getElementById('edit-form-' + productId);
-    const productRow = document.getElementById('product-row-' + productId);
-
-    if (formRow && productRow) {
-        formRow.style.display = 'none';
-        productRow.style.display = '';
-    }
-}
-
-// Функция для скрытия всех форм редактирования
-function hideAllEditForms() {
-    const editForms = document.getElementsByClassName('edit-form-row');
-    const productRows = document.getElementsByClassName('product-row');
-
-    // Скрываем все формы редактирования
-    for (let i = 0; i < editForms.length; i++) {
-        editForms[i].style.display = 'none';
-    }
-
-    // Показываем все строки продуктов
-    for (let i = 0; i < productRows.length; i++) {
-        productRows[i].style.display = '';
-    }
-}
-</script>
-
-<style>
-.stat-card {
-    background: var(--card-bg);
-    border-radius: 10px;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border: 1px solid var(--border-color);
-}
-
-.stat-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 15px;
-    color: white;
-    font-size: 24px;
-}
-
-.header-stats {
-    display: flex;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.table th {
-    border-top: none;
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-    border-bottom: 2px solid var(--border-color);
-}
-
-.badge {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-}
-
-.btn-group .btn {
-    margin-right: 5px;
-}
-
-.btn-group .btn:last-child {
-    margin-right: 0;
-}
-
-.edit-form-row {
-    background-color: var(--bg-tertiary) !important;
-}
-
-/* Стили для сообщений об ошибках */
-.messages {
-    margin-bottom: 20px;
-}
-
-.alert {
-    border-radius: 8px;
-    padding: 12px 20px;
-    margin-bottom: 15px;
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-}
-
-.alert-success {
-    background-color: rgba(40, 167, 69, 0.2);
-    border-color: #28a745;
-    color: var(--text-primary);
-}
-
-.alert-error {
-    background-color: rgba(220, 53, 69, 0.2);
-    border-color: #dc3545;
-    color: var(--text-primary);
-}
-
-/* Стили для карточек в темной теме */
-[data-theme="dark"] .card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-}
-
-[data-theme="dark"] .card-header {
-    background-color: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .card-body {
-    background-color: var(--card-bg);
-}
-
-[data-theme="dark"] .bg-light {
-    background-color: var(--bg-tertiary) !important;
-}
-
-[data-theme="dark"] .form-control {
-    background-color: var(--card-bg);
-    border-color: var(--border-color);
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .form-control:focus {
-    background-color: var(--card-bg);
-    border-color: var(--primary-color);
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .form-control-plaintext {
-    color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .form-text.text-muted {
-    color: var(--text-secondary) !important;
-}
-
-[data-theme="dark"] .table {
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .table-warning {
-    background-color: rgba(255, 193, 7, 0.1) !important;
-    color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .border {
-    border-color: var(--border-color) !important;
-}
-
-/* Стили для кнопок в темной теме */
-[data-theme="dark"] .btn-outline-danger {
-    border-color: #dc3545;
-    color: #dc3545;
-}
-
-[data-theme="dark"] .btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: white;
-}
-
-/* Красная иконка мусорки всегда */
-.fa-trash {
-    color: #dc3545 !important;
-}
-
-/* Стили для текста в темной теме */
-[data-theme="dark"] .text-muted {
-    color: var(--text-secondary) !important;
-}
-
-[data-theme="dark"] h1,
-[data-theme="dark"] h2,
-[data-theme="dark"] h3,
-[data-theme="dark"] h4,
-[data-theme="dark"] h5,
-[data-theme="dark"] strong {
-    color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] label {
-    color: var(--text-primary) !important;
-}
-
-/* Стили для баджей */
-[data-theme="dark"] .badge-warning {
-    background-color: #ffc107;
-    color: #212529;
-}
-
-[data-theme="dark"] .badge-success {
-    background-color: #28a745;
-    color: white;
-}
-</style>
 {% endblock %}

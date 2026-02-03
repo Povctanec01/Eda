@@ -24,16 +24,16 @@
                     <div class="meal-info">
                         <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
                         {% if order.card.meal_type == 'breakfast' %}
-                            <span class="badge bg-success">Завтрак</span>
+                        <span class="badge bg-success">Завтрак</span>
                         {% elif order.card.meal_type == 'lunch' %}
-                            <span class="badge bg-primary">Обед</span>
+                        <span class="badge bg-primary">Обед</span>
                         {% endif %}
                     </div>
                     <div class="order-status">
                         {% if order.status == 'pending' %}
-                            <span class="badge bg-warning text-dark">Готовится</span>
+                        <span class="badge bg-warning text-dark">Готовится</span>
                         {% elif order.status == 'ready' %}
-                            <span class="badge bg-success">Готово</span>
+                        <span class="badge bg-success">Готово</span>
                         {% endif %}
                     </div>
                 </div>

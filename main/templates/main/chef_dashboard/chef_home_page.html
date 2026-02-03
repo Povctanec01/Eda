@@ -20,7 +20,7 @@
                     <p class="card-value">{{ chef_active_orders_count }}</p>
                     <p class="card-desc">Ожидают приготовления</p>
                     {% if chef_active_orders_count > 3 %}
-                        <a href="{% url 'chef_orders' %}" class="btn btn-sm btn-outline">Посмотреть все</a>
+                    <a href="{% url 'chef_orders' %}" class="btn btn-sm btn-outline">Посмотреть все</a>
                     {% endif %}
                 </div>
             </div>
@@ -52,60 +52,60 @@
                 <div class="section-header">
                     <h2 class="dinner2"><i class="fas fa-concierge-bell"></i> Активные заказы</h2>
                     {% if orders %}
-                        <button class="btn btn-primary" onclick="markAllPrepared()">
-                        <i class="fas fa-check-double"></i> Отметить все готовыми
-                        </button>
+                    <button class="btn btn-primary" onclick="markAllPrepared()">
+                    <i class="fas fa-check-double"></i> Отметить все готовыми
+                    </button>
                     {% endif %}
                 </div>
                 <div class="orders-list">
                     {% for order in orders %}
-                        <div class="order-item" id="order-{{ order.id }}">
-                            <div class="order-header">
-                                <div class="order-number">
-                                    <strong>#{{ order.id }}</strong>
-                                    <span class="order-time">{{ order.ordered_at|date:"H:i" }}</span>
-                                </div>
-                                <div class="student-info">
-                                    <i class="fas fa-user-graduate"></i>
-                                    <span>{{ order.user.get_full_name|default:order.user.username }}</span>
-                                </div>
+                    <div class="order-item" id="order-{{ order.id }}">
+                        <div class="order-header">
+                            <div class="order-number">
+                                <strong>#{{ order.id }}</strong>
+                                <span class="order-time">{{ order.ordered_at|date:"H:i" }}</span>
                             </div>
-                            <div class="order-details">
-                                <div class="meal-info">
-                                    <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
-                                    <p class="meal-ingredients">
-                                        {% if order.card.ingredients %}
-                                            {{ order.card.ingredients }}
-                                        {% else %}
-                                            Без ингредиентов
-                                        {% endif %}
-                                    </p>
-                                    {% if order.card.allergens %}
-                                        <div class="allergy-warning">
-                                            <i class="fas fa-exclamation-circle text-danger"></i>
-                                            <span class="text-danger">Аллергия: {{ order.card.allergens }}</span>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="order-actions">
-                                    {% if order.status == 'pending' %}
-                                        <span class="badge bg-orange">В ожидании</span>
-                                        <form method="post" class="mark-ready-form" data-order-id="{{ order.id }}" style="display:inline;">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="order_id" value="{{ order.id }}">
-                                            <button type="submit" class="btn btn-success btn-sm">
-                                                <i class="fas fa-check"></i> Готово
-                                            </button>
-                                        </form>
-                                    {% elif order.status == 'ready' %}
-                                        <span class="badge bg-success">✓ Готово</span>
-                                    {% endif %}
-                                </div>
+                            <div class="student-info">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>{{ order.user.get_full_name|default:order.user.username }}</span>
                             </div>
                         </div>
-                        {% empty %}
-                            <p class="text-muted">Нет активных заказов.</p>
-                        {% endfor %}
+                        <div class="order-details">
+                            <div class="meal-info">
+                                <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
+                                <p class="meal-ingredients">
+                                    {% if order.card.ingredients %}
+                                    {{ order.card.ingredients }}
+                                    {% else %}
+                                    Без ингредиентов
+                                    {% endif %}
+                                </p>
+                                {% if order.card.allergens %}
+                                <div class="allergy-warning">
+                                    <i class="fas fa-exclamation-circle text-danger"></i>
+                                    <span class="text-danger">Аллергия: {{ order.card.allergens }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="order-actions">
+                                {% if order.status == 'pending' %}
+                                <span class="badge bg-orange">В ожидании</span>
+                                <form method="post" class="mark-ready-form" data-order-id="{{ order.id }}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="fas fa-check"></i> Готово
+                                    </button>
+                                </form>
+                                {% elif order.status == 'ready' %}
+                                <span class="badge bg-success">✓ Готово</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Нет активных заказов.</p>
+                    {% endfor %}
                 </div>
                 {% if all_orders_count > 3 %}
                 <div class="mt-3 text-center">
@@ -148,14 +148,14 @@
                 {% endfor %}
             </div>
             {% if buys|length >= 2 %}
-                <div class="mt-3 text-center">
-                    <a href="{% url 'chef_buys' %}" class="btn btn-outline-secondary">
-                    Перейти ко всем заявкам
-                    </a>
-                </div>
+            <div class="mt-3 text-center">
+                <a href="{% url 'chef_buys' %}" class="btn btn-outline-secondary">
+                Перейти ко всем заявкам
+                </a>
+            </div>
             {% endif %}
             {% else %}
-                <p style="color: #666; font-style: italic;">Нет Активных заявок</p>
+            <p style="color: #666; font-style: italic;">Нет Активных заявок</p>
             {% endif %}
         </section>
     </div>

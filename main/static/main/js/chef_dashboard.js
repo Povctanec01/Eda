@@ -145,3 +145,86 @@ document.addEventListener('DOMContentLoaded', function () {
         updateOrdersBadge(window.djangoData.allOrdersCount - (parseInt(document.getElementById('ordersBadge').textContent) || 0));
     }
 });
+    // Функция для поиска продуктов
+function filterProducts() {
+    const input = document.getElementById('productSearch');
+    const filter = input.value.toLowerCase();
+    const rows = document.getElementsByClassName('product-row');
+
+    for (let i = 0; i < rows.length; i++) {
+        const productName = rows[i].getElementsByTagName('td')[0].innerText.toLowerCase();
+        if (productName.includes(filter)) {
+            rows[i].style.display = '';
+        } else {
+            rows[i].style.display = 'none';
+        }
+    }
+}
+
+// Функция для показа формы изменения количества
+function showQuantityForm(productId) {
+    // Скрываем все другие формы редактирования
+    hideAllEditForms();
+
+    // Показываем нужную форму
+    const formRow = document.getElementById('quantity-form-' + productId);
+    const productRow = document.getElementById('product-row-' + productId);
+
+    if (formRow && productRow) {
+        formRow.style.display = 'table-row';
+        productRow.style.display = 'none';
+    }
+}
+
+// Функция для скрытия формы изменения количества
+function hideQuantityForm(productId) {
+    const formRow = document.getElementById('quantity-form-' + productId);
+    const productRow = document.getElementById('product-row-' + productId);
+
+    if (formRow && productRow) {
+        formRow.style.display = 'none';
+        productRow.style.display = '';
+    }
+}
+
+// Функция для показа формы полного редактирования
+function showEditForm(productId) {
+    // Скрываем все другие формы редактирования
+    hideAllEditForms();
+
+    // Показываем нужную форму
+    const formRow = document.getElementById('edit-form-' + productId);
+    const productRow = document.getElementById('product-row-' + productId);
+
+    if (formRow && productRow) {
+        formRow.style.display = 'table-row';
+        productRow.style.display = 'none';
+    }
+}
+
+// Функция для скрытия формы полного редактирования
+function hideEditForm(productId) {
+    const formRow = document.getElementById('edit-form-' + productId);
+    const productRow = document.getElementById('product-row-' + productId);
+
+    if (formRow && productRow) {
+        formRow.style.display = 'none';
+        productRow.style.display = '';
+    }
+}
+
+// Функция для скрытия всех форм редактирования
+function hideAllEditForms() {
+    const editForms = document.getElementsByClassName('edit-form-row');
+    const productRows = document.getElementsByClassName('product-row');
+
+    // Скрываем все формы редактирования
+    for (let i = 0; i < editForms.length; i++) {
+        editForms[i].style.display = 'none';
+    }
+
+    // Показываем все строки продуктов
+    for (let i = 0; i < productRows.length; i++) {
+        productRows[i].style.display = '';
+    }
+}

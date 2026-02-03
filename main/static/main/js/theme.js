@@ -68,7 +68,6 @@ class ThemeManager {
         if (themeSlider) {
             const icon = themeSlider.querySelector('.theme-icon') || document.createElement('span');
             icon.className = 'theme-icon';
-            icon.textContent = this.currentTheme === 'dark' ? '🌙' : '☀️';
 
             if (!themeSlider.querySelector('.theme-icon')) {
                 themeSlider.appendChild(icon);

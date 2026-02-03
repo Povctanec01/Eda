@@ -7,7 +7,6 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary fw-bold dinner">📊 Статистика пользователей</h2>
     </div>
-
     <!-- Форма добавления персонала -->
     <div class="card shadow-sm mb-5">
         <div class="card-header bg-white border-bottom">
@@ -29,7 +28,6 @@
                 {% endfor %}
             </div>
             {% endif %}
-
             <!-- БЛОК ОШИБОК ФОРМЫ -->
             {% if staff_form.errors %}
             <div class="alert alert-danger d-flex align-items-center mb-3">
@@ -37,19 +35,18 @@
                 <div>
                     <strong>Ошибки в форме:</strong>
                     <ul class="mb-0 mt-1">
-                    {% for field in staff_form %}
+                        {% for field in staff_form %}
                         {% for error in field.errors %}
-                            <li>{{ field.label }}: {{ error }}</li>
+                        <li>{{ field.label }}: {{ error }}</li>
                         {% endfor %}
-                    {% endfor %}
-                    {% for error in staff_form.non_field_errors %}
+                        {% endfor %}
+                        {% for error in staff_form.non_field_errors %}
                         <li>{{ error }}</li>
-                    {% endfor %}
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
             {% endif %}
-
             <form method="post">
                 {% csrf_token %}
                 <div class="row g-3">
@@ -132,7 +129,6 @@
             </form>
         </div>
     </div>
-
     <!-- Карточки статистики -->
     <div class="row g-4 mb-5">
         <div class="col-md-4">
@@ -160,62 +156,58 @@
             </div>
         </div>
     </div>
-
     <!-- Заголовок списка пользователей -->
     <div class="user-list-header mb-4">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
             <h5 class="mb-0">Список всех пользователей</h5>
             <span class="allergens-count">
-                <i class="fas fa-users"></i> Всего: <span id="totalUsersCount">{{ users_with_roles|length }}</span>
+            <i class="fas fa-users"></i> Всего: <span id="totalUsersCount">{{ users_with_roles|length }}</span>
             </span>
         </div>
-
         <!-- Поисковая панель -->
         <div class="d-flex gap-2 flex-wrap align-items-center mb-3">
             <div class="search-group">
                 <input type="text" id="userSearch" class="search-input form-control" placeholder="Поиск по имени...">
             </div>
             <button id="deleteSelectedBtn" class="btn btn-danger" disabled
-                    data-delete-url="{% url 'admin_users_delete_selected' %}">
-                <i class="fas fa-trash"></i> Удалить выбранные
+                data-delete-url="{% url 'admin_users_delete_selected' %}">
+            <i class="fas fa-trash"></i> Удалить выбранные
             </button>
         </div>
-
         <!-- Информация о результатах поиска -->
         <div class="search-results-info mt-2 text-muted" id="searchResultsInfo">
             <i class="fas fa-info-circle"></i> <span id="resultsCount">0</span> пользователей найдено
         </div>
     </div>
-
     <!-- Вертикальный прокручиваемый список пользователей -->
     <div class="allergens-scroll-container mb-5">
         <div class="allergens-scrollable">
             {% if users_with_roles %}
-                {% for user in users_with_roles %}
-                <div class="allergen-item user-item" data-username="{{ user.username }}">
-                    <div class="user-checkbox-wrapper">
-                        <input type="checkbox" class="user-checkbox form-check-input" value="{{ user.username }}" id="user-{{ forloop.counter }}">
-                    </div>
-                    <div class="allergen-info">
-                        <div class="allergen-name">{{ user.username }}</div>
-                        <div class="allergen-id">ID: {{ user.id }}</div>
-                    </div>
-                    <div class="user-role-badge">
-                        <span class="badge
-                            {% if user.role == 'student' %}bg-primary
-                            {% elif user.role == 'chef' %}bg-success
-                            {% elif user.role == 'admin' %}bg-danger
-                            {% else %}bg-secondary{% endif %}">
-                            {{ user.role|title }}
-                        </span>
-                    </div>
+            {% for user in users_with_roles %}
+            <div class="allergen-item user-item" data-username="{{ user.username }}">
+                <div class="user-checkbox-wrapper">
+                    <input type="checkbox" class="user-checkbox form-check-input" value="{{ user.username }}" id="user-{{ forloop.counter }}">
                 </div>
-                {% endfor %}
+                <div class="allergen-info">
+                    <div class="allergen-name">{{ user.username }}</div>
+                    <div class="allergen-id">ID: {{ user.id }}</div>
+                </div>
+                <div class="user-role-badge">
+                    <span class="badge
+                        {% if user.role == 'student' %}bg-primary
+                        {% elif user.role == 'chef' %}bg-success
+                        {% elif user.role == 'admin' %}bg-danger
+                        {% else %}bg-secondary{% endif %}">
+                    {{ user.role|title }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
             {% else %}
-                <div class="no-users-placeholder text-center py-4">
-                    <i class="fas fa-users-slash"></i>
-                    <p class="mt-2">Нет зарегистрированных пользователей</p>
-                </div>
+            <div class="no-users-placeholder text-center py-4">
+                <i class="fas fa-users-slash"></i>
+                <p class="mt-2">Нет зарегистрированных пользователей</p>
+            </div>
             {% endif %}
         </div>
     </div>

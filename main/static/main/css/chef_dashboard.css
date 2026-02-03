@@ -1533,3 +1533,192 @@ body {
 [data-theme="dark"] .form-control-plaintext {
     color: var(--text-primary) !important;
 }
+.stat-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-color);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+    font-size: 24px;
+}
+
+.header-stats {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.table th {
+    border-top: none;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.btn-group .btn {
+    margin-right: 5px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+.edit-form-row {
+    background-color: var(--bg-tertiary) !important;
+}
+
+/* Стили для сообщений об ошибках */
+.messages {
+    margin-bottom: 20px;
+}
+
+.alert {
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 15px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.alert-success {
+    background-color: rgba(40, 167, 69, 0.2);
+    border-color: #28a745;
+    color: var(--text-primary);
+}
+
+.alert-error {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: #dc3545;
+    color: var(--text-primary);
+}
+
+/* Стили для карточек в темной теме */
+[data-theme="dark"] .card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .card-header {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .card-body {
+    background-color: var(--card-bg);
+}
+
+[data-theme="dark"] .bg-light {
+    background-color: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .form-control {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control-plaintext {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .form-text.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .table {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .table-warning {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .border {
+    border-color: var(--border-color) !important;
+}
+
+/* Стили для кнопок в темной теме */
+[data-theme="dark"] .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+[data-theme="dark"] .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Красная иконка мусорки всегда */
+.fa-trash {
+    color: #dc3545 !important;
+}
+
+/* Стили для текста в темной теме */
+[data-theme="dark"] .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] strong {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] label {
+    color: var(--text-primary) !important;
+}
+
+/* Стили для баджей */
+[data-theme="dark"] .badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+[data-theme="dark"] .badge-success {
+    background-color: #28a745;
+    color: white;
+}
+.dish-price {
+    font-weight: bold;
+    color: #28a745;
+    font-size: 1.1em;
+}
+.price-badge {
+    background: #28a745;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    margin-left: 10px;
+}

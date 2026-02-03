@@ -12,7 +12,6 @@
         <script src="{% static 'main/js/dashboard.js' %}"></script>
         <script src="{% static 'main/js/theme.js' %}"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.css" />
-
     </head>
     <body>
         <aside class="sidebar">
@@ -24,7 +23,7 @@
                     </div>
                 </a>
                 <button class="sidebar-toggle">
-                    <i class="fas fa-bars"></i>
+                <i class="fas fa-bars"></i>
                 </button>
             </div>
             <div class="user-info">
@@ -38,46 +37,46 @@
                 </div>
                 <div class="theme-toggle" style="margin-top: 15px">
                     <label class="theme-switch">
-                        <input type="checkbox" id="themeToggle" />
-                        <span class="theme-slider"></span>
+                    <input type="checkbox" id="themeToggle" />
+                    <span class="theme-slider"></span>
                     </label>
                 </div>
             </div>
             <nav class="sidebar-menu">
-              <a href="{% url 'admin_home_page' %}" {% if request.resolver_match.url_name == 'admin_home_page' %}class="active"{% endif %}>
+                <a href="{% url 'admin_home_page' %}" {% if request.resolver_match.url_name == 'admin_home_page' %}class="active"{% endif %}>
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Дашборд</span>
-              </a>
-              <a href="{% url 'admin_statistics' %}" {% if request.resolver_match.url_name == 'admin_statistics' %}class="active"{% endif %}>
+                </a>
+                <a href="{% url 'admin_statistics' %}" {% if request.resolver_match.url_name == 'admin_statistics' %}class="active"{% endif %}>
                 <i class="fas fa-chart-line"></i>
                 <span>Статистика</span>
-              </a>
-                <a href="{% url 'admin_buys' %}" {% if request.resolver_match.url_name == 'admin_buys' %}class="active"{% endif %}>
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Закупки</span>
-                    <span class="badge badge-pending">{{ pending_count }}</span>
                 </a>
-              <a href="{% url 'admin_users_statistics' %}" {% if request.resolver_match.url_name == 'admin_users_statistics' %}class="active"{% endif %}>
+                <a href="{% url 'admin_buys' %}" {% if request.resolver_match.url_name == 'admin_buys' %}class="active"{% endif %}>
+                <i class="fas fa-shopping-cart"></i>
+                <span>Закупки</span>
+                <span class="badge badge-pending">{{ pending_count }}</span>
+                </a>
+                <a href="{% url 'admin_users_statistics' %}" {% if request.resolver_match.url_name == 'admin_users_statistics' %}class="active"{% endif %}>
                 <i class="fas fa-users"></i>
                 <span>Пользователи</span>
-              </a>
-              <a href="{% url 'admin_card_edit' %}" {% if request.resolver_match.url_name == 'admin_card_edit' %}class="active"{% endif %}>
+                </a>
+                <a href="{% url 'admin_card_edit' %}" {% if request.resolver_match.url_name == 'admin_card_edit' %}class="active"{% endif %}>
                 <i class="fas fa-utensils"></i>
                 <span>Меню</span>
-              </a>
-              <a href="{% url 'admin_finance' %}" {% if request.resolver_match.url_name == 'admin_finance' %}class="active"{% endif %}>
+                </a>
+                <a href="{% url 'admin_finance' %}" {% if request.resolver_match.url_name == 'admin_finance' %}class="active"{% endif %}>
                 <i class="fas fa-file-invoice-dollar"></i>
                 <span>Финансы</span>
-              </a>
+                </a>
                 <a href="{% url 'admin_settings' %}" {% if request.resolver_match.url_name == 'admin_settings' %}class="active"{% endif %}>
-                  <i class="fas fa-cog"></i>
-                  <span>Настройки</span>
+                <i class="fas fa-cog"></i>
+                <span>Настройки</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
                 <a href="{% url 'logout' %}" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Выйти</span>
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Выйти</span>
                 </a>
             </div>
         </aside>

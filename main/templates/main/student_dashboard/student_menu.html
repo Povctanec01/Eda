@@ -6,78 +6,75 @@
 {% if messages %}
 <div class="messages">
     {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
 </div>
 {% endif %}
-
 <section class="menu-management" style="margin-top: 30px;">
     <h2 class="dinner">Блюда</h2>
-
     {% if cards %}
-        {% if not cards %}
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i>
-                На данный момент блюд нет в наличии. Попробуйте позже.
-            </div>
-        {% endif %}
-
-        <div class="dishes-filters">
-            <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Все')">
-                <i class="fa-solid fa-spoon"></i> Все
-            </button>
-            <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Обед')">
-                Обеды
-            </button>
-            <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Завтрак')">
-                Завтраки
-            </button>
-        </div>
-
-        <div class="dishes-list">
-            {% for card in cards %}
-                <div class="dish-item" data-meal-type="{{ card.meal_type }}">
-                    <div class="dish-header">
-                        <div>
-                            <h3>{{ card.title }}</h3>
-                            <span class="badge" style="background: #667eea; color: white;">{{ card.get_meal_type_display }}</span>
-                        </div>
-                    </div>
-                    <p class="dish-desc">Описание: {{ card.description|default:"Без описания" }}</p>
-
-                    <!-- Кнопка Заказать -->
-                    <div class="dish-actions">
-                        {% if not card.is_hidden %}
-                            <a href="{% url 'student_order_create' card.id %}" class="btn btn-sm btn-outline-primary mt-2">
-                                Заказать
-                            </a>
-                        {% else %}
-                            <span class="text-danger">
-                                <i class="fas fa-ban"></i> Блюдо временно не доступно
-                            </span>
-                        {% endif %}
-                    </div>
-
-                    <!-- Отображение аллергенов (если есть) -->
-                    {% if card.allergens.exists %}
-                        <div class="allergens-list mt-1">
-                            <small class="text-danger">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Аллергены:
-                                {% for allergen in card.allergens.all %}
-                                    <span class="badge bg-danger">{{ allergen.name }}</span>
-                                {% endfor %}
-                            </small>
-                        </div>
-                    {% endif %}
+    {% if not cards %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        На данный момент блюд нет в наличии. Попробуйте позже.
+    </div>
+    {% endif %}
+    <div class="dishes-filters">
+        <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Все')">
+        <i class="fa-solid fa-spoon"></i> Все
+        </button>
+        <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Обед')">
+        Обеды
+        </button>
+        <button class="btn btn-primary rounded-pill px-3" type="button" onclick="showMeals('Завтрак')">
+        Завтраки
+        </button>
+    </div>
+    <div class="dishes-list">
+        {% for card in cards %}
+        <div class="dish-item" data-meal-type="{{ card.meal_type }}">
+            <div class="dish-header">
+                <div>
+                    <h3>{{ card.title }}</h3>
+                    <span class="badge" style="background: #667eea; color: white;">{{ card.get_meal_type_display }}</span>
                 </div>
-            {% endfor %}
+            </div>
+            <p class="dish-desc">Описание: {{ card.description|default:"Без описания" }}</p>
+            <!-- Кнопка Заказать -->
+            <span class="badge bg-success text-white" style="margin-left: 5px;">
+                {{ card.price }} руб.
+            </span>
+            <div class="dish-actions">
+                {% if not card.is_hidden %}
+                <a href="{% url 'student_order_create' card.id %}" class="btn btn-sm btn-outline-primary mt-2">
+                Заказать
+                </a>
+                {% else %}
+                <span class="text-danger">
+                <i class="fas fa-ban"></i> Блюдо временно не доступно
+                </span>
+                {% endif %}
+            </div>
+            <!-- Отображение аллергенов (если есть) -->
+            {% if card.allergens.exists %}
+            <div class="allergens-list mt-1">
+                <small class="text-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                Аллергены:
+                {% for allergen in card.allergens.all %}
+                <span class="badge bg-danger">{{ allergen.name }}</span>
+                {% endfor %}
+                </small>
+            </div>
+            {% endif %}
         </div>
+        {% endfor %}
+    </div>
     {% else %}
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i>
-            На сегодня блюд нет в наличии. Ожидайте добавления новых блюд.
-        </div>
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        На сегодня блюд нет в наличии. Ожидайте добавления новых блюд.
+    </div>
     {% endif %}
 </section>
 {% endblock %}

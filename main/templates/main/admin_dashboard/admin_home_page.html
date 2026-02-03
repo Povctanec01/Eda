@@ -6,7 +6,6 @@
     <header class="top-bar">
         <div class="top-bar-left">
             <h1>Доброй день, {{ user.username }}!</h1>
-
             <p>Сегодня: <span id="currentDate">Загрузка...</span></p>
         </div>
         <div class="top-bar-right">
@@ -20,7 +19,6 @@
             </div>
         </div>
     </header>
-
     <section class="dashboard-cards">
         <div class="card">
             <div class="card-icon bg-purple">
@@ -50,7 +48,6 @@
                 <p class="card-desc">+8% к прошлому дню</p>
             </div>
         </div>
-
         <div class="card">
             <div class="card-icon bg-orange">
                 <i class="fas fa-utensil-spoon"></i>
@@ -63,23 +60,21 @@
             </div>
         </div>
     </section>
-
     <section class="reports-section">
         <div class="section-header">
             <h2><i class="fas fa-file-invoice-dollar"></i> Отчеты и аналитика</h2>
             <div class="report-actions">
                 <button class="btn btn-secondary" onclick="generateReport('daily')">
-                    <i class="fas fa-file-excel"></i> Дневной отчет
+                <i class="fas fa-file-excel"></i> Дневной отчет
                 </button>
                 <button class="btn btn-secondary" onclick="generateReport('weekly')">
-                    <i class="fas fa-file-pdf"></i> Недельный отчет
+                <i class="fas fa-file-pdf"></i> Недельный отчет
                 </button>
                 <button class="btn btn-primary" onclick="generateReport('monthly')">
-                    <i class="fas fa-chart-bar"></i> Месячный отчет
+                <i class="fas fa-chart-bar"></i> Месячный отчет
                 </button>
             </div>
         </div>
-
         <div class="reports-table">
             <table>
                 <thead>
@@ -103,7 +98,7 @@
                         <td>Омлет с овощами</td>
                         <td>
                             <button class="btn-action btn-view" onclick="viewDayDetails('27.01.2024')">
-                                <i class="fas fa-eye"></i>
+                            <i class="fas fa-eye"></i>
                             </button>
                         </td>
                     </tr>
@@ -116,7 +111,7 @@
                         <td>Суп куриный</td>
                         <td>
                             <button class="btn-action btn-view" onclick="viewDayDetails('26.01.2024')">
-                                <i class="fas fa-eye"></i>
+                            <i class="fas fa-eye"></i>
                             </button>
                         </td>
                     </tr>
@@ -129,7 +124,7 @@
                         <td>Плов</td>
                         <td>
                             <button class="btn-action btn-view" onclick="viewDayDetails('25.01.2024')">
-                                <i class="fas fa-eye"></i>
+                            <i class="fas fa-eye"></i>
                             </button>
                         </td>
                     </tr>
@@ -142,14 +137,13 @@
                         <td>Каша овсяная</td>
                         <td>
                             <button class="btn-action btn-view" onclick="viewDayDetails('24.01.2024')">
-                                <i class="fas fa-eye"></i>
+                            <i class="fas fa-eye"></i>
                             </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
         <div class="reports-summary">
             <div class="summary-card">
                 <h4>Итого за неделю</h4>
@@ -168,7 +162,6 @@
             </div>
         </div>
     </section>
-
     <div id="detailsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
