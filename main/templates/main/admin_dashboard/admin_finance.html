@@ -84,31 +84,8 @@
         </div>
     </div>
 
-    <!-- Детальная статистика -->
-    <div class="row">
-        <!-- Доход по типам блюд -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Доход по типам блюд (месяц)</h6>
-                </div>
-                <div class="card-body">
-                    <div class="chart-pie pt-4">
-                        <canvas id="revenueByMealChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center small">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> Завтраки: {{ breakfast_revenue_month }} ₽
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Обеды: {{ lunch_revenue_month }} ₽
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Топ блюд по выручке -->
+    <div class="row mb-4">
+         <!-- Топ за месяц -->
         <div class="col-lg-6 mb-4">
             <div class="card shadow">
                 <div class="card-header py-3">
@@ -128,14 +105,62 @@
                             <tbody>
                                 {% for dish in top_revenue_dishes_month %}
                                 <tr>
-                                    <td>{{ dish.dish.title }}</td>  <!-- Исправлено: dish.dish.title -->
+                                    <td>{{ dish.dish.title }}</td>
                                     <td>
                                         <span class="badge {% if dish.dish.meal_type == 'breakfast' %}badge-primary{% else %}badge-success{% endif %}">
                                             {{ dish.dish.get_meal_type_display }}
                                         </span>
                                     </td>
-                                    <td>{{ dish.count }}</td>  <!-- Количество заказов -->
-                                    <td class="font-weight-bold">{{ dish.revenue|floatformat:2 }} ₽</td>  <!-- Выручка -->
+                                    <td>{{ dish.count }}</td>
+                                    <td class="font-weight-bold">{{ dish.revenue|floatformat:2 }} ₽</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Нет данных за месяц</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Топ блюд по выручке -->
+    <div class="row mb-4">
+        <!-- Топ за неделю -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Топ-5 блюд по выручке (неделя)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Блюдо</th>
+                                    <th>Тип</th>
+                                    <th>Кол-во заказов</th>
+                                    <th>Выручка</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dish in top_revenue_dishes_week %}
+                                <tr>
+                                    <td>{{ dish.dish.title }}</td>
+                                    <td>
+                                        <span class="badge {% if dish.dish.meal_type == 'breakfast' %}badge-primary{% else %}badge-success{% endif %}">
+                                            {{ dish.dish.get_meal_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ dish.count }}</td>
+                                    <td class="font-weight-bold">{{ dish.revenue|floatformat:2 }} ₽</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Нет данных за неделю</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -203,46 +228,4 @@
         </div>
     </div>
 </div>
-
-<!-- Подключаем Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // График дохода по типам блюд
-    var ctx = document.getElementById('revenueByMealChart').getContext('2d');
-    var revenueByMealChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Завтраки', 'Обеды'],
-            datasets: [{
-                data: [{{ breakfast_revenue_month }}, {{ lunch_revenue_month }}],
-                backgroundColor: ['#4e73df', '#1cc88a'],
-                hoverBackgroundColor: ['#2e59d9', '#17a673'],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            tooltips: {
-                backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#858796",
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                caretPadding: 10,
-                callbacks: {
-                    label: function(tooltipItem, chart) {
-                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                        return datasetLabel + ': ' + tooltipItem.yLabel + ' ₽';
-                    }
-                }
-            },
-            legend: {
-                display: false
-            },
-            cutoutPercentage: 80,
-        },
-    });
-</script>
 {% endblock %}

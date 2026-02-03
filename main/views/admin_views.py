@@ -247,21 +247,49 @@ def admin_finance(request):
         total = 0.00
         for order in orders:
             if order.card and order.card.price:
-                total += float(order.card.price)
+                try:
+                    total += float(order.card.price)
+                except (ValueError, TypeError):
+                    continue
         return total
-
-    # Расчет выручки
-    revenue_today = calculate_revenue(orders_today_all)
-    revenue_week = calculate_revenue(orders_week_all)
-    revenue_month = calculate_revenue(orders_month_all)
 
     # Функция для расчета выручки по типу блюда
     def calculate_revenue_by_type(orders, meal_type):
         total = 0.00
         for order in orders:
             if order.card and order.card.price and order.card.meal_type == meal_type:
-                total += float(order.card.price)
+                try:
+                    total += float(order.card.price)
+                except (ValueError, TypeError):
+                    continue
         return total
+
+    # Функция для получения топ-блюд
+    def get_top_dishes(orders, limit=5):
+        dish_revenue = {}
+        for order in orders:
+            if order.card:
+                dish_id = order.card.id
+                if dish_id not in dish_revenue:
+                    dish_revenue[dish_id] = {
+                        'dish': order.card,
+                        'revenue': 0.00,
+                        'count': 0
+                    }
+                try:
+                    dish_revenue[dish_id]['revenue'] += float(order.card.price) if order.card.price else 0.00
+                except (ValueError, TypeError):
+                    continue
+                dish_revenue[dish_id]['count'] += 1
+
+        # Сортируем по выручке и берем топ
+        sorted_dishes = sorted(dish_revenue.values(), key=lambda x: x['revenue'], reverse=True)[:limit]
+        return sorted_dishes
+
+    # Расчет выручки
+    revenue_today = calculate_revenue(orders_today_all)
+    revenue_week = calculate_revenue(orders_week_all)
+    revenue_month = calculate_revenue(orders_month_all)
 
     # Статистика по типам блюд
     breakfast_revenue_today = calculate_revenue_by_type(orders_today_all, 'breakfast')
@@ -281,27 +309,9 @@ def admin_finance(request):
     avg_check_week = revenue_week / total_ordered_week if total_ordered_week > 0 else 0.00
     avg_check_month = revenue_month / total_ordered_month if total_ordered_month > 0 else 0.00
 
-    # Топ блюд по выручке за месяц (упрощенный вариант)
-    top_revenue_dishes_month = []
-    # Получаем все блюда за месяц
-    monthly_orders = orders_month_all.select_related('card')
-    dish_revenue = {}
-
-    for order in monthly_orders:
-        if order.card:
-            dish_id = order.card.id
-            if dish_id not in dish_revenue:
-                dish_revenue[dish_id] = {
-                    'dish': order.card,
-                    'revenue': 0.00,
-                    'count': 0
-                }
-            dish_revenue[dish_id]['revenue'] += float(order.card.price) if order.card.price else 0.00
-            dish_revenue[dish_id]['count'] += 1
-
-    # Сортируем по выручке и берем топ-5
-    sorted_dishes = sorted(dish_revenue.values(), key=lambda x: x['revenue'], reverse=True)[:5]
-    top_revenue_dishes_month = sorted_dishes
+    # Топ блюд
+    top_revenue_dishes_week = get_top_dishes(orders_week_all, 5)
+    top_revenue_dishes_month = get_top_dishes(orders_month_all, 5)
 
     # Количество завтраков и обедов
     breakfast_today = orders_today_all.filter(card__meal_type='breakfast').count()
@@ -311,15 +321,16 @@ def admin_finance(request):
     breakfast_month = orders_month_all.filter(card__meal_type='breakfast').count()
     lunch_month = orders_month_all.filter(card__meal_type='lunch').count()
 
-    return render(request, 'main/admin_dashboard/admin_finance.html', {
-        'revenue_today': round(revenue_today, 2),
-        'revenue_week': round(revenue_week, 2),
-        'revenue_month': round(revenue_month, 2),
+    # Преобразуем данные для шаблона - убедимся, что это числа
+    context = {
+        'revenue_today': float(round(revenue_today, 2)),
+        'revenue_week': float(round(revenue_week, 2)),
+        'revenue_month': float(round(revenue_month, 2)),
 
-        'breakfast_revenue_today': round(breakfast_revenue_today, 2),
-        'lunch_revenue_today': round(lunch_revenue_today, 2),
-        'breakfast_revenue_week': round(breakfast_revenue_week, 2),
-        'lunch_revenue_week': round(lunch_revenue_week, 2),
+        'breakfast_revenue_today': float(round(breakfast_revenue_today, 2)),
+        'lunch_revenue_today': float(round(lunch_revenue_today, 2)),
+        'breakfast_revenue_week': float(round(breakfast_revenue_week, 2)),
+        'lunch_revenue_week': float(round(lunch_revenue_week, 2)),
         'breakfast_revenue_month': float(round(breakfast_revenue_month, 2)),
         'lunch_revenue_month': float(round(lunch_revenue_month, 2)),
 
@@ -327,10 +338,11 @@ def admin_finance(request):
         'total_ordered_week': total_ordered_week,
         'total_ordered_month': total_ordered_month,
 
-        'avg_check_today': round(avg_check_today, 2),
-        'avg_check_week': round(avg_check_week, 2),
-        'avg_check_month': round(avg_check_month, 2),
+        'avg_check_today': float(round(avg_check_today, 2)),
+        'avg_check_week': float(round(avg_check_week, 2)),
+        'avg_check_month': float(round(avg_check_month, 2)),
 
+        'top_revenue_dishes_week': top_revenue_dishes_week,
         'top_revenue_dishes_month': top_revenue_dishes_month,
 
         'breakfast_today': breakfast_today,
@@ -339,7 +351,9 @@ def admin_finance(request):
         'lunch_week': lunch_week,
         'breakfast_month': breakfast_month,
         'lunch_month': lunch_month,
-    })
+    }
+
+    return render(request, 'main/admin_dashboard/admin_finance.html', context)
 
 @login_required
 def admin_users_delete_selected(request):
