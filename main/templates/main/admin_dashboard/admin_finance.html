@@ -2,5 +2,247 @@
 {% load static %}
 {% block title %}Финансы{% endblock %}
 {% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Финансовая статистика</h1>
+    </div>
 
+    <!-- Ключевые финансовые показатели -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Выручка (сегодня)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ revenue_today }} ₽</div>
+                            <small class="text-muted">Заказов: {{ total_ordered_today }}</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Выручка (неделя)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ revenue_week }} ₽</div>
+                            <small class="text-muted">Заказов: {{ total_ordered_week }}</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Выручка (месяц)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ revenue_month }} ₽</div>
+                            <small class="text-muted">Заказов: {{ total_ordered_month }}</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Средний чек</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ avg_check_month }} ₽</div>
+                            <small class="text-muted">
+                                День: {{ avg_check_today }} ₽ | Неделя: {{ avg_check_week }} ₽
+                            </small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-receipt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Детальная статистика -->
+    <div class="row">
+        <!-- Доход по типам блюд -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Доход по типам блюд (месяц)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4">
+                        <canvas id="revenueByMealChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center small">
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-primary"></i> Завтраки: {{ breakfast_revenue_month }} ₽
+                        </span>
+                        <span class="mr-2">
+                            <i class="fas fa-circle text-success"></i> Обеды: {{ lunch_revenue_month }} ₽
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Топ блюд по выручке -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Топ-5 блюд по выручке (месяц)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Блюдо</th>
+                                    <th>Тип</th>
+                                    <th>Кол-во заказов</th>
+                                    <th>Выручка</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dish in top_revenue_dishes_month %}
+                                <tr>
+                                    <td>{{ dish.dish.title }}</td>  <!-- Исправлено: dish.dish.title -->
+                                    <td>
+                                        <span class="badge {% if dish.dish.meal_type == 'breakfast' %}badge-primary{% else %}badge-success{% endif %}">
+                                            {{ dish.dish.get_meal_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ dish.count }}</td>  <!-- Количество заказов -->
+                                    <td class="font-weight-bold">{{ dish.revenue|floatformat:2 }} ₽</td>  <!-- Выручка -->
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ежедневная статистика -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Ежедневная статистика</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Показатель</th>
+                                    <th>Сегодня</th>
+                                    <th>За неделю</th>
+                                    <th>За месяц</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Выручка</strong></td>
+                                    <td class="text-success font-weight-bold">{{ revenue_today }} ₽</td>
+                                    <td>{{ revenue_week }} ₽</td>
+                                    <td>{{ revenue_month }} ₽</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Заказов</strong></td>
+                                    <td>{{ total_ordered_today }}</td>
+                                    <td>{{ total_ordered_week }}</td>
+                                    <td>{{ total_ordered_month }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Средний чек</strong></td>
+                                    <td>{{ avg_check_today }} ₽</td>
+                                    <td>{{ avg_check_week }} ₽</td>
+                                    <td>{{ avg_check_month }} ₽</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Завтраки</strong></td>
+                                    <td>{{ breakfast_today }} ({{ breakfast_revenue_today }} ₽)</td>
+                                    <td>{{ breakfast_week }} ({{ breakfast_revenue_week }} ₽)</td>
+                                    <td>{{ breakfast_month }} ({{ breakfast_revenue_month }} ₽)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Обеды</strong></td>
+                                    <td>{{ lunch_today }} ({{ lunch_revenue_today }} ₽)</td>
+                                    <td>{{ lunch_week }} ({{ lunch_revenue_week }} ₽)</td>
+                                    <td>{{ lunch_month }} ({{ lunch_revenue_month }} ₽)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключаем Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // График дохода по типам блюд
+    var ctx = document.getElementById('revenueByMealChart').getContext('2d');
+    var revenueByMealChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Завтраки', 'Обеды'],
+            datasets: [{
+                data: [{{ breakfast_revenue_month }}, {{ lunch_revenue_month }}],
+                backgroundColor: ['#4e73df', '#1cc88a'],
+                hoverBackgroundColor: ['#2e59d9', '#17a673'],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+                callbacks: {
+                    label: function(tooltipItem, chart) {
+                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                        return datasetLabel + ': ' + tooltipItem.yLabel + ' ₽';
+                    }
+                }
+            },
+            legend: {
+                display: false
+            },
+            cutoutPercentage: 80,
+        },
+    });
+</script>
 {% endblock %}

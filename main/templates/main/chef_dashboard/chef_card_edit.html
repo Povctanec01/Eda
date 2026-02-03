@@ -85,30 +85,19 @@
                 <div>
                     <h3>{{ card.title }}</h3>
                     <span class="badge" style="background: #667eea; color: white;">{{ card.get_meal_type_display }}</span>
-                    {% if card.is_hidden %}
-                    <span class="badge bg-warning text-dark" style="margin-left: 5px;">
-                    <i class="fas fa-eye-slash"></i> Скрыто
-                    </span>
-                    {% endif %}
-                </div>
-                <span class="dish-price">ID: {{ card.id }}</span>
-            </div>
-            <p class="dish-desc">{{ card.description|default:"Без описания" }}</p>
-            <div class="dish-header">
-                <div>
-                    <h3>{{ card.title }}</h3>
-                    <span class="badge" style="background: #667eea; color: white;">{{ card.get_meal_type_display }}</span>
                     <span class="badge bg-success text-white" style="margin-left: 5px;">
-                    {{ card.price }} руб.
+                        {{ card.price }} руб.
                     </span>
                     {% if card.is_hidden %}
                     <span class="badge bg-warning text-dark" style="margin-left: 5px;">
-                    <i class="fas fa-eye-slash"></i> Скрыто
+                        <i class="fas fa-eye-slash"></i> Скрыто
                     </span>
                     {% endif %}
                 </div>
                 <span class="dish-price">ID: {{ card.id }}</span>
             </div>
+
+            <p class="dish-desc">{{ card.description|default:"Без описания" }}</p>
             <!-- Отображение аллергенов -->
             <div class="allergens-list" style="margin: 10px 0;">
                 {% if card.allergens.all %}
@@ -123,21 +112,22 @@
                 {% endif %}
             </div>
             <div class="dish-actions">
+                <!-- Кнопка Удалить -->
                 <form method="post" onsubmit="return confirm('Удалить блюдо «{{ card.title }}»?');" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="delete" value="1">
                     <input type="hidden" name="card_id" value="{{ card.id }}">
                     <button type="submit" class="btn-danger btn-sm">Удалить</button>
                 </form>
-            </div>
-            <div class="dish-actions">
-                <form method="post" onsubmit="return confirm('{{ card.is_hidden|yesno:'Показать,Скрыть' }} блюдо «{{ card.title }}»?');" style="display: inline;">
+
+                <!-- Кнопка Скрыть/Показать -->
+                <form method="post" onsubmit="return confirm('{{ card.is_hidden|yesno:'Показать,Скрыть' }} блюдо «{{ card.title }}»?');" style="display: inline; margin-left: 10px;">
                     {% csrf_token %}
                     <input type="hidden" name="toggle_visibility" value="1">
                     <input type="hidden" name="card_id" value="{{ card.id }}">
                     <button type="submit" class="{{ card.is_hidden|yesno:'btn-success,btn-warning' }} btn-sm">
-                    <i class="fas {{ card.is_hidden|yesno:'fa-eye,fa-eye-slash' }}"></i>
-                    {{ card.is_hidden|yesno:'Показать,Скрыть' }}
+                        <i class="fas {{ card.is_hidden|yesno:'fa-eye,fa-eye-slash' }}"></i>
+                        {{ card.is_hidden|yesno:'Показать,Скрыть' }}
                     </button>
                 </form>
             </div>
