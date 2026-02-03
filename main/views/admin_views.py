@@ -80,7 +80,7 @@ def admin_home_page(request):
     lunch_today = orders_today_all.filter(card__meal_type='lunch').count()
 
     total_ordered_today = orders_today_all.count()
-
+    revenue_today = calculate_revenue(orders_today_all)
     # Убираем дублирующую проверку, так как уже есть login_required
     student_count = Profile.objects.filter(role='student').count()
     return render(request, 'main/admin_dashboard/admin_home_page.html', {
@@ -88,6 +88,7 @@ def admin_home_page(request):
         'total_ordered_today': total_ordered_today,
         'breakfast_today': breakfast_today,
         'lunch_today': lunch_today,
+        'revenue_today': float(round(revenue_today, 2)),
     })
 
 
@@ -227,6 +228,15 @@ def admin_buys(request):
         'approved_count': approved_count,
     })
 
+def calculate_revenue(orders):
+    total = 0.00
+    for order in orders:
+        if order.card and order.card.price:
+            try:
+                total += float(order.card.price)
+            except (ValueError, TypeError):
+                continue
+    return total
 
 @login_required
 def admin_finance(request):
@@ -243,15 +253,7 @@ def admin_finance(request):
     orders_month_all = Order.objects.filter(ordered_at__gte=now - timedelta(days=30))
 
     # Функция для расчета выручки вручную (без агрегации)
-    def calculate_revenue(orders):
-        total = 0.00
-        for order in orders:
-            if order.card and order.card.price:
-                try:
-                    total += float(order.card.price)
-                except (ValueError, TypeError):
-                    continue
-        return total
+
 
     # Функция для расчета выручки по типу блюда
     def calculate_revenue_by_type(orders, meal_type):

@@ -1118,7 +1118,7 @@ body {
     .sidebar {
         width: 70px;
     }
-    
+
     .sidebar .logo span,
     .sidebar .user-details,
     .sidebar-menu span,
@@ -1131,105 +1131,7 @@ body {
     }
 }
 
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s;
-    }
-    
-    .sidebar.show {
-        transform: translateX(0);
-    }
-    
-    .sidebar-toggle {
-        display: block;
-    }
-    
-    .main-content {
-        margin-left: 0;
-        padding: 20px;
-    }
-    
-    .top-bar {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-    }
-    
-    .top-bar-right {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .dashboard-cards {
-        grid-template-columns: 1fr;
-    }
 
-    .orders-section .order-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-
-    .orders-section .order-details {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .orders-section .order-actions {
-        align-items: stretch;
-    }
-
-    .order-details {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .order-actions {
-        align-items: stretch;
-    }
-    
-    .inventory-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-    }
-    
-    .product-stock {
-        width: 100%;
-        margin: 10px 0;
-    }
-
-    .menu-actions {
-        flex-direction: column;
-    }
-    
-    .dish-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .allergens-grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    }
-
-    .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .pagination-top {
-        align-self: flex-end;
-    }
-
-    .flat-pagination {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 2px;
-    }
-}
 
 @media (max-width: 480px) {
     .allergens-grid {

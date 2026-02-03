@@ -359,51 +359,6 @@ body {
     color: #bbb;
 }
 
-@media (max-width: 768px) {
-    .nav-links {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        flex-direction: column;
-        padding: 20px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-
-    .nav-links.show {
-        display: flex;
-    }
-
-    .mobile-menu-btn {
-        display: block;
-    }
-
-    .hero {
-        flex-direction: column;
-        text-align: center;
-        padding-top: 120px;
-    }
-
-    .hero-content {
-        padding-right: 0;
-        margin-bottom: 40px;
-    }
-
-    .hero h1 {
-        font-size: 2rem;
-    }
-
-    .hero-buttons {
-        justify-content: center;
-    }
-
-    .roles-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
 .fa-user-chef:before {
     content: "\f805";
     font-family: 'Font Awesome 6 Free';

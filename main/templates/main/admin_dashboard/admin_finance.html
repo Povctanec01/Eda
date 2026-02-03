@@ -2,6 +2,7 @@
 {% load static %}
 {% block title %}Финансы{% endblock %}
 {% block body %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">Финансовая статистика</h1>
@@ -18,6 +19,7 @@
                                 Выручка (сегодня)</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ revenue_today }} ₽</div>
                             <small class="text-muted">Заказов: {{ total_ordered_today }}</small>
+
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
@@ -84,99 +86,12 @@
         </div>
     </div>
 
-    <div class="row mb-4">
-         <!-- Топ за месяц -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Топ-5 блюд по выручке (месяц)</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th>Блюдо</th>
-                                    <th>Тип</th>
-                                    <th>Кол-во заказов</th>
-                                    <th>Выручка</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for dish in top_revenue_dishes_month %}
-                                <tr>
-                                    <td>{{ dish.dish.title }}</td>
-                                    <td>
-                                        <span class="badge {% if dish.dish.meal_type == 'breakfast' %}badge-primary{% else %}badge-success{% endif %}">
-                                            {{ dish.dish.get_meal_type_display }}
-                                        </span>
-                                    </td>
-                                    <td>{{ dish.count }}</td>
-                                    <td class="font-weight-bold">{{ dish.revenue|floatformat:2 }} ₽</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center">Нет данных за месяц</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Топ блюд по выручке -->
-    <div class="row mb-4">
-        <!-- Топ за неделю -->
-        <div class="col-lg-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-success">Топ-5 блюд по выручке (неделя)</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th>Блюдо</th>
-                                    <th>Тип</th>
-                                    <th>Кол-во заказов</th>
-                                    <th>Выручка</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for dish in top_revenue_dishes_week %}
-                                <tr>
-                                    <td>{{ dish.dish.title }}</td>
-                                    <td>
-                                        <span class="badge {% if dish.dish.meal_type == 'breakfast' %}badge-primary{% else %}badge-success{% endif %}">
-                                            {{ dish.dish.get_meal_type_display }}
-                                        </span>
-                                    </td>
-                                    <td>{{ dish.count }}</td>
-                                    <td class="font-weight-bold">{{ dish.revenue|floatformat:2 }} ₽</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center">Нет данных за неделю</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Ежедневная статистика -->
+<!-- Статистика -->
     <div class="row">
         <div class="col-lg-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Ежедневная статистика</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Статистика</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -227,5 +142,92 @@
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Топ-5 блюд по выручке (месяц)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Блюдо</th>
+                                    <th>Тип</th>
+                                    <th>Кол-во заказов</th>
+                                    <th>Выручка</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dish in top_revenue_dishes_month %}
+                                <tr>
+                                    <td>{{ dish.dish.title }}</td>
+                                    <td>
+                                        <span class="badge {% if dish.dish.meal_type == 'breakfast' %}badge-primary{% else %}badge-success{% endif %}">
+                                            {{ dish.dish.get_meal_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ dish.count }}</td>
+                                    <td class="font-weight-bold">{{ dish.revenue|floatformat:2 }} ₽</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Нет данных за месяц</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Топ блюд по выручке -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Топ-5 блюд по выручке (неделя)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Блюдо</th>
+                                    <th>Тип</th>
+                                    <th>Кол-во заказов</th>
+                                    <th>Выручка</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dish in top_revenue_dishes_week %}
+                                <tr>
+                                    <td>{{ dish.dish.title }}</td>
+                                    <td>
+                                        <span class="badge {% if dish.dish.meal_type == 'breakfast' %}badge-primary{% else %}badge-success{% endif %}">
+                                            {{ dish.dish.get_meal_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ dish.count }}</td>
+                                    <td class="font-weight-bold">{{ dish.revenue|floatformat:2 }} ₽</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Нет данных за неделю</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 {% endblock %}

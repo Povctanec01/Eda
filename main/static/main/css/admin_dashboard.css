@@ -976,60 +976,6 @@ body {
     }
 }
 
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s;
-    }
-    
-    .sidebar.show {
-        transform: translateX(0);
-    }
-    
-    .sidebar-toggle {
-        display: block;
-    }
-    
-    .main-content {
-        margin-left: 0;
-        padding: 20px;
-    }
-    
-    .top-bar {
-        flex-direction: column;
-        gap: 15px;
-        align-items: flex-start;
-    }
-    
-    .top-bar-right {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .dashboard-cards {
-        grid-template-columns: 1fr;
-    }
-
-    .request-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    
-    .report-actions {
-        flex-wrap: wrap;
-    }
-
-    .menu-actions {
-        flex-direction: column;
-    }
-    
-    .dish-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-}
 /* Заголовок списка пользователей */
 .user-list-header {
     background: var(--bg-secondary);
