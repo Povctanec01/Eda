@@ -49,5 +49,6 @@ urlpatterns = [
     path('admin_dashboard/card_edit',admin_views.admin_card_edit, name='admin_card_edit'),
     path('delete/<int:card_id>/',common_views.index, name='card_delete'),
     path('admin_dashboard/users/delete-selected/',admin_views.admin_users_delete_selected, name='admin_users_delete_selected'),
+    path('admin_finance/pdf/', admin_views.generate_finance_pdf, name='generate_finance_pdf'),
 
 ]

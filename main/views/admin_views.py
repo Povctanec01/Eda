@@ -8,65 +8,305 @@ from django.utils import timezone
 from datetime import time, datetime, timedelta
 from main.models import Card, Order, CardBuys, Profile
 from main.forms import CardForm, CardFormBuys
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import os
+from django.conf import settings
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+# Регистрируем шрифт для поддержки кириллицы (делаем это один раз при импорте)
+def register_fonts():
+    """Регистрируем шрифты для поддержки кириллицы"""
+    try:
+        # Путь к шрифту в статических файлах
+        font_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'arial.ttf')
+
+        if os.path.exists(font_path):
+            pdfmetrics.registerFont(TTFont('Arial', font_path))
+            pdfmetrics.registerFont(TTFont('Arial-Bold', font_path))
+            return True
+        else:
+            # Если нет файла шрифта, ищем стандартные пути
+            possible_paths = [
+                '/usr/share/fonts/truetype/msttcorefonts/arial.ttf',  # Linux
+                'C:/Windows/Fonts/arial.ttf',  # Windows
+                '/System/Library/Fonts/Arial.ttf',  # macOS
+            ]
+
+            for path in possible_paths:
+                if os.path.exists(path):
+                    pdfmetrics.registerFont(TTFont('Arial', path))
+                    pdfmetrics.registerFont(TTFont('Arial-Bold', path))
+                    return True
+
+            # Если не нашли Arial, используем DejaVu Sans (часто установлен в Linux)
+            dejavu_paths = [
+                '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+                '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',
+            ]
+
+            for path in dejavu_paths:
+                if os.path.exists(path):
+                    pdfmetrics.registerFont(TTFont('Arial', path))
+                    pdfmetrics.registerFont(TTFont('Arial-Bold', path))
+                    return True
+
+            return False
+    except:
+        return False
+
+# Регистрируем шрифты при импорте модуля
+font_registered = register_fonts()
 
 
-class StaffRegistrationForm(forms.Form):
-    username = forms.CharField(
-        max_length=150,
-        label="Имя пользователя",
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    password1 = forms.CharField(
-        label="Пароль",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
-    )
-    password2 = forms.CharField(
-        label="Подтвердите пароль",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
-    )
-    role = forms.ChoiceField(
-        choices=[('chef', 'Повар'), ('admin', 'Администратор')],
-        label="Роль",
-        widget=forms.Select(attrs={'class': 'form-control try'})
-    )
+def generate_finance_pdf(request):
+    # Получаем данные из сессии
+    pdf_data = request.session.get('finance_pdf_data', {})
 
-    def clean_username(self):
-        username = self.cleaned_data.get('username')
-        if User.objects.filter(username=username).exists():
-            raise forms.ValidationError("Пользователь с таким именем уже существует.")
-        return username
+    # Создаем PDF
+    response = HttpResponse(content_type='application/pdf')
+    response[
+        'Content-Disposition'] = f'attachment; filename="finance_report_{datetime.now().strftime("%Y-%m-%d_%H-%M")}.pdf"'
 
-    def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get('password1')
-        password2 = cleaned_data.get('password2')
-        if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("Пароли не совпадают")
-        if password1 and len(password1) < 8:
-            raise forms.ValidationError("Пароль должен содержать минимум 8 символов")
-        return cleaned_data
+    p = canvas.Canvas(response, pagesize=A4)
+    width, height = A4
 
-    def save(self):
-        username = self.cleaned_data['username']
-        password = self.cleaned_data['password1']
-        role = self.cleaned_data['role']
+    # Проверяем шрифт
+    if not font_registered:
+        font_name = "Helvetica"
+        bold_font_name = "Helvetica-Bold"
+    else:
+        font_name = "Arial"
+        bold_font_name = "Arial-Bold"
 
-        # Создаем пользователя
-        user = User.objects.create_user(username=username, password=password)
+    # === ШАПКА ===
+    # Фон шапки
+    p.setFillColorRGB(0.2, 0.4, 0.6)  # Синий цвет
+    p.rect(0, height - 80, width, 80, fill=True, stroke=False)
 
-        # Если роль 'admin', делаем суперпользователем
-        if role == 'admin':
-            user.is_staff = True
-            user.is_superuser = True
-            user.save()
+    # Заголовок
+    p.setFillColorRGB(1, 1, 1)  # Белый
+    p.setFont(bold_font_name, 22)
+    p.drawCentredString(width / 2, height - 50, "Финансовый отчет")
 
-        # Убедимся, что роль не пустая
-        if not role:
-            role = 'student'
+    # Дата
+    p.setFont(font_name, 12)
+    creation_time = datetime.now().strftime('%d.%m.%Y %H:%M')
+    p.drawCentredString(width / 2, height - 75, f"Создан: {creation_time}")
 
-        user.profile.role = role
-        user.profile.save()
-        return user
+    # === ТАБЛИЦА ===
+    # Начальные координаты для таблицы
+    start_y = height - 120
+    row_height = 30
+    # УВЕЛИЧИВАЕМ ширину колонок для больших чисел
+    col_widths = [200, 130, 130, 130]  # Ширина колонок
+
+    # Заголовки таблицы
+    headers = ["Показатель", "Сегодня", "Неделя", "Месяц"]
+
+    # Рисуем заголовки
+    p.setFillColorRGB(0.3, 0.3, 0.3)  # Темно-серый
+    p.setFont(bold_font_name, 12)
+
+    x = 40  # Уменьшил отступ слева
+    for i, header in enumerate(headers):
+        p.drawString(x, start_y - 20, header)
+        x += col_widths[i]
+
+    # Горизонтальная линия под заголовками
+    p.setStrokeColorRGB(0.2, 0.4, 0.6)  # Синий
+    p.setLineWidth(2)
+    p.line(40, start_y - 25, width - 40, start_y - 25)  # Увеличил ширину линии
+
+    # Данные таблицы
+    current_y = start_y - 50
+
+    # Подготавливаем данные с правильным форматированием
+    def format_currency(value):
+        """Форматирует денежные значения"""
+        try:
+            return f"{float(value):,.2f} ₽"
+        except:
+            return f"{value} ₽"
+
+    def format_count(value):
+        """Форматирует числовые значения"""
+        try:
+            return f"{int(value):,}"
+        except:
+            return str(value)
+
+    def format_meal_data(count, revenue):
+        """Форматирует данные по питанию"""
+        try:
+            count_int = int(count)
+            revenue_float = float(revenue)
+            return f"{count_int} ({revenue_float:,.2f} ₽)"
+        except:
+            return f"{count} ({revenue} ₽)"
+
+    # Список данных для отображения
+    data_rows = [
+        ("Выручка",
+         format_currency(pdf_data.get('revenue_today', '0.00')),
+         format_currency(pdf_data.get('revenue_week', '0.00')),
+         format_currency(pdf_data.get('revenue_month', '0.00'))),
+
+        ("Заказов",
+         format_count(pdf_data.get('total_ordered_today', '0')),
+         format_count(pdf_data.get('total_ordered_week', '0')),
+         format_count(pdf_data.get('total_ordered_month', '0'))),
+
+        ("Средний чек",
+         format_currency(pdf_data.get('avg_check_today', '0.00')),
+         format_currency(pdf_data.get('avg_check_week', '0.00')),
+         format_currency(pdf_data.get('avg_check_month', '0.00'))),
+
+        ("Завтраки",
+         format_meal_data(pdf_data.get('breakfast_today', '0'),
+                          pdf_data.get('breakfast_revenue_today', '0.00')),
+         format_meal_data(pdf_data.get('breakfast_week', '0'),
+                          pdf_data.get('breakfast_revenue_week', '0.00')),
+         format_meal_data(pdf_data.get('breakfast_month', '0'),
+                          pdf_data.get('breakfast_revenue_month', '0.00'))),
+
+        ("Обеды",
+         format_meal_data(pdf_data.get('lunch_today', '0'),
+                          pdf_data.get('lunch_revenue_today', '0.00')),
+         format_meal_data(pdf_data.get('lunch_week', '0'),
+                          pdf_data.get('lunch_revenue_week', '0.00')),
+         format_meal_data(pdf_data.get('lunch_month', '0'),
+                          pdf_data.get('lunch_revenue_month', '0.00'))),
+    ]
+
+    # Рисуем строки с данными
+    for i, (label, today_val, week_val, month_val) in enumerate(data_rows):
+        # Чередование цвета фона
+        if i % 2 == 0:
+            p.setFillColorRGB(0.95, 0.95, 0.95)  # Светло-серый
+        else:
+            p.setFillColorRGB(1, 1, 1)  # Белый
+
+        p.rect(40, current_y - row_height + 5, width - 50, row_height, fill=True, stroke=False)
+
+        # Текст
+        p.setFillColorRGB(0, 0, 0)  # Черный
+        p.setFont(font_name, 11)
+
+        # Показатель
+        p.drawString(45, current_y - 15, label)
+
+        # Значения - УМЕНЬШАЕМ размер шрифта для длинных чисел
+        if label in ["Выручка", "Средний чек"]:
+            p.setFillColorRGB(0, 0.5, 0)  # Зеленый для денег
+            value_font_size = 10 if len(today_val) > 12 else 11  # Меньше для длинных
+        else:
+            p.setFillColorRGB(0, 0, 0)  # Черный
+            value_font_size = 10 if len(today_val) > 15 else 11  # Меньше для длинных
+
+        p.setFont(bold_font_name if label in ["Выручка", "Средний чек"] else font_name, value_font_size)
+
+        # Позиционирование значений с учетом ширины колонок
+        x_pos = 40 + col_widths[0]
+        # Проверяем, помещается ли текст
+        text_width = p.stringWidth(today_val,
+                                   bold_font_name if label in ["Выручка", "Средний чек"] else font_name,
+                                   value_font_size)
+        if text_width > col_widths[1] - 20:
+            # Если не помещается, уменьшаем шрифт еще больше
+            value_font_size = 9
+            p.setFont(bold_font_name if label in ["Выручка", "Средний чек"] else font_name, value_font_size)
+
+        p.drawString(x_pos + 5, current_y - 15, today_val)
+
+        x_pos += col_widths[1]
+        p.drawString(x_pos + 5, current_y - 15, week_val)
+
+        x_pos += col_widths[2]
+        p.drawString(x_pos + 5, current_y - 15, month_val)
+
+        # Горизонтальная линия между строками
+        p.setStrokeColorRGB(0.9, 0.9, 0.9)  # Светло-серый
+        p.setLineWidth(1)
+        p.line(40, current_y - row_height + 5, width - 40, current_y - row_height + 5)
+
+        current_y -= row_height
+
+    # Внешняя рамка таблицы
+    p.setStrokeColorRGB(0.2, 0.4, 0.6)  # Синий
+    p.setLineWidth(2)
+    table_height = start_y - current_y - 30
+    p.rect(40, current_y + 5, width - 50, table_height, fill=False, stroke=True)
+
+    # === ИТОГИ ===
+    current_y -= 40
+
+    # Заголовок итогов
+    p.setFillColorRGB(0.2, 0.4, 0.6)  # Синий
+    p.setFont(bold_font_name, 14)
+    p.drawString(40, current_y, "Итоги за месяц:")
+
+    current_y -= 25
+
+    # Общая выручка
+    p.setFillColorRGB(0, 0.5, 0)  # Зеленый
+    p.setFont(bold_font_name, 16)
+    total = pdf_data.get('revenue_month', '0.00')
+    try:
+        formatted_total = f"{float(total):,.2f} ₽"
+    except:
+        formatted_total = f"{total} ₽"
+    p.drawString(40, current_y, f"Общая выручка: {formatted_total}")
+
+    # Количество заказов
+    current_y -= 25
+    p.setFillColorRGB(0, 0, 0)  # Черный
+    p.setFont(font_name, 12)
+    orders = pdf_data.get('total_ordered_month', '0')
+    try:
+        formatted_orders = f"{int(orders):,}"
+    except:
+        formatted_orders = str(orders)
+    p.drawString(40, current_y, f"Всего заказов: {formatted_orders}")
+
+    # Соотношение завтраки/обеды
+    try:
+        orders_int = int(orders)
+        if orders_int > 0:
+            current_y -= 20
+            breakfast = int(pdf_data.get('breakfast_month', '0'))
+            lunch = int(pdf_data.get('lunch_month', '0'))
+            breakfast_percent = (breakfast / orders_int) * 100
+            lunch_percent = (lunch / orders_int) * 100
+
+            p.drawString(40, current_y, "Соотношение: ")
+            p.setFillColorRGB(0.2, 0.4, 0.6)  # Синий
+            p.drawString(120, current_y, f"Завтраки {breakfast_percent:.1f}%")
+            p.setFillColorRGB(0.8, 0.2, 0.2)  # Красный
+            p.drawString(220, current_y, f"Обеды {lunch_percent:.1f}%")
+    except:
+        pass
+
+    # === ПОДВАЛ ===
+    footer_y = 40
+
+    # Линия
+    p.setStrokeColorRGB(0.2, 0.4, 0.6)  # Синий
+    p.setLineWidth(1)
+    p.line(40, footer_y + 20, width - 40, footer_y + 20)
+
+    # Текст подвала
+    p.setFillColorRGB(0.5, 0.5, 0.5)  # Серый
+    p.setFont(font_name, 9)
+    p.drawCentredString(width / 2, footer_y, "Сгенерировано автоматически")
+    p.drawCentredString(width / 2, footer_y - 12, "© Система питания")
+
+    # Сохраняем PDF
+    p.showPage()
+    p.save()
+
+    return response
 
 @login_required
 def admin_home_page(request):
@@ -252,8 +492,6 @@ def admin_finance(request):
     orders_week_all = Order.objects.filter(ordered_at__gte=now - timedelta(days=7))
     orders_month_all = Order.objects.filter(ordered_at__gte=now - timedelta(days=30))
 
-    # Функция для расчета выручки вручную (без агрегации)
-
 
     # Функция для расчета выручки по типу блюда
     def calculate_revenue_by_type(orders, meal_type):
@@ -322,8 +560,6 @@ def admin_finance(request):
     lunch_week = orders_week_all.filter(card__meal_type='lunch').count()
     breakfast_month = orders_month_all.filter(card__meal_type='breakfast').count()
     lunch_month = orders_month_all.filter(card__meal_type='lunch').count()
-
-    # Преобразуем данные для шаблона - убедимся, что это числа
     context = {
         'revenue_today': float(round(revenue_today, 2)),
         'revenue_week': float(round(revenue_week, 2)),
@@ -353,6 +589,35 @@ def admin_finance(request):
         'lunch_week': lunch_week,
         'breakfast_month': breakfast_month,
         'lunch_month': lunch_month,
+    }
+
+    # Сохраняем данные для PDF в сессии
+    request.session['finance_pdf_data'] = {
+        'revenue_today': context['revenue_today'],
+        'revenue_week': context['revenue_week'],
+        'revenue_month': context['revenue_month'],
+
+        'breakfast_revenue_today': context['breakfast_revenue_today'],
+        'lunch_revenue_today': context['lunch_revenue_today'],
+        'breakfast_revenue_week': context['breakfast_revenue_week'],
+        'lunch_revenue_week': context['lunch_revenue_week'],
+        'breakfast_revenue_month': context['breakfast_revenue_month'],
+        'lunch_revenue_month': context['lunch_revenue_month'],
+
+        'total_ordered_today': context['total_ordered_today'],
+        'total_ordered_week': context['total_ordered_week'],
+        'total_ordered_month': context['total_ordered_month'],
+
+        'avg_check_today': context['avg_check_today'],
+        'avg_check_week': context['avg_check_week'],
+        'avg_check_month': context['avg_check_month'],
+
+        'breakfast_today': context['breakfast_today'],
+        'lunch_today': context['lunch_today'],
+        'breakfast_week': context['breakfast_week'],
+        'lunch_week': context['lunch_week'],
+        'breakfast_month': context['breakfast_month'],
+        'lunch_month': context['lunch_month'],
     }
 
     return render(request, 'main/admin_dashboard/admin_finance.html', context)
