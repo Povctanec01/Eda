@@ -27,7 +27,7 @@ class StaffRegistrationForm(forms.Form):
     role = forms.ChoiceField(
         choices=[('chef', 'Повар'), ('admin', 'Администратор')],
         label="Роль",
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control try'})
     )
 
     def clean_username(self):

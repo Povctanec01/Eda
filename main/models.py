@@ -87,14 +87,20 @@ class Card(models.Model):
         default='select',
         verbose_name="Тип приёма пищи"
     )
+    price = models.DecimalField(  # ДОБАВИТЬ ЭТО ПОЛЕ
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена",
+        default=0.00
+    )
     ingredients = models.TextField('Ингредиенты', blank=True, null=True)
     allergens = models.ManyToManyField(Allergen, blank=True, verbose_name="Аллергены")
     created_at = models.DateTimeField(auto_now_add=True)
-    is_hidden = models.BooleanField(default=False, verbose_name="Скрыто")  # Добавляем это поле
+    is_hidden = models.BooleanField(default=False, verbose_name="Скрыто")
 
     def __str__(self):
         hidden_status = " (скрыто)" if self.is_hidden else ""
-        return f"{self.title} ({self.get_meal_type_display()}){hidden_status}"
+        return f"{self.title} ({self.get_meal_type_display()}) - {self.price} руб.{hidden_status}"
 
     class Meta:
         verbose_name = "Блюдо"
