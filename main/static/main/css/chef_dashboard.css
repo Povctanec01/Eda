@@ -1400,3 +1400,136 @@ body {
 .alert {
     animation: slideIn 0.3s ease-out;
 }
+/* ДОБАВЬТЕ В КОНЕЦ chef_dashboard.css */
+
+/* Стили для страницы остатков продуктов в темной теме */
+[data-theme="dark"] .dashboard-header h1 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+[data-theme="dark"] .card-header {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .card-header h3 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-group label {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .table th {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+[data-theme="dark"] .table td {
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] .search-box input {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .search-box input::placeholder {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: rgba(23, 162, 184, 0.2);
+    border-color: var(--info-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .table-warning {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .form-control {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+/* Иконка мусорки всегда красная */
+.fa-trash {
+    color: #dc3545 !important;
+}
+
+/* В темной теме делаем иконку еще ярче */
+[data-theme="dark"] .fa-trash {
+    color: #ff6b6b !important;
+}
+
+/* Стили для кнопок в темной теме */
+[data-theme="dark"] .btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn-outline-secondary {
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover {
+    background-color: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+[data-theme="dark"] .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Белый текст для заголовков в темной теме */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .form-control-plaintext {
+    color: var(--text-primary) !important;
+}

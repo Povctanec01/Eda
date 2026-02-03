@@ -1,25 +1,12 @@
 {% extends 'main/chef_dashboard/chef_base.html' %}
 {% load static %}
-{% block title %}Панель повара - Школьная Столовая{% endblock %}
+{% block title %}Панель повара{% endblock %}
 {% block body %}
 <div class="chest">
     <header class="top-bar">
         <div class="top-bar-left">
             <h1 class="dinner2">Доброй день, {{ user.username }}!</h1>
             <p>Сегодня: <span id="currentDate">Загрузка...</span></p>
-        </div>
-        <div class="top-bar-right">
-            <div class="notification-bell" onclick="showNotifications()">
-                <i class="fas fa-bell"></i>
-                <span class="badge">5</span>
-            </div>
-            <div class="kitchen-status">
-                <span class="status-indicator active"></span>
-                <span>Кухня работает</span>
-                <button class="btn btn-sm btn-outline" onclick="toggleKitchenStatus()">
-                <i class="fas fa-power-off"></i> Статус
-                </button>
-            </div>
         </div>
     </header>
     <div id="dashboard" class="dashboard-section active">
@@ -45,7 +32,7 @@
                 <div class="card-content">
                     <h3>Заказ не забрали:</h3>
                     <p class="card-value">{{ chef_active_orders_count }}</p>
-                    <a href="{% url 'chef_orders' %}" class="btn btn-sm btn-outline">Статистика</a>
+                    <a href="{% url 'chef_statistics' %}" class="btn btn-sm btn-outline">Статистика</a>
                 </div>
             </div>
             <div class="card">
@@ -56,7 +43,7 @@
                     <h3>Низкие остатки</h3>
                     <p class="card-value">{{ low_stock_count }}</p>
                     <p class="card-desc">Продуктов</p>
-                    <button class="btn btn-sm btn-outline" onclick="showSection('inventory')">Проверить</button>
+                    <a href="{% url 'chef_remaining_product' %}" class="btn btn-sm btn-outline">Проверить</a>
                 </div>
             </div>
         </section>
@@ -132,7 +119,7 @@
         <section class="inventory-section">
             <div class="section-header">
                 <h2 class="dinner2"><i class="fas fa-boxes"></i> Заявки на закупку</h2>
-                <a href="{% url 'chef_buys' %}" class="btn btn-primary" onclick="openPurchaseModal()">
+                <a href="{% url 'chef_buys' %}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Новая заявка
                 </a>
             </div>

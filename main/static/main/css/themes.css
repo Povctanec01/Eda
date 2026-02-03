@@ -812,3 +812,114 @@ p {
     opacity: 0.2;
     color: var(--text-primary) !important;
 }
+/* ДОБАВЬТЕ В КОНЕЦ themes.css */
+
+/* Дополнительные стили для темной темы - остатки продуктов */
+[data-theme="dark"] .stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .stat-info h3 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .stat-info p {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .form-text.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+/* Стили для форм редактирования в таблице */
+[data-theme="dark"] .edit-form-row {
+    background-color: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .edit-form-row .border {
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .edit-form-row .rounded {
+    background-color: var(--bg-secondary);
+}
+
+/* Все белые элементы должны стать темными */
+[data-theme="dark"] .bg-light {
+    background-color: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .table-light {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Стили для баджей статуса */
+[data-theme="dark"] .badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+[data-theme="dark"] .badge-success {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Иконка мусорки - всегда красная */
+[data-theme="dark"] .btn-outline-danger .fa-trash {
+    color: #ff6b6b !important;
+}
+
+/* Для светлой темы тоже делаем красной */
+.btn-outline-danger .fa-trash {
+    color: #dc3545 !important;
+}
+
+/* Стили для заголовков таблиц */
+[data-theme="dark"] .table thead th {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-bottom-color: var(--border-color);
+}
+
+/* Стили для строк таблицы */
+[data-theme="dark"] .table tbody tr {
+    border-bottom-color: var(--border-color);
+}
+
+/* Стили для поиска */
+[data-theme="dark"] #productSearch {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] #productSearch::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Стили для кнопок действий */
+[data-theme="dark"] .btn-group .btn {
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .btn-group .btn:hover {
+    background-color: var(--bg-tertiary);
+}
+
+/* Стили для уведомлений */
+[data-theme="dark"] .alert {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: rgba(23, 162, 184, 0.2);
+    border-color: var(--info-color);
+}
+
+[data-theme="dark"] .alert-success {
+    background-color: rgba(40, 167, 69, 0.2);
+    border-color: var(--success-color);
+}

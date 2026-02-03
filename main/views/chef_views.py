@@ -268,19 +268,13 @@ def chef_remaining_product(request):
     if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
 
-    # Получаем все продукты
     products = ProductRemaining.objects.all().order_by('name')
-
-    # Форма для добавления нового продукта
     form = ProductRemainingForm()
 
-    # Обработка POST-запросов
+    # Обработка всех действий через обычные POST-запросы
     if request.method == 'POST':
-        # Проверяем, это AJAX-запрос или обычный POST
-        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-
-        # Добавление нового продукта
-        if 'add_product' in request.POST and not is_ajax:
+        # 1. Добавление нового продукта
+        if 'add_product' in request.POST:
             form = ProductRemainingForm(request.POST)
             if form.is_valid():
                 form.save()
@@ -291,8 +285,8 @@ def chef_remaining_product(request):
                     for error in errors:
                         messages.error(request, f"Ошибка в поле '{field}': {error}")
 
-        # Удаление продукта
-        elif 'delete_product' in request.POST and not is_ajax:
+        # 2. Удаление продукта
+        elif 'delete_product' in request.POST:
             product_id = request.POST.get('product_id')
             product = get_object_or_404(ProductRemaining, id=product_id)
             product_name = product.name
@@ -300,7 +294,7 @@ def chef_remaining_product(request):
             messages.success(request, f"Продукт '{product_name}' удалён.")
             return redirect('chef_remaining_product')
 
-        # Обновление количества продукта
+        # 3. Обновление количества продукта (простая форма)
         elif 'update_quantity' in request.POST:
             product_id = request.POST.get('product_id')
             new_quantity = request.POST.get('new_quantity')
@@ -309,29 +303,26 @@ def chef_remaining_product(request):
                 product = get_object_or_404(ProductRemaining, id=product_id)
                 product.quantity = Decimal(new_quantity)
                 product.save()
-
-                # Если это AJAX-запрос, возвращаем JSON
-                if is_ajax:
-                    return JsonResponse({
-                        'success': True,
-                        'product_id': product.id,  # ВАЖНО: возвращаем ID
-                        'product_name': product.name,
-                        'new_quantity': str(product.quantity),
-                        'unit': product.unit,
-                        'is_low_stock': product.is_low_stock()
-                    })
-                else:
-                    messages.success(request, f"Количество '{product.name}' обновлено.")
-                    return redirect('chef_remaining_product')
-
+                messages.success(request, f"Количество '{product.name}' обновлено до {new_quantity} {product.unit}")
+                return redirect('chef_remaining_product')
             except (ValueError, ValidationError) as e:
-                if is_ajax:
-                    return JsonResponse({'success': False, 'error': str(e)})
-                else:
-                    messages.error(request, f"Ошибка обновления: {str(e)}")
-                    return redirect('chef_remaining_product')
+                messages.error(request, f"Ошибка обновления: {str(e)}")
+                return redirect('chef_remaining_product')
 
-    # Подсчёт низких запасов
+        # 4. Редактирование продукта (полное)
+        elif 'edit_product' in request.POST:
+            product_id = request.POST.get('product_id')
+            product = get_object_or_404(ProductRemaining, id=product_id)
+            form = ProductRemainingForm(request.POST, instance=product)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Продукт успешно обновлён!")
+                return redirect('chef_remaining_product')
+            else:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"Ошибка в поле '{field}': {error}")
+
     low_stock_count = sum(1 for product in products if product.is_low_stock())
 
     return render(request, 'main/chef_dashboard/chef_remaining_product.html', {
@@ -340,39 +331,6 @@ def chef_remaining_product(request):
         'low_stock_count': low_stock_count,
         'total_products': products.count()
     })
-
-
-@login_required
-def edit_product_modal(request, product_id):
-    """Представление для редактирования продукта через модальное окно"""
-    if not request.user.is_authenticated or request.user.profile.role != 'chef':
-        return JsonResponse({'success': False, 'error': 'Доступ запрещён'}, status=403)
-
-    product = get_object_or_404(ProductRemaining, id=product_id)
-
-    if request.method == 'POST':
-        form = ProductRemainingForm(request.POST, instance=product)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({
-                'success': True,
-                'product_name': product.name,
-                'quantity': str(product.quantity),
-                'unit': product.unit,
-                'min_quantity': str(product.min_quantity)
-            })
-        else:
-            errors = {field: error[0] for field, error in form.errors.items()}
-            return JsonResponse({'success': False, 'errors': errors})
-
-    # Для GET-запроса возвращаем HTML формы
-    form = ProductRemainingForm(instance=product)
-    html = render_to_string('main/chef_dashboard/edit_product_modal.html', {
-        'form': form,
-        'product': product
-    }, request=request)
-
-    return JsonResponse({'success': True, 'html': html})
 
 @login_required
 def chef_statistics(request):

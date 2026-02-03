@@ -37,7 +37,6 @@ urlpatterns = [
     path('chef/allergens/',chef_allergens, name='chef_allergens'),
     path('chef/get-allergens/',chef_views.get_allergens, name='get_allergens'),
     path('chef/remaining-product/', chef_views.chef_remaining_product, name='chef_remaining_product'),
-    path('chef/edit-product/<int:product_id>/', chef_views.edit_product_modal, name='edit_product_modal'),
 
 #admin
     path('admin_dashboard/admin_home_page',admin_views.admin_home_page, name='admin_home_page'),
