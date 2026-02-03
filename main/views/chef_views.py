@@ -1,9 +1,14 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
-from main.models import Card, Order, CardBuys, Profile, Allergen
-from main.forms import CardForm, CardFormBuys
+from django.template.loader import render_to_string
+
+from main.models import Card, Order, CardBuys, Profile, Allergen, ProductRemaining
+from main.forms import CardForm, CardFormBuys, ProductRemainingForm
 from datetime import timedelta, time
 from django.utils import timezone
 from django import forms
@@ -17,6 +22,9 @@ def chef_home_page(request):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'message': 'Доступ запрещён'}, status=403)
         return redirect('login')
+
+    products = ProductRemaining.objects.all().order_by('name')
+    low_stock_count = sum(1 for product in products if product.is_low_stock())
 
     # Обработка POST-запросов
     if request.method == 'POST':
@@ -49,7 +57,8 @@ def chef_home_page(request):
         'orders': recent_orders,
         'all_orders_count': all_orders_count,
         'form_buys': form_buys,
-        'buys': buys
+        'buys': buys,
+        'low_stock_count': low_stock_count,
     })
 
 
@@ -253,11 +262,117 @@ def chef_buys(request):
         'approved_count': approved_count,
     })
 
+
 @login_required
 def chef_remaining_product(request):
     if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
-    return render(request, 'main/chef_dashboard/chef_remaining_product.html')
+
+    # Получаем все продукты
+    products = ProductRemaining.objects.all().order_by('name')
+
+    # Форма для добавления нового продукта
+    form = ProductRemainingForm()
+
+    # Обработка POST-запросов
+    if request.method == 'POST':
+        # Проверяем, это AJAX-запрос или обычный POST
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+        # Добавление нового продукта
+        if 'add_product' in request.POST and not is_ajax:
+            form = ProductRemainingForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Продукт успешно добавлен!")
+                return redirect('chef_remaining_product')
+            else:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"Ошибка в поле '{field}': {error}")
+
+        # Удаление продукта
+        elif 'delete_product' in request.POST and not is_ajax:
+            product_id = request.POST.get('product_id')
+            product = get_object_or_404(ProductRemaining, id=product_id)
+            product_name = product.name
+            product.delete()
+            messages.success(request, f"Продукт '{product_name}' удалён.")
+            return redirect('chef_remaining_product')
+
+        # Обновление количества продукта
+        elif 'update_quantity' in request.POST:
+            product_id = request.POST.get('product_id')
+            new_quantity = request.POST.get('new_quantity')
+
+            try:
+                product = get_object_or_404(ProductRemaining, id=product_id)
+                product.quantity = Decimal(new_quantity)
+                product.save()
+
+                # Если это AJAX-запрос, возвращаем JSON
+                if is_ajax:
+                    return JsonResponse({
+                        'success': True,
+                        'product_id': product.id,  # ВАЖНО: возвращаем ID
+                        'product_name': product.name,
+                        'new_quantity': str(product.quantity),
+                        'unit': product.unit,
+                        'is_low_stock': product.is_low_stock()
+                    })
+                else:
+                    messages.success(request, f"Количество '{product.name}' обновлено.")
+                    return redirect('chef_remaining_product')
+
+            except (ValueError, ValidationError) as e:
+                if is_ajax:
+                    return JsonResponse({'success': False, 'error': str(e)})
+                else:
+                    messages.error(request, f"Ошибка обновления: {str(e)}")
+                    return redirect('chef_remaining_product')
+
+    # Подсчёт низких запасов
+    low_stock_count = sum(1 for product in products if product.is_low_stock())
+
+    return render(request, 'main/chef_dashboard/chef_remaining_product.html', {
+        'products': products,
+        'form': form,
+        'low_stock_count': low_stock_count,
+        'total_products': products.count()
+    })
+
+
+@login_required
+def edit_product_modal(request, product_id):
+    """Представление для редактирования продукта через модальное окно"""
+    if not request.user.is_authenticated or request.user.profile.role != 'chef':
+        return JsonResponse({'success': False, 'error': 'Доступ запрещён'}, status=403)
+
+    product = get_object_or_404(ProductRemaining, id=product_id)
+
+    if request.method == 'POST':
+        form = ProductRemainingForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({
+                'success': True,
+                'product_name': product.name,
+                'quantity': str(product.quantity),
+                'unit': product.unit,
+                'min_quantity': str(product.min_quantity)
+            })
+        else:
+            errors = {field: error[0] for field, error in form.errors.items()}
+            return JsonResponse({'success': False, 'errors': errors})
+
+    # Для GET-запроса возвращаем HTML формы
+    form = ProductRemainingForm(instance=product)
+    html = render_to_string('main/chef_dashboard/edit_product_modal.html', {
+        'form': form,
+        'product': product
+    }, request=request)
+
+    return JsonResponse({'success': True, 'html': html})
 
 @login_required
 def chef_statistics(request):

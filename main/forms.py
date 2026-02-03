@@ -1,6 +1,7 @@
 # main/forms.py
 from django import forms
-from .models import Card, CardBuys, Allergen
+from .models import Card, CardBuys, Allergen, ProductRemaining
+
 
 class CardForm(forms.ModelForm):
     class Meta:
@@ -30,4 +31,40 @@ class CardFormBuys(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Название блюда', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'placeholder': 'Описание', 'rows': 4, 'class': 'form-control'}),
+        }
+
+class ProductRemainingForm(forms.ModelForm):
+    class Meta:
+        model = ProductRemaining
+        fields = ['name', 'quantity', 'unit', 'min_quantity']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Например: Картофель'
+            }),
+            'quantity': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'unit': forms.Select(attrs={
+                'class': 'form-control'
+            }, choices=[
+                ('кг', 'Килограммы'),
+                ('г', 'Граммы'),
+                ('л', 'Литр'),
+                ('шт', 'Штуки'),
+                ('уп', 'Упаковка'),
+            ]),
+            'min_quantity': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+        }
+        labels = {
+            'name': 'Название продукта',
+            'quantity': 'Текущее количество',
+            'unit': 'Единица измерения',
+            'min_quantity': 'Минимальный запас',
         }

@@ -164,3 +164,37 @@ def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
     else:
         Profile.objects.create(user=instance)
+
+
+class ProductRemaining(models.Model):
+    """Модель для отслеживания остатков продуктов на складе"""
+    name = models.CharField(max_length=255, verbose_name="Название продукта")
+    quantity = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Количество"
+    )
+    unit = models.CharField(
+        max_length=50,
+        verbose_name="Единица измерения",
+        default="кг"
+    )
+    min_quantity = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Минимальное количество",
+        default=0
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлено")
+
+    class Meta:
+        verbose_name = "Остаток продукта"
+        verbose_name_plural = "Остатки продуктов"
+
+    def __str__(self):
+        return f"{self.name} - {self.quantity} {self.unit}"
+
+    def is_low_stock(self):
+        """Проверяет, есть ли низкий запас продукта"""
+        return self.quantity <= self.min_quantity
