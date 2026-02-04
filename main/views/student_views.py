@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from main.models import Card, Order, Allergen
+from main.models import Card, Order, Allergen, BuffetProduct
 from django.utils import timezone
 from datetime import time, datetime
 from django.contrib.auth import logout
