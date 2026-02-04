@@ -79,3 +79,48 @@ class ProductRemainingForm(forms.ModelForm):
             'unit': 'Единица измерения',
             'min_quantity': 'Минимальный запас',
         }
+
+# Добавьте в forms.py
+from django import forms
+from main.models import BuffetProduct
+
+class BuffetProductForm(forms.ModelForm):
+    class Meta:
+        model = BuffetProduct
+        fields = ['name', 'description', 'category', 'price', 'ingredients', 'allergens', 'is_available', 'stock_quantity']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Название товара'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Описание товара'
+            }),
+            'category': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0'
+            }),
+            'ingredients': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2,
+                'placeholder': 'Состав продукта'
+            }),
+            'allergens': forms.SelectMultiple(attrs={
+                'class': 'form-control',
+                'size': '5'
+            }),
+            'stock_quantity': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0'
+            })
+        }
+        labels = {
+            'is_available': 'Доступен для заказа',
+            'stock_quantity': 'Количество на складе'
+        }

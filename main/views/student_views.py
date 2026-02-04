@@ -386,10 +386,72 @@ def update_non_critical_allergens(request):
 
     return redirect('student_allergens')
 
+# Обновите функцию buffet в student_views.py:
 @login_required
-def buffet(request):
+def student_buffet(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
 
+    # Получаем только доступные товары
+    products = BuffetProduct.objects.filter(
+        is_available=True
+    ).order_by('category', 'name')
+
+    # Фильтрация по категории
+    category_filter = request.GET.get('category', '')
+    if category_filter:
+        products = products.filter(category=category_filter)
+
+    # Получаем аллергены пользователя для фильтрации
+    profile = request.user.profile
+    critical_allergens = profile.critical_allergens.all()
+
+    # Фильтруем товары с критическими аллергенами
+    if critical_allergens.exists():
+        products = products.exclude(
+            allergens__in=critical_allergens
+        ).distinct()
+
+    # Добавляем информацию о некритических аллергенах
+    non_critical_allergens = profile.non_critical_allergens.all()
+    filtered_products = []
+
+    for product in products:
+        # Проверяем некритические аллергены
+        product_non_critical_allergens = product.allergens.filter(
+            id__in=non_critical_allergens.values_list('id', flat=True)
+        )
+
+        if product_non_critical_allergens.exists():
+            product.has_non_critical_allergens = True
+            product.non_critical_allergens_list = list(product_non_critical_allergens)
+        else:
+            product.has_non_critical_allergens = False
+            product.non_critical_allergens_list = []
+
+        # Добавляем badge для категории
+        category_badge_classes = {
+            'baked': 'bg-warning',
+            'sweets': 'bg-pink',
+            'drinks': 'bg-info',
+            'snacks': 'bg-secondary',
+            'other': 'bg-dark'
+        }
+        product.category_badge_class = category_badge_classes.get(product.category, 'bg-dark')
+
+        # Проверяем наличие на складе
+        if product.stock_quantity == 0:
+            product.is_out_of_stock = True
+        elif product.stock_quantity < 10:
+            product.is_low_stock = True
+        else:
+            product.is_out_of_stock = False
+            product.is_low_stock = False
+
+        filtered_products.append(product)
+
     return render(request, 'main/student_dashboard/student_buffet.html', {
+        'products': filtered_products,
+        'category_filter': category_filter,
+        'category_choices': BuffetProduct.CATEGORY_CHOICES,
     })

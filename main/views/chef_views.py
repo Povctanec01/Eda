@@ -407,10 +407,85 @@ def get_allergens(request):
     })
 
 
+# Добавьте импорт в начале chef_views.py
+from main.models import BuffetProduct
+from main.forms import BuffetProductForm
+
+
+# Обновите функцию buffet в chef_views.py:
 @login_required
-def buffet(request):
+def chef_buffet(request):
     if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
 
+    # Получаем все товары, сортируем по категории и названию
+    products = BuffetProduct.objects.all().order_by('category', 'name')
+
+    # Считаем статистику
+    available_count = products.filter(is_available=True).count()
+    low_stock_count = products.filter(stock_quantity__lt=10, stock_quantity__gt=0).count()
+    out_of_stock_count = products.filter(stock_quantity=0).count()
+
+    # Обработка добавления нового товара
+    if request.method == 'POST':
+        if 'add_product' in request.POST:
+            form = BuffetProductForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Буфетный товар успешно добавлен!")
+                return redirect('chef_buffet')
+            else:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"Ошибка в поле '{field}': {error}")
+
+        # Удаление товара
+        elif 'delete_product' in request.POST:
+            product_id = request.POST.get('product_id')
+            product = get_object_or_404(BuffetProduct, id=product_id)
+            product_name = product.name
+            product.delete()
+            messages.success(request, f"Товар '{product_name}' удалён.")
+            return redirect('chef_buffet')
+
+        # Переключение доступности
+        elif 'toggle_availability' in request.POST:
+            product_id = request.POST.get('product_id')
+            product = get_object_or_404(BuffetProduct, id=product_id)
+            product.is_available = not product.is_available
+            product.save()
+
+            status = "доступен" if product.is_available else "недоступен"
+            messages.success(request, f"Товар '{product.name}' теперь {status}.")
+            return redirect('chef_buffet')
+
+        # Редактирование товара
+        elif 'edit_product' in request.POST:
+            product_id = request.POST.get('product_id')
+            product = get_object_or_404(BuffetProduct, id=product_id)
+            form = BuffetProductForm(request.POST, instance=product)
+            if form.is_valid():
+                form.save()
+                messages.success(request, f"Товар '{product.name}' успешно обновлён!")
+                return redirect('chef_buffet')
+            else:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"Ошибка в поле '{field}': {error}")
+
+    form = BuffetProductForm()
+
+    # Фильтрация по категории
+    category_filter = request.GET.get('category', '')
+    if category_filter:
+        products = products.filter(category=category_filter)
+
     return render(request, 'main/chef_dashboard/chef_buffet.html', {
+        'products': products,
+        'form': form,
+        'available_count': available_count,
+        'low_stock_count': low_stock_count,
+        'out_of_stock_count': out_of_stock_count,
+        'category_filter': category_filter,
+        'category_choices': BuffetProduct.CATEGORY_CHOICES,
     })

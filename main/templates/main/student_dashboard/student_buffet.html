@@ -2,4 +2,169 @@
 {% load static %}
 {% block title %} Буфет{% endblock %}
 {% block body %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-store-alt me-2"></i>Буфет
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Фильтры по категории -->
+                    <div class="mb-3">
+                        <h5>Категории товаров:</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{% url 'student_buffet' %}"
+                               class="btn btn-sm {% if not category_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                Все товары
+                            </a>
+                            {% for value, label in category_choices %}
+                            <a href="?category={{ value }}"
+                               class="btn btn-sm {% if category_filter == value %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                {{ label }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Информация о наличии -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Здесь вы можете заказать дополнительные продукты из буфета.
+                                Обратите внимание на наличие аллергенов и статус товара.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for product in products %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 product-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ product.name }}</h5>
+                    <span class="badge {{ product.category_badge_class }}">{{ product.get_category_display }}</span>
+                </div>
+
+                <div class="card-body">
+                    {% if product.description %}
+                    <p class="card-text">{{ product.description }}</p>
+                    {% endif %}
+
+                    {% if product.ingredients %}
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <strong>Состав:</strong> {{ product.ingredients|truncatechars:80 }}
+                        </small>
+                    </div>
+                    {% endif %}
+
+                    <!-- Аллергены -->
+                    {% if product.has_non_critical_allergens %}
+                    <div class="alert alert-warning alert-sm mb-3">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        <small>
+                            <strong>Внимание!</strong> Содержит аллергены:
+                            {% for allergen in product.non_critical_allergens_list %}
+                            {{ allergen.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </small>
+                    </div>
+                    {% endif %}
+
+                    <!-- Статус наличия -->
+                    <div class="mb-3">
+                        {% if product.is_out_of_stock %}
+                        <div class="alert alert-danger alert-sm">
+                            <i class="fas fa-times-circle me-1"></i>
+                            <small>Товар временно отсутствует</small>
+                        </div>
+                        {% elif product.is_low_stock %}
+                        <div class="alert alert-warning alert-sm">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <small>Осталось мало, торопитесь!</small>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-success alert-sm">
+                            <i class="fas fa-check-circle me-1"></i>
+                            <small>Есть в наличии</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0 text-primary">{{ product.price }} руб.</h4>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary {% if product.is_out_of_stock %}disabled{% endif %}"
+                                    {% if product.is_out_of_stock %}disabled{% endif %}
+                                    onclick="orderBuffetProduct({{ product.id }}, {{ product.price }})">
+                                <i class="fas fa-shopping-cart me-1"></i>
+                                {% if product.is_out_of_stock %}Нет в наличии{% else %}Заказать{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-store-slash fa-3x text-muted mb-3"></i>
+                <h5>Товары не найдены</h5>
+                <p class="text-muted">В буфете пока нет доступных товаров</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.product-card {
+    transition: transform 0.2s;
+    border: 1px solid #dee2e6;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.alert-sm {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+.bg-pink {
+    background-color: #e83e8c !important;
+}
+</style>
+
+<script>
+function orderBuffetProduct(productId, price) {
+    const balance = parseFloat(document.getElementById('balanceAmount').innerText);
+
+    if (balance < price) {
+        alert('Недостаточно средств на счете!');
+        showTopUpModal();
+        return;
+    }
+
+    if (!confirm(`Заказать товар за ${price} руб.?`)) {
+        return;
+    }
+
+    // Здесь можно добавить AJAX-запрос для оформления заказа
+    // Пока просто покажем сообщение
+    alert('Заказ оформлен! Функция оплаты будет добавлена позже.');
+}
+</script>
 {% endblock %}

@@ -211,3 +211,47 @@ class ProductRemaining(models.Model):
     def is_low_stock(self):
         """Проверяет, есть ли низкий запас продукта"""
         return self.quantity <= self.min_quantity
+
+
+# Добавьте в конец models.py или после модели ProductRemaining
+class BuffetProduct(models.Model):
+    CATEGORY_CHOICES = [
+        ('baked', 'Выпечка'),
+        ('sweets', 'Сладости'),
+        ('drinks', 'Напитки'),
+        ('snacks', 'Закуски'),
+        ('other', 'Другое'),
+    ]
+
+    name = models.CharField(max_length=200, verbose_name="Название товара")
+    description = models.TextField(verbose_name="Описание", blank=True)
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default='other',
+        verbose_name="Категория"
+    )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена",
+        default=0.00
+    )
+    ingredients = models.TextField(verbose_name="Состав", blank=True)
+    allergens = models.ManyToManyField(Allergen, blank=True, verbose_name="Аллергены")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+    is_available = models.BooleanField(default=True, verbose_name="Доступен")
+    stock_quantity = models.IntegerField(
+        default=0,
+        verbose_name="Количество в наличии"
+    )
+
+    class Meta:
+        verbose_name = "Буфетный товар"
+        verbose_name_plural = "Буфетные товары"
+        ordering = ['category', 'name']
+
+    def __str__(self):
+        available = "✓" if self.is_available else "✗"
+        return f"{self.name} ({self.get_category_display()}) - {self.price} руб. [{available}]"
