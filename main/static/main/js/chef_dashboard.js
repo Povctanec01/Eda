@@ -228,3 +228,35 @@ function hideAllEditForms() {
         productRows[i].style.display = '';
     }
 }
+function showEditForm_buffet(productId) {
+    // Скрываем все формы редактирования
+    document.querySelectorAll('.edit-product-form').forEach(form => {
+        form.style.display = 'none';
+    });
+
+    // Скрываем карточку товара
+    document.getElementById('product-' + productId).style.display = 'none';
+
+    // Показываем нужную форму
+    document.getElementById('edit-form-' + productId).style.display = 'block';
+
+    // Прокручиваем к форме
+    document.getElementById('edit-form-' + productId).scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+}
+
+function hideEditForm_buffet(productId) {
+    // Скрываем форму редактирования
+    document.getElementById('edit-form-' + productId).style.display = 'none';
+
+    // Показываем карточку товара
+    document.getElementById('product-' + productId).style.display = 'block';
+
+    // Прокручиваем к карточке
+    document.getElementById('product-' + productId).scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+}

@@ -3,39 +3,43 @@
 {% block title %} Буфет{% endblock %}
 {% block body %}
 <div class="container-fluid">
+    <!-- Заголовок и информация -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-store-alt me-2"></i>Буфет
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <!-- Фильтры по категории -->
-                    <div class="mb-3">
-                        <h5>Категории товаров:</h5>
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="{% url 'student_buffet' %}"
-                               class="btn btn-sm {% if not category_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                                Все товары
-                            </a>
-                            {% for value, label in category_choices %}
-                            <a href="?category={{ value }}"
-                               class="btn btn-sm {% if category_filter == value %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                                {{ label }}
-                            </a>
-                            {% endfor %}
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">
+                                <i class="fas fa-store-alt me-2"></i>Школьный буфет
+                            </h3>
+                            <p class="mb-0 opacity-75">Ассортимент дополнительных продуктов</p>
+                        </div>
+                        <div class="text-end">
+                            <div class="badge bg-light text-primary p-2">
+                                <i class="fas fa-eye me-1"></i>
+                                Только просмотр
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Информация о наличии -->
-                    <div class="row mb-3">
-                        <div class="col-12">
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>Как сделать заказ?</h5>
+                            <ol class="mb-0">
+                                <li>Выберите интересующий товар</li>
+                                <li>Проверьте наличие и состав</li>
+                                <li>Обратитесь к сотруднику столовой</li>
+                                <li>Оплатите заказ на месте</li>
+                            </ol>
+                        </div>
+                        <div class="col-md-4">
                             <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>
-                                Здесь вы можете заказать дополнительные продукты из буфета.
-                                Обратите внимание на наличие аллергенов и статус товара.
+                                <h6><i class="fas fa-clock me-1"></i>Часы работы буфета:</h6>
+                                <p class="mb-0">Пн-Пт: 8:00 - 16:00</p>
+                                <p class="mb-0">Сб: 9:00 - 14:00</p>
+                                <p class="mb-0">Вс: выходной</p>
                             </div>
                         </div>
                     </div>
@@ -44,127 +48,186 @@
         </div>
     </div>
 
-    <div class="row">
-        {% for product in products %}
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card h-100 product-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">{{ product.name }}</h5>
-                    <span class="badge {{ product.category_badge_class }}">{{ product.get_category_display }}</span>
-                </div>
-
+    <!-- Фильтры -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
                 <div class="card-body">
-                    {% if product.description %}
-                    <p class="card-text">{{ product.description }}</p>
-                    {% endif %}
-
-                    {% if product.ingredients %}
-                    <div class="mb-3">
-                        <small class="text-muted">
-                            <strong>Состав:</strong> {{ product.ingredients|truncatechars:80 }}
-                        </small>
+                    <h5 class="mb-3">
+                        <i class="fas fa-filter me-2"></i>Фильтровать по категориям:
+                    </h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'student_buffet' %}"
+                           class="btn {% if not category_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            <i class="fas fa-th-large me-1"></i>Все товары
+                        </a>
+                        {% for value, label in category_choices %}
+                        <a href="?category={{ value }}"
+                           class="btn {% if category_filter == value %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            <i class="fas
+                                {% if value == 'baked' %}fa-bread-slice
+                                {% elif value == 'sweets' %}fa-candy-cane
+                                {% elif value == 'drinks' %}fa-glass-whiskey
+                                {% elif value == 'snacks' %}fa-cheese
+                                {% else %}fa-box{% endif %}
+                                me-1"></i>
+                            {{ label }}
+                        </a>
+                        {% endfor %}
                     </div>
-                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Аллергены -->
-                    {% if product.has_non_critical_allergens %}
-                    <div class="alert alert-warning alert-sm mb-3">
-                        <i class="fas fa-exclamation-triangle me-1"></i>
-                        <small>
-                            <strong>Внимание!</strong> Содержит аллергены:
-                            {% for allergen in product.non_critical_allergens_list %}
-                            {{ allergen.name }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        </small>
+
+
+    <!-- Список товаров -->
+    <div class="row">
+        {% if products %}
+            {% for product in products %}
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 product-card">
+                    <!-- Статус наличия в заголовке -->
+                    <div class="card-header position-relative">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-truncate">{{ product.name }}</h5>
+                            <span class="badge {{ product.category_badge_class }}">
+                                {{ product.get_category_display }}
+                            </span>
+                        </div>
+
+                        <!-- Бейдж статуса -->
+                        <div class="position-absolute top-0 end-0 mt-2 me-2">
+                            {% if product.is_out_of_stock %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-ban"></i> Нет
+                            </span>
+                            {% elif product.is_low_stock %}
+                            <span class="badge bg-warning">
+                                <i class="fas fa-exclamation"></i> Мало
+                            </span>
+                            {% else %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check"></i> Есть
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
-                    {% endif %}
 
-                    <!-- Статус наличия -->
-                    <div class="mb-3">
-                        {% if product.is_out_of_stock %}
-                        <div class="alert alert-danger alert-sm">
-                            <i class="fas fa-times-circle me-1"></i>
-                            <small>Товар временно отсутствует</small>
+                    <div class="card-body">
+                        <!-- Цена -->
+                        <div class="text-center mb-3">
+                            <h2 class="text-primary">{{ product.price }} <small class="text-muted">руб.</small></h2>
                         </div>
-                        {% elif product.is_low_stock %}
-                        <div class="alert alert-warning alert-sm">
-                            <i class="fas fa-exclamation-triangle me-1"></i>
-                            <small>Осталось мало, торопитесь!</small>
-                        </div>
-                        {% else %}
-                        <div class="alert alert-success alert-sm">
-                            <i class="fas fa-check-circle me-1"></i>
-                            <small>Есть в наличии</small>
+
+                        <!-- Описание -->
+                        {% if product.description %}
+                        <div class="mb-3">
+                            <h6><i class="fas fa-align-left me-1"></i>Описание:</h6>
+                            <p class="small">{{ product.description }}</p>
                         </div>
                         {% endif %}
-                    </div>
-                </div>
 
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0 text-primary">{{ product.price }} руб.</h4>
+                        <!-- Состав -->
+                        {% if product.ingredients %}
+                        <div class="mb-3">
+                            <h6><i class="fas fa-list me-1"></i>Состав:</h6>
+                            <p class="small text-muted">{{ product.ingredients }}</p>
                         </div>
-                        <div>
-                            <button class="btn btn-primary {% if product.is_out_of_stock %}disabled{% endif %}"
-                                    {% if product.is_out_of_stock %}disabled{% endif %}
-                                    onclick="orderBuffetProduct({{ product.id }}, {{ product.price }})">
-                                <i class="fas fa-shopping-cart me-1"></i>
-                                {% if product.is_out_of_stock %}Нет в наличии{% else %}Заказать{% endif %}
-                            </button>
+                        {% endif %}
+
+                        <!-- Наличие -->
+                        <div class="mb-3">
+                            <h6><i class="fas fa-boxes me-1"></i>На складе:</h6>
+                            <div class="d-flex align-items-center">
+                                {% if product.is_out_of_stock %}
+                                <i class="fas fa-times-circle text-danger me-2 fa-lg"></i>
+                                <div>
+                                    <p class="mb-0 text-danger"><strong>Нет в наличии</strong></p>
+                                    <small class="text-muted">Ожидается поставка</small>
+                                </div>
+                                {% elif product.is_low_stock %}
+                                <i class="fas fa-exclamation-triangle text-warning me-2 fa-lg"></i>
+                                <div>
+                                    <p class="mb-0 text-warning"><strong>Мало на складе</strong></p>
+                                    <small class="text-muted">Осталось: {{ product.stock_quantity }} шт.</small>
+                                </div>
+                                {% else %}
+                                <i class="fas fa-check-circle text-success me-2 fa-lg"></i>
+                                <div>
+                                    <p class="mb-0 text-success"><strong>В наличии</strong></p>
+                                    <small class="text-muted">Доступно: {{ product.stock_quantity }} шт.</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Аллергены -->
+                        <div class="mb-3">
+                            <h6><i class="fas fa-allergies me-1"></i>Аллергены:</h6>
+                            {% if product.allergens.all %}
+                            <div class="allergen-tags">
+                                {% for allergen in product.allergens.all %}
+                                <span class="allergen-tag
+                                    {% if allergen in user.profile.critical_allergens.all %}critical
+                                    {% elif allergen in user.profile.non_critical_allergens.all %}non-critical
+                                    {% else %}neutral{% endif %}">
+                                    {{ allergen.name }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-success alert-sm mb-0">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Без аллергенов
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Информация о заказе -->
+                    <div class="card-footer bg-light border-top">
+                        <div class="text-center">
+                            <p class="mb-1">
+                                <i class="fas fa-info-circle text-primary me-1"></i>
+                                <small class="text-muted">
+                                    Для заказа обратитесь к сотруднику столовой
+                                </small>
+                            </p>
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                Обновлено: {{ product.updated_at|date:"d.m.Y H:i" }}
+                            </small>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {% empty %}
+            {% endfor %}
+        {% else %}
         <div class="col-12">
-            <div class="text-center py-5">
-                <i class="fas fa-store-slash fa-3x text-muted mb-3"></i>
-                <h5>Товары не найдены</h5>
-                <p class="text-muted">В буфете пока нет доступных товаров</p>
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-store-slash fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">Товары не найдены</h4>
+                    <p class="text-muted mb-4">
+                        {% if category_filter %}
+                        В категории "{{ category_filter }}" пока нет товаров
+                        {% else %}
+                        В буфете пока нет доступных товаров
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'student_buffet' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-1"></i>Смотреть все товары
+                    </a>
+                </div>
             </div>
         </div>
-        {% endfor %}
+        {% endif %}
     </div>
 </div>
 
 <style>
-.product-card {
-    transition: transform 0.2s;
-    border: 1px solid #dee2e6;
-}
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-.alert-sm {
-    padding: 0.5rem 0.75rem;
-    margin-bottom: 0.5rem;
-    font-size: 0.85rem;
-}
-.bg-pink {
-    background-color: #e83e8c !important;
-}
+
 </style>
-
-<script>
-function orderBuffetProduct(productId, price) {
-    const balance = parseFloat(document.getElementById('balanceAmount').innerText);
-
-    if (balance < price) {
-        alert('Недостаточно средств на счете!');
-        showTopUpModal();
-        return;
-    }
-
-    if (!confirm(`Заказать товар за ${price} руб.?`)) {
-        return;
-    }
-
-    // Здесь можно добавить AJAX-запрос для оформления заказа
-    // Пока просто покажем сообщение
-    alert('Заказ оформлен! Функция оплаты будет добавлена позже.');
-}
-</script>
 {% endblock %}

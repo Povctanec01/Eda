@@ -1,7 +1,6 @@
 # main/forms.py
 from django import forms
-from .models import Card, CardBuys, Allergen, ProductRemaining
-
+from .models import Card, CardBuys, Allergen, ProductRemaining, BuffetProduct
 
 class CardForm(forms.ModelForm):
     class Meta:
@@ -80,9 +79,7 @@ class ProductRemainingForm(forms.ModelForm):
             'min_quantity': 'Минимальный запас',
         }
 
-# Добавьте в forms.py
-from django import forms
-from main.models import BuffetProduct
+
 
 class BuffetProductForm(forms.ModelForm):
     class Meta:

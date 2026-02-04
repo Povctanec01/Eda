@@ -1270,3 +1270,23 @@ body {
     border-radius: 5px;
     display: inline-block;
 }
+.product-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-color: #007bff;
+}
+.product-card .card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 2px solid #dee2e6;
+    padding: 1rem 1.25rem;
+}
+.allergen-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}

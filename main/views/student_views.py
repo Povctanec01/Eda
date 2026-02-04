@@ -386,7 +386,7 @@ def update_non_critical_allergens(request):
 
     return redirect('student_allergens')
 
-# Обновите функцию buffet в student_views.py:
+
 @login_required
 def student_buffet(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
@@ -442,11 +442,17 @@ def student_buffet(request):
         # Проверяем наличие на складе
         if product.stock_quantity == 0:
             product.is_out_of_stock = True
+            product.availability_text = "Нет в наличии"
+            product.availability_class = "text-danger"
         elif product.stock_quantity < 10:
             product.is_low_stock = True
+            product.availability_text = f"Мало ({product.stock_quantity} шт.)"
+            product.availability_class = "text-warning"
         else:
             product.is_out_of_stock = False
             product.is_low_stock = False
+            product.availability_text = f"В наличии ({product.stock_quantity} шт.)"
+            product.availability_class = "text-success"
 
         filtered_products.append(product)
 
