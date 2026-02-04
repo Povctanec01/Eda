@@ -25,6 +25,7 @@ urlpatterns = [
     path('student/allergens/critical/update/',update_critical_allergens, name='update_critical_allergens'),
     path('student/allergens/non-critical/update/',update_non_critical_allergens, name='update_non_critical_allergens'),
     path('student/top-up-balance/', student_views.top_up_balance, name='student_top_up_balance'),
+    path('studen_buffet', student_views.buffet, name='student_buffet'),
 
 #chef
     path('chef_home_page',chef_views.chef_home_page, name='chef_home_page'),
@@ -38,6 +39,7 @@ urlpatterns = [
     path('chef/allergens/',chef_allergens, name='chef_allergens'),
     path('chef/get-allergens/',chef_views.get_allergens, name='get_allergens'),
     path('chef/remaining-product/', chef_views.chef_remaining_product, name='chef_remaining_product'),
+    path('chef_buffet', chef_views.buffet, name='chef_buffet'),
 
 #admin
     path('admin_dashboard/admin_home_page',admin_views.admin_home_page, name='admin_home_page'),

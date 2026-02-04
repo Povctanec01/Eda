@@ -385,3 +385,11 @@ def update_non_critical_allergens(request):
         messages.success(request, "Некритичные аллергены обновлены!")
 
     return redirect('student_allergens')
+
+@login_required
+def buffet(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+
+    return render(request, 'main/student_dashboard/student_buffet.html', {
+    })

@@ -60,6 +60,10 @@
                 <i class="fas fa-utensils"></i>
                 <span>Меню</span>
             </a>
+            <a href="{% url 'student_buffet' %}" {% if request.resolver_match.url_name == 'student_buffet' %}class="active"{% endif %}>
+                <i class="fas fa-utensils"></i>
+                <span>Буфет</span>
+            </a>
             <a href="{% url 'student_my_orders' %}" {% if request.resolver_match.url_name == 'student_my_orders' %}class="active"{% endif %}>
                 <i class="fas fa-shopping-cart"></i>
                 <span>Мои заказы</span>

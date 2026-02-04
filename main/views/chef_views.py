@@ -405,3 +405,12 @@ def get_allergens(request):
         'items': results,
         'total_count': total_count
     })
+
+
+@login_required
+def buffet(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'chef':
+        return redirect('login')
+
+    return render(request, 'main/chef_dashboard/chef_buffet.html', {
+    })

@@ -59,6 +59,10 @@
                 <i class="fas fa-utensils"></i>
                 <span>Меню</span>
                 </a>
+                <a href="{% url 'chef_buffet' %}" {% if request.resolver_match.url_name == 'chef_buffet' %}class="active"{% endif %}>
+                <i class="fas fa-utensils"></i>
+                <span>Буфет</span>
+                </a>
                 <a href="{% url 'chef_allergens' %}" {% if request.resolver_match.url_name == 'chef_allergens' %}class="active"{% endif %}>
                 <i class="fas fa-exclamation-triangle"></i>
                 <span>Аллергены</span>
