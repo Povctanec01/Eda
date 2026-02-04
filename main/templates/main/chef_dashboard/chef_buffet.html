@@ -180,7 +180,7 @@
                                         <span class="badge {% if product.is_available %}bg-success{% else %}bg-danger{% endif %}">
                                             {{ product.is_available|yesno:"Доступен,Не доступен" }}
                                         </span>
-                                    </div>
+                                </div>
                                 </div>
                                 <div class="text-end">
                                     <h5 class="text-primary">{{ product.price }} руб.</h5>
@@ -365,12 +365,4 @@
         </div>
     </div>
 </div>
-
-<style>
-
-</style>
-
-<script>
-
-</script>
 {% endblock %}

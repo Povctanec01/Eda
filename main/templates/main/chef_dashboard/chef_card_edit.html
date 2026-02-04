@@ -171,7 +171,7 @@
                         <!-- Кнопка редактирования -->
                         <button type="button"
                                 class="btn btn-outline-primary btn-sm"
-                                onclick="showEditForm('{{ card.id }}')"
+                                onclick="showDishEditForm('{{ card.id }}')"
                                 title="Редактировать блюдо">
                             <i class="fas fa-edit"></i> Редактировать
                         </button>
@@ -298,7 +298,7 @@
                                         <i class="fas fa-save"></i> Сохранить изменения
                                     </button>
                                     <button type="button" class="btn btn-secondary"
-                                            onclick="hideEditForm('{{ card.id }}')">
+                                            onclick="hideDishEditForm('{{ card.id }}')">
                                         Отмена
                                     </button>
                                 </div>
@@ -318,48 +318,4 @@
         </div>
     </div>
 </div>
-
-<script>
-    function showEditForm(cardId) {
-        // Скрываем все формы редактирования
-        document.querySelectorAll('.edit-dish-form').forEach(form => {
-            form.style.display = 'none';
-        });
-        // Показываем нужную форму
-        document.getElementById('edit-form-' + cardId).style.display = 'block';
-        // Прокручиваем к форме
-        document.getElementById('edit-form-' + cardId).scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function hideEditForm(cardId) {
-        document.getElementById('edit-form-' + cardId).style.display = 'none';
-    }
-
-    function showMeals(type) {
-        const dishes = document.querySelectorAll('.dish-item');
-        dishes.forEach(dish => {
-            const mealType = dish.dataset.mealType;
-            const isHidden = dish.dataset.hidden === 'true';
-
-            if (type === 'Все') {
-                dish.style.display = 'block';
-            } else if (type === mealType) {
-                dish.style.display = 'block';
-            } else {
-                dish.style.display = 'none';
-            }
-        });
-    }
-
-    function toggleVisibilityFilter() {
-        const dishes = document.querySelectorAll('.dish-item');
-        dishes.forEach(dish => {
-            const isHidden = dish.dataset.hidden === 'true';
-            if (isHidden) {
-                dish.style.display = dish.style.display === 'none' ? 'block' : 'none';
-            }
-        });
-    }
-</script>
-
 {% endblock %}

@@ -67,31 +67,30 @@ function markAllPrepared() {
         .catch(err => console.error(err));
     });
 }
-$(document).ready(function() {
-    // Инициализация Select2 для поля аллергенов
-    $('#id_allergens').select2({
-        placeholder: "Выберите аллергены",
-        allowClear: true,
-        language: "ru",
-        width: '100%',
-        dropdownParent: $('.menu-management'),
-        // Закрытие при клике вне поля (это поведение по умолчанию в Select2)
-        closeOnSelect: false // Оставляем dropdown открытым после выбора
-    });
 
-    // Select2 автоматически закрывает dropdown при клике вне элемента
-    // но мы можем добавить дополнительную обработку
-    $(document).on('click', function(e) {
-        // Если клик был не по Select2 и не внутри его dropdown
-        if (!$(e.target).closest('.select2-container').length) {
-            // Закрываем все открытые Select2 dropdown
-            $('.select2-container--open').removeClass('select2-container--open');
-            $('.select2-dropdown').hide();
-        }
-    });
-});
+// === Инициализация Select2 для поля аллергенов ===
+function initSelect2() {
+    if ($('#id_allergens').length) {
+        $('#id_allergens').select2({
+            placeholder: "Выберите аллергены",
+            allowClear: true,
+            language: "ru",
+            width: '100%',
+            dropdownParent: $('.menu-management'),
+            closeOnSelect: false
+        });
 
-// Функция для фильтрации блюд по типу
+        // Закрытие при клике вне поля
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.select2-container').length) {
+                $('.select2-container--open').removeClass('select2-container--open');
+                $('.select2-dropdown').hide();
+            }
+        });
+    }
+}
+
+// === Функция для фильтрации блюд по типу ===
 function showMeals(type) {
     const items = document.querySelectorAll('.dish-item');
 
@@ -104,16 +103,26 @@ function showMeals(type) {
         }
     });
 }
-// Функция для фильтрации скрытых блюд
+
+// === Функция для фильтрации скрытых блюд ===
 function toggleVisibilityFilter() {
     const items = document.querySelectorAll('.dish-item');
-    const showHiddenOnly = true; // или реализуйте переключение
+    let showHiddenOnly = false;
+
+    // Определяем текущее состояние
+    const firstItem = items[0];
+    if (firstItem) {
+        const isHidden = firstItem.getAttribute('data-hidden') === 'true';
+        const isVisible = firstItem.style.display !== 'none';
+        showHiddenOnly = isHidden && isVisible;
+    }
 
     items.forEach(item => {
         const isHidden = item.getAttribute('data-hidden') === 'true';
         item.style.display = showHiddenOnly ? (isHidden ? 'block' : 'none') : 'block';
     });
 }
+
 // === Обновление счётчика в боковом меню ===
 function updateOrdersBadge(delta) {
     const badge = document.getElementById('ordersBadge');
@@ -122,6 +131,162 @@ function updateOrdersBadge(delta) {
     current += delta;
     if (current < 0) current = 0;
     badge.textContent = current;
+}
+
+// === Функция для поиска продуктов ===
+function filterProducts() {
+    const input = document.getElementById('productSearch');
+    if (!input) return;
+
+    const filter = input.value.toLowerCase();
+    const rows = document.getElementsByClassName('product-row');
+
+    for (let i = 0; i < rows.length; i++) {
+        const productName = rows[i].getElementsByTagName('td')[0].innerText.toLowerCase();
+        if (productName.includes(filter)) {
+            rows[i].style.display = '';
+        } else {
+            rows[i].style.display = 'none';
+        }
+    }
+}
+
+// === Функция для показа формы изменения количества ===
+function showQuantityForm(productId) {
+    // Скрываем все другие формы редактирования
+    hideAllEditForms();
+
+    // Показываем нужную форму
+    const formRow = document.getElementById('quantity-form-' + productId);
+    const productRow = document.getElementById('product-row-' + productId);
+
+    if (formRow && productRow) {
+        formRow.style.display = 'table-row';
+        productRow.style.display = 'none';
+    }
+}
+
+// === Функция для скрытия формы изменения количества ===
+function hideQuantityForm(productId) {
+    const formRow = document.getElementById('quantity-form-' + productId);
+    const productRow = document.getElementById('product-row-' + productId);
+
+    if (formRow && productRow) {
+        formRow.style.display = 'none';
+        productRow.style.display = '';
+    }
+}
+
+// === Функция для показа формы полного редактирования ===
+function showEditForm(productId) {
+    // Скрываем все другие формы редактирования
+    hideAllEditForms();
+
+    // Показываем нужную форму
+    const formRow = document.getElementById('edit-form-' + productId);
+    const productRow = document.getElementById('product-row-' + productId);
+
+    if (formRow && productRow) {
+        formRow.style.display = 'table-row';
+        productRow.style.display = 'none';
+    }
+}
+
+// === Функция для скрытия формы полного редактирования ===
+function hideEditForm(productId) {
+    const formRow = document.getElementById('edit-form-' + productId);
+    const productRow = document.getElementById('product-row-' + productId);
+
+    if (formRow && productRow) {
+        formRow.style.display = 'none';
+        productRow.style.display = '';
+    }
+}
+
+// === Функция для показа формы редактирования буфета ===
+function showEditForm_buffet(productId) {
+    // Скрываем все формы редактирования
+    document.querySelectorAll('.edit-product-form').forEach(form => {
+        form.style.display = 'none';
+    });
+
+    // Скрываем карточку товара
+    const productElement = document.getElementById('product-' + productId);
+    if (productElement) {
+        productElement.style.display = 'none';
+    }
+
+    // Показываем нужную форму
+    const formElement = document.getElementById('edit-form-' + productId);
+    if (formElement) {
+        formElement.style.display = 'block';
+
+        // Прокручиваем к форме
+        formElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+}
+
+// === Функция для скрытия формы редактирования буфета ===
+function hideEditForm_buffet(productId) {
+    // Скрываем форму редактирования
+    const formElement = document.getElementById('edit-form-' + productId);
+    if (formElement) {
+        formElement.style.display = 'none';
+    }
+
+    // Показываем карточку товара
+    const productElement = document.getElementById('product-' + productId);
+    if (productElement) {
+        productElement.style.display = 'block';
+
+        // Прокручиваем к карточке
+        productElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+}
+
+// === Функция для скрытия всех форм редактирования ===
+function hideAllEditForms() {
+    const editForms = document.getElementsByClassName('edit-form-row');
+    const productRows = document.getElementsByClassName('product-row');
+
+    // Скрываем все формы редактирования
+    for (let i = 0; i < editForms.length; i++) {
+        editForms[i].style.display = 'none';
+    }
+
+    // Показываем все строки продуктов
+    for (let i = 0; i < productRows.length; i++) {
+        productRows[i].style.display = '';
+    }
+}
+
+// === Функция для управления карточками блюд ===
+function showDishEditForm(cardId) {
+    // Скрываем все формы редактирования
+    document.querySelectorAll('.edit-dish-form').forEach(form => {
+        form.style.display = 'none';
+    });
+
+    // Показываем нужную форму
+    const formElement = document.getElementById('edit-form-' + cardId);
+    if (formElement) {
+        formElement.style.display = 'block';
+        // Прокручиваем к форме
+        formElement.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function hideDishEditForm(cardId) {
+    const formElement = document.getElementById('edit-form-' + cardId);
+    if (formElement) {
+        formElement.style.display = 'none';
+    }
 }
 
 // === Инициализация при загрузке ===
@@ -144,119 +309,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof window.djangoData !== 'undefined' && window.djangoData.allOrdersCount !== undefined) {
         updateOrdersBadge(window.djangoData.allOrdersCount - (parseInt(document.getElementById('ordersBadge').textContent) || 0));
     }
+
+    // Инициализируем Select2
+    initSelect2();
 });
-    // Функция для поиска продуктов
-function filterProducts() {
-    const input = document.getElementById('productSearch');
-    const filter = input.value.toLowerCase();
-    const rows = document.getElementsByClassName('product-row');
 
-    for (let i = 0; i < rows.length; i++) {
-        const productName = rows[i].getElementsByTagName('td')[0].innerText.toLowerCase();
-        if (productName.includes(filter)) {
-            rows[i].style.display = '';
-        } else {
-            rows[i].style.display = 'none';
-        }
-    }
-}
-
-// Функция для показа формы изменения количества
-function showQuantityForm(productId) {
-    // Скрываем все другие формы редактирования
-    hideAllEditForms();
-
-    // Показываем нужную форму
-    const formRow = document.getElementById('quantity-form-' + productId);
-    const productRow = document.getElementById('product-row-' + productId);
-
-    if (formRow && productRow) {
-        formRow.style.display = 'table-row';
-        productRow.style.display = 'none';
-    }
-}
-
-// Функция для скрытия формы изменения количества
-function hideQuantityForm(productId) {
-    const formRow = document.getElementById('quantity-form-' + productId);
-    const productRow = document.getElementById('product-row-' + productId);
-
-    if (formRow && productRow) {
-        formRow.style.display = 'none';
-        productRow.style.display = '';
-    }
-}
-
-// Функция для показа формы полного редактирования
-function showEditForm(productId) {
-    // Скрываем все другие формы редактирования
-    hideAllEditForms();
-
-    // Показываем нужную форму
-    const formRow = document.getElementById('edit-form-' + productId);
-    const productRow = document.getElementById('product-row-' + productId);
-
-    if (formRow && productRow) {
-        formRow.style.display = 'table-row';
-        productRow.style.display = 'none';
-    }
-}
-
-// Функция для скрытия формы полного редактирования
-function hideEditForm(productId) {
-    const formRow = document.getElementById('edit-form-' + productId);
-    const productRow = document.getElementById('product-row-' + productId);
-
-    if (formRow && productRow) {
-        formRow.style.display = 'none';
-        productRow.style.display = '';
-    }
-}
-
-// Функция для скрытия всех форм редактирования
-function hideAllEditForms() {
-    const editForms = document.getElementsByClassName('edit-form-row');
-    const productRows = document.getElementsByClassName('product-row');
-
-    // Скрываем все формы редактирования
-    for (let i = 0; i < editForms.length; i++) {
-        editForms[i].style.display = 'none';
-    }
-
-    // Показываем все строки продуктов
-    for (let i = 0; i < productRows.length; i++) {
-        productRows[i].style.display = '';
-    }
-}
-function showEditForm_buffet(productId) {
-    // Скрываем все формы редактирования
-    document.querySelectorAll('.edit-product-form').forEach(form => {
-        form.style.display = 'none';
-    });
-
-    // Скрываем карточку товара
-    document.getElementById('product-' + productId).style.display = 'none';
-
-    // Показываем нужную форму
-    document.getElementById('edit-form-' + productId).style.display = 'block';
-
-    // Прокручиваем к форме
-    document.getElementById('edit-form-' + productId).scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-    });
-}
-
-function hideEditForm_buffet(productId) {
-    // Скрываем форму редактирования
-    document.getElementById('edit-form-' + productId).style.display = 'none';
-
-    // Показываем карточку товара
-    document.getElementById('product-' + productId).style.display = 'block';
-
-    // Прокручиваем к карточке
-    document.getElementById('product-' + productId).scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-    });
-}
+// === Инициализация jQuery при готовности ===
+$(document).ready(function() {
+    initSelect2();
+});
