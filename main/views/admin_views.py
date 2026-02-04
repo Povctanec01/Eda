@@ -308,6 +308,51 @@ def generate_finance_pdf(request):
 
     return response
 
+class StaffRegistrationForm(forms.Form):
+    username = forms.CharField(
+        max_length=150,
+        label="Имя пользователя",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    password1 = forms.CharField(
+        label="Пароль",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+    password2 = forms.CharField(
+        label="Подтвердите пароль",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+    role = forms.ChoiceField(
+        choices=[('chef', 'Повар'), ('admin', 'Администратор')],
+        label="Роль",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("Пользователь с таким именем уже существует.")
+        return username
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Пароли не совпадают")
+        if password1 and len(password1) < 8:
+            raise forms.ValidationError("Пароль должен содержать минимум 8 символов")
+        return cleaned_data
+
+    def save(self):
+        username = self.cleaned_data['username']
+        password = self.cleaned_data['password1']
+        role = self.cleaned_data['role']
+        user = User.objects.create_user(username=username, password=password)
+        user.profile.role = role
+        user.profile.save()
+        return user
+
 @login_required
 def admin_home_page(request):
     if not request.user.is_authenticated or request.user.profile.role != 'admin':
