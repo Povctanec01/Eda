@@ -160,39 +160,40 @@ def chef_card_edit(request):
         form = CardForm()
 
     #Удаление
-    if request.method == 'POST' and 'delete' in request.POST:
-        card_id = request.POST.get('card_id')
-        card = get_object_or_404(Card, id=card_id)
-        card.delete()
-        messages.success(request, "Блюдо удалено.")
-        return redirect('chef_card_edit')
+    if request.method == 'POST':
+        if 'delete' in request.POST:
+            card_id = request.POST.get('card_id')
+            card = get_object_or_404(Card, id=card_id)
+            card.delete()
+            messages.success(request, "Блюдо удалено.")
+            return redirect('chef_card_edit')
 
-    # Изменения видимости блюдо (скрыто/показано)
-    if request.method == 'POST' and 'toggle_visibility' in request.POST:
-        card_id = request.POST.get('card_id')
-        card = get_object_or_404(Card, id=card_id)
-        card.is_hidden = not card.is_hidden
-        card.save()
+        # Изменения видимости блюдо (скрыто/показано)
+        if 'toggle_visibility' in request.POST:
+            card_id = request.POST.get('card_id')
+            card = get_object_or_404(Card, id=card_id)
+            card.is_hidden = not card.is_hidden
+            card.save()
 
-        action = "скрыто" if card.is_hidden else "отображено"
-        messages.success(request, f"Блюдо «{card.title}» {action}.")
-        return redirect('chef_card_edit')
+            action = "скрыто" if card.is_hidden else "отображено"
+            messages.success(request, f"Блюдо «{card.title}» {action}.")
+            return redirect('chef_card_edit')
 
-    # Обработка редактирования блюда
-    if request.method == 'POST' and 'edit_card' in request.POST:
-        card_id = request.POST.get('card_id')
-        card = get_object_or_404(Card, id=card_id)
+        # Обработка редактирования блюда
+        if 'edit_card' in request.POST:
+            card_id = request.POST.get('card_id')
+            card = get_object_or_404(Card, id=card_id)
 
-        form = CardForm(request.POST, instance=card)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f"Блюдо «{card.title}» успешно обновлено!")
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"Ошибка в поле '{field}': {error}")
+            form = CardForm(request.POST, instance=card)
+            if form.is_valid():
+                form.save()
+                messages.success(request, f"Блюдо «{card.title}» успешно обновлено!")
+            else:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"Ошибка в поле '{field}': {error}")
 
-        return redirect('chef_card_edit')
+            return redirect('chef_card_edit')
 
     # Количество скрытых блюд
     hidden_count = cards.filter(is_hidden=True).count()
