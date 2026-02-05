@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 
-from main.models import Card, Order, CardBuys, Profile, Allergen, ProductRemaining
+from main.models import Card, Order, CardBuys, Profile, Allergen, ProductRemaining, Review
 from main.forms import CardForm, CardFormBuys, ProductRemainingForm
 from datetime import timedelta, time
 from django.utils import timezone
@@ -180,11 +180,23 @@ def chef_orders(request):
     orders = Order.objects.filter(status='pending').select_related('user', 'card').order_by('ordered_at')
     return render(request, 'main/chef_dashboard/chef_orders.html', {'orders': orders})
 
-
+from django.db.models import Avg, Count
 @login_required
 def chef_card_edit(request):
     if not request.user.is_authenticated or request.user.profile.role != 'chef':
         return redirect('login')
+
+    cards = Card.objects.all().order_by('meal_type', 'title')  # ДОБАВИТЬ ЗДЕСЬ
+
+    for card in cards:  # Теперь cards определен
+        reviews = Review.objects.filter(card=card)
+        if reviews.exists():
+            avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+            card.average_rating = round(avg_rating, 1)
+            card.review_count = reviews.count()
+        else:
+            card.average_rating = None
+            card.review_count = 0
 
     if request.method == 'POST' and 'add' in request.POST:
         form = CardForm(request.POST)
@@ -232,10 +244,6 @@ def chef_card_edit(request):
                     messages.error(request, f"Ошибка в поле '{field}': {error}")
 
         return redirect('chef_card_edit')
-
-    # Получаем все блюда, включая скрытые
-    cards = Card.objects.all().order_by('meal_type', 'title')
-
     # Считаем количество скрытых блюд
     hidden_count = cards.filter(is_hidden=True).count()
 

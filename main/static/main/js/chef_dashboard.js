@@ -107,20 +107,27 @@ function showMeals(type) {
 // === Функция для фильтрации скрытых блюд ===
 function toggleVisibilityFilter() {
     const items = document.querySelectorAll('.dish-item');
-    let showHiddenOnly = false;
+    const button = document.querySelector('button[onclick*="toggleVisibilityFilter"]');
+    let currentState = button.getAttribute('data-state') || 'all'; // Сохраняем состояние в атрибуте кнопки
 
-    // Определяем текущее состояние
-    const firstItem = items[0];
-    if (firstItem) {
-        const isHidden = firstItem.getAttribute('data-hidden') === 'true';
-        const isVisible = firstItem.style.display !== 'none';
-        showHiddenOnly = isHidden && isVisible;
+    if (currentState === 'all') {
+        // Переключаемся на показ только скрытых
+        items.forEach(item => {
+            const isHidden = item.getAttribute('data-hidden') === 'true';
+            item.style.display = isHidden ? 'block' : 'none';
+        });
+
+        button.innerHTML = '<i class="fas fa-eye"></i> Показать все';
+        button.setAttribute('data-state', 'hidden-only');
+    } else {
+        // Показываем все блюда
+        items.forEach(item => {
+            item.style.display = 'block';
+        });
+
+        button.innerHTML = '<i class="fas fa-eye-slash"></i> Показать скрытые';
+        button.setAttribute('data-state', 'all');
     }
-
-    items.forEach(item => {
-        const isHidden = item.getAttribute('data-hidden') === 'true';
-        item.style.display = showHiddenOnly ? (isHidden ? 'block' : 'none') : 'block';
-    });
 }
 
 // === Обновление счётчика в боковом меню ===

@@ -689,3 +689,123 @@ body {
         width: 100%;
     }
 }
+/* Стили для рейтинга */
+.star-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.star-rating .fas.fa-star,
+.star-rating .fas.fa-star-half-alt {
+    color: #ffc107;
+}
+
+.star-rating .far.fa-star {
+    color: #e0e0e0;
+}
+
+/* Виджет рейтинга для отзывов */
+.rating-widget .stars {
+    display: flex;
+    gap: 5px;
+}
+
+.rating-widget .star {
+    font-size: 24px;
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.2s;
+}
+
+.rating-widget .star.fas {
+    color: #ffc107;
+}
+
+.rating-widget .star.hover {
+    color: #ffdb70;
+}
+
+/* Карточка с рейтингом */
+.dish-rating {
+    font-size: 14px;
+}
+
+.rating-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #fff8e1;
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid #ffecb3;
+    font-size: 12px;
+}
+
+.rating-badge .stars {
+    margin-right: 4px;
+}
+/* Стили для отзывов */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.review-item {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.review-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.review-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.review-text {
+    margin: 10px 0;
+    color: #555;
+    line-height: 1.5;
+}
+
+.review-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.section-box {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.section-box h4 {
+    margin-bottom: 20px;
+    color: #333;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.rating-widget {
+    margin-top: 10px;
+}

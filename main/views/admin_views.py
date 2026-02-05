@@ -1,12 +1,13 @@
 from django import forms
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Avg
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import time, datetime, timedelta
-from main.models import Card, Order, CardBuys, Profile
+from main.models import Card, Order, CardBuys, Profile, Review
 from main.forms import CardForm, CardFormBuys
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -432,11 +433,27 @@ def admin_settings(request):
     return render(request, 'main/admin_dashboard/admin_settings.html')
 
 
+from django.db.models import Avg
+
+
 @login_required
 def admin_card_edit(request):
     if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
+
     form = CardForm()
+    cards = Card.objects.all().order_by('meal_type', 'title')
+
+    # РАССЧИТЫВАЕМ РЕЙТИНГИ ДЛЯ КАЖДОГО БЛЮДА
+    for card in cards:
+        reviews = Review.objects.filter(card=card)
+        if reviews.exists():
+            avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+            card.average_rating = round(avg_rating, 1)
+            card.review_count = reviews.count()
+        else:
+            card.average_rating = None
+            card.review_count = 0
 
     if request.method == 'POST' and 'delete' in request.POST:
         card_id = request.POST.get('card_id')
@@ -445,7 +462,7 @@ def admin_card_edit(request):
         messages.success(request, "Блюдо удалено.")
         return redirect('admin_card_edit')
 
-    if request.method == 'POST' and 'toggle_visibility' in request.POST :
+    if request.method == 'POST' and 'toggle_visibility' in request.POST:
         card_id = request.POST.get('card_id')
         card = get_object_or_404(Card, id=card_id)
         card.is_hidden = not card.is_hidden
@@ -455,10 +472,18 @@ def admin_card_edit(request):
         messages.success(request, f"Блюдо «{card.title}» {action}.")
         return redirect('admin_card_edit')
 
+    # Добавьте также для добавления блюда, если у вас есть такая форма
+    if request.method == 'POST' and 'add' in request.POST:
+        form = CardForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Блюдо добавлено!")
+            return redirect('admin_card_edit')
 
-    cards = Card.objects.all().order_by('meal_type', 'title')
-    return render(request, 'main/admin_dashboard/admin_card_edit.html', {'form': form, 'cards': cards})
-
+    return render(request, 'main/admin_dashboard/admin_card_edit.html', {
+        'form': form,
+        'cards': cards  # Теперь с рассчитанными рейтингами
+    })
 
 @login_required
 def admin_buys(request):

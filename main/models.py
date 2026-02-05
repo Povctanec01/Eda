@@ -255,3 +255,38 @@ class BuffetProduct(models.Model):
     def __str__(self):
         available = "✓" if self.is_available else "✗"
         return f"{self.name} ({self.get_category_display()}) - {self.price} руб. [{available}]"
+class Review(models.Model):
+    """Модель для отзывов студентов на блюда"""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name='reviews'
+    )
+    card = models.ForeignKey(
+        Card,
+        on_delete=models.CASCADE,
+        verbose_name="Блюдо",
+        related_name='reviews'
+    )
+    rating = models.IntegerField(
+        verbose_name="Оценка",
+        choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')]
+    )
+    comment = models.TextField(
+        verbose_name="Комментарий",
+        blank=True,
+        null=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+
+    class Meta:
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
+        # Один отзыв на одно блюдо от одного пользователя
+        unique_together = ['user', 'card']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} → {self.card.title}: {self.rating}★"

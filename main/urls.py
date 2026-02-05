@@ -2,6 +2,7 @@ from django.urls import path
 from .views import common_views, student_views, chef_views, admin_views
 from .views.chef_views import chef_allergens
 from main.views.student_views import update_critical_allergens, update_non_critical_allergens
+from main.views.student_views import submit_review, delete_review
 
 urlpatterns = [
     path('',common_views.index, name='index'),
@@ -53,4 +54,6 @@ urlpatterns = [
     path('admin_dashboard/users/delete-selected/',admin_views.admin_users_delete_selected, name='admin_users_delete_selected'),
     path('admin_finance/pdf/', admin_views.generate_finance_pdf, name='generate_finance_pdf'),
 
+    path('student/submit-review/', submit_review, name='submit_review'),
+    path('student/delete-review/<int:review_id>/', delete_review, name='delete_review'),
 ]

@@ -27,11 +27,35 @@
         <div class="menu-item" data-meal-type="{{ card.meal_type }}">
             <h4>{{ card.title }}</h4>
             <p class="text-muted">{{ card.description|default:"Без описания" }}</p>
+
+            <!-- Отображение рейтинга -->
+            <div class="dish-rating mb-2">
+                {% if card.average_rating %}
+                <div class="star-rating">
+                    {% with avg_rating=card.average_rating %}
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= avg_rating %}
+                                <i class="fas fa-star text-warning"></i>
+                            {% elif forloop.counter|add:"-0.5" <= avg_rating %}
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                            {% else %}
+                                <i class="far fa-star text-warning"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <small class="text-muted ml-1">({{ card.average_rating|floatformat:1 }})</small>
+                        <small class="text-muted">отзывов: {{ card.review_count }}</small>
+                    {% endwith %}
+                </div>
+                {% else %}
+                <small class="text-muted">Нет оценок</small>
+                {% endif %}
+            </div>
+
             <span class="badge {{ card.badge_class }}">
-            <span class="badge bg-success text-white" style="margin-left: 5px;">
-                {{ card.price }} руб.
-            </span>
-            {{ card.get_meal_type_display }}
+                <span class="badge bg-success text-white" style="margin-left: 5px;">
+                    {{ card.price }} руб.
+                </span>
+                {{ card.get_meal_type_display }}
             </span>
             <!-- Отображение аллергенов -->
             {% if card.allergens.exists %}

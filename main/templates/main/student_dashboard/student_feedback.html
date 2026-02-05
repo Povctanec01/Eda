@@ -1,49 +1,209 @@
 {% extends 'main/student_dashboard/student_base.html' %}
 {% load static %}
-{% block title %} Отзывы{% endblock %}
+{% block title %}Отзывы{% endblock %}
 {% block body %}
-<div class="dashboard-section">
-    <div class="reviews-container">
-        <h2><i class="fas fa-star"></i> Мои отзывы</h2>
-        <button class="btn btn-primary" onclick="openReviewModal()">
-        <i class="fas fa-plus"></i> Оставить новый отзыв
-        </button>
-        <div class="reviews-list">
-            <div class="review-item">
-                <div class="review-header">
-                    <h4>Омлет с овощами</h4>
-                    <div class="review-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
+
+<div class="reviews-container">
+    <h2><i class="fas fa-star"></i> Мои оценки</h2>
+
+    <!-- Блюда для оценки -->
+    {% if evaluable_orders %}
+    <div class="section-box mb-4">
+        <h4><i class="fas fa-pen"></i> Оцените ваши заказы</h4>
+        <div class="row">
+            {% for order in evaluable_orders %}
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ order.card.title }}</h5>
+                        <p class="card-text text-muted small">
+                            Заказано: {{ order.ordered_at|date:"d.m.Y" }}
+                        </p>
+                        <div class="rating-widget text-center" data-card-id="{{ order.card.id }}">
+                            <div class="stars mb-3">
+                                {% for i in "12345" %}
+                                <i class="far fa-star star" data-rating="{{ forloop.counter }}"></i>
+                                {% endfor %}
+                            </div>
+                            <button class="btn btn-primary submit-review">
+                                <i class="fas fa-check"></i> Оценить
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <p class="review-text">Очень вкусный и сытный завтрак! Овощи свежие, омлет хорошо приготовлен.</p>
-                <div class="review-footer">
-                    <span class="review-date">26.01.2024</span>
-                    <button class="btn btn-sm btn-outline" onclick="editReview(this)">Изменить</button>
-                </div>
             </div>
-            <div class="review-item">
-                <div class="review-header">
-                    <h4>Суп куриный</h4>
-                    <div class="review-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                <p class="review-text">Отличный суп! Наваристый, с большим количеством курицы. Люблю его особенно в холодные дни.</p>
-                <div class="review-footer">
-                    <span class="review-date">25.01.2024</span>
-                    <button class="btn btn-sm btn-outline" onclick="editReview(this)">Изменить</button>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
+    {% else %}
+    <div class="alert alert-info mb-4">
+        <i class="fas fa-info-circle"></i> У вас нет новых заказов для оценки.
+    </div>
+    {% endif %}
+
+    <!-- Мои оценки -->
+    <div class="section-box">
+        <h4><i class="fas fa-history"></i> Мои оценки</h4>
+        {% if user_reviews %}
+        <div class="reviews-list">
+            {% for review in user_reviews %}
+            <div class="review-item" id="review-{{ review.id }}">
+                <div class="review-header">
+                    <h5>{{ review.card.title|default:"[Блюдо удалено]" }}</h5>
+                    <div class="review-rating">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                            <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                            <i class="far fa-star text-warning"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <small class="text-muted ml-1">{{ review.rating }}/5</small>
+                    </div>
+                </div>
+                <div class="review-footer">
+                    <span class="review-date">{{ review.created_at|date:"d.m.Y H:i" }}</span>
+                    <button class="btn btn-sm btn-outline-danger"
+                            onclick="deleteReview({{ review.id }})">
+                        Удалить
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> У вас пока нет оценок.
+        </div>
+        {% endif %}
+    </div>
 </div>
+
+{% csrf_token %}
+<script>
+// Обработка звёздного рейтинга
+document.querySelectorAll('.rating-widget').forEach(widget => {
+    const stars = widget.querySelectorAll('.star');
+    const submitBtn = widget.querySelector('.submit-review');
+    let selectedRating = 0;
+
+    // Клик по звезде
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const rating = parseInt(star.dataset.rating);
+            selectedRating = rating;
+
+            // Обновляем отображение звезд
+            stars.forEach((s, index) => {
+                if (index < rating) {
+                    s.classList.remove('far');
+                    s.classList.add('fas');
+                } else {
+                    s.classList.remove('fas');
+                    s.classList.add('far');
+                }
+            });
+        });
+    });
+
+    // Отправка оценки
+    submitBtn.addEventListener('click', () => {
+        if (selectedRating === 0) {
+            alert('Пожалуйста, поставьте оценку');
+            return;
+        }
+
+        const cardId = widget.dataset.cardId;
+
+        // Получаем CSRF токен
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Отправка AJAX запроса
+        fetch('{% url "submit_review" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken
+            },
+            body: new URLSearchParams({
+                'card_id': cardId,
+                'rating': selectedRating
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Оценка отправлена!');
+                location.reload();
+            } else {
+                alert('Ошибка: ' + (data.error || 'Неизвестная ошибка'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Произошла ошибка при отправке оценки');
+        });
+    });
+});
+
+// Удаление оценки
+function deleteReview(reviewId) {
+    if (confirm('Удалить эту оценку?')) {
+        window.location.href = '{% url "delete_review" 0 %}'.replace('0', reviewId);
+    }
+}
+</script>
+
+<style>
+.star-rating {
+    font-size: 14px;
+    color: #ffc107;
+}
+
+.star {
+    font-size: 24px;
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.2s;
+    margin: 0 5px;
+}
+
+.star.fas {
+    color: #ffc107;
+}
+
+.review-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: white;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.review-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.review-date {
+    color: #666;
+}
+
+.rating-widget .stars {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+</style>
 {% endblock %}

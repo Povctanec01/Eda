@@ -3,11 +3,14 @@ from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from main.models import Card, Order, Allergen, BuffetProduct
+from main.models import Card, Order, Allergen, BuffetProduct, Review
 from django.utils import timezone
-from datetime import time, datetime
+from datetime import time, datetime, timedelta
 from django.contrib.auth import logout
 from django.contrib import messages
+# Добавьте в начало student_views.py
+from django.db.models import Avg
+from main.models import Card, Order, Allergen, BuffetProduct, Review  # Добавьте Review
 
 @login_required
 def student_home_page(request):
@@ -48,7 +51,7 @@ def student_home_page(request):
             allergens__in=critical_allergens
         ).distinct()
 
-    # Добавляем информацию об аллергенах для каждого блюда
+    # Добавляем информацию об аллергенах и рейтингах для каждого блюда
     filtered_cards = []
     for card in today_cards:
         # Проверяем некритические аллергены
@@ -71,6 +74,17 @@ def student_home_page(request):
             card.badge_class = 'bg-primary'
         else:
             card.badge_class = 'bg-secondary'
+
+        # Добавляем информацию о рейтинге
+        reviews = Review.objects.filter(card=card)
+        if reviews.exists():
+            from django.db.models import Avg
+            avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+            card.average_rating = round(avg_rating, 1)
+            card.review_count = reviews.count()
+        else:
+            card.average_rating = None
+            card.review_count = 0
 
         filtered_cards.append(card)
 
@@ -219,12 +233,110 @@ def student_menu(request):
         'cards': cards
     })
 
+
+@login_required
 def student_feedback(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
-    if not request.user.is_authenticated:
+
+    # Проверьте, что эти запросы возвращают данные
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+
+    evaluable_orders = Order.objects.filter(
+        user=request.user,
+        ordered_at__gte=thirty_days_ago,
+        status__in=['ready', 'received']
+    ).select_related('card').order_by('-ordered_at')
+
+    # Отладочный вывод
+    print(f"Evaluable orders count: {evaluable_orders.count()}")
+
+    reviewed_card_ids = Review.objects.filter(
+        user=request.user
+    ).values_list('card_id', flat=True)
+
+    evaluable_orders = evaluable_orders.exclude(card_id__in=reviewed_card_ids)
+
+    user_reviews = Review.objects.filter(
+        user=request.user
+    ).select_related('card').order_by('-created_at')
+
+    print(f"User reviews count: {user_reviews.count()}")
+
+    return render(request, 'main/student_dashboard/student_feedback.html', {
+        'evaluable_orders': evaluable_orders,
+        'user_reviews': user_reviews
+    })
+
+
+@login_required
+def submit_review(request):
+    """Обработчик отправки отзыва"""
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return JsonResponse({'success': False, 'error': 'Доступ запрещен'})
+
+    if request.method == 'POST':
+        try:
+            card_id = request.POST.get('card_id')
+            rating = int(request.POST.get('rating', 0))
+
+            if not card_id:
+                return JsonResponse({'success': False, 'error': 'Блюдо не выбрано'})
+
+            if rating < 1 or rating > 5:
+                return JsonResponse({'success': False, 'error': 'Оценка должна быть от 1 до 5'})
+
+            # Проверяем, что заказ существует и принадлежит пользователю
+            card = get_object_or_404(Card, id=card_id)
+
+            # Проверяем, что у пользователя был заказ этого блюда
+            has_order = Order.objects.filter(
+                user=request.user,
+                card=card,
+                status__in=['ready', 'received']
+            ).exists()
+
+            if not has_order:
+                return JsonResponse({'success': False, 'error': 'Вы не заказывали это блюдо'})
+
+            # Проверяем, нет ли уже отзыва
+            existing_review = Review.objects.filter(
+                user=request.user,
+                card=card
+            ).first()
+
+            if existing_review:
+                # Обновляем существующий отзыв - теперь только рейтинг
+                existing_review.rating = rating
+                existing_review.comment = None  # Очищаем комментарий
+                existing_review.save()
+                messages.success(request, f"Оценка для {card.title} обновлена!")
+            else:
+                # Создаем новый отзыв без комментария
+                Review.objects.create(
+                    user=request.user,
+                    card=card,
+                    rating=rating
+                )
+                messages.success(request, f"Спасибо за оценку {card.title}!")
+
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
+
+@login_required
+def delete_review(request, review_id):
+    """Удаление отзыва"""
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
-    return render(request, 'main/student_dashboard/student_feedback.html')
+
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+    review.delete()
+    messages.success(request, "Отзыв удален")
+    return redirect('student_feedback')
 
 
 @login_required
