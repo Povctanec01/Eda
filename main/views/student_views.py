@@ -400,17 +400,6 @@ def toggle_like(request, card_id):
     return redirect('student_likes')
 
 
-@login_required
-def student_order_history(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'student':
-        return redirect('login')
-
-    # Все заказы пользователя, от новых к старым
-    orders = Order.objects.filter(user=request.user).select_related('card').order_by('-ordered_at')
-
-    return render(request, 'main/student_dashboard/student_order_history.html', {
-        'orders': orders
-    })
 
 @login_required
 def student_my_orders(request):

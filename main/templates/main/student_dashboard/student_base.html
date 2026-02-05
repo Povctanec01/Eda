@@ -85,10 +85,6 @@
                 <i class="fas fa-star"></i>
                 <span>Отзывы</span>
             </a>
-            <a href="{% url 'student_order_history' %}" {% if request.resolver_match.url_name == 'student_order_history' %}class="active"{% endif %}>
-              <i class="fas fa-history"></i>
-              <span>История заказов</span>
-            </a>
             <a href="{% url 'student_settings' %}" {% if request.resolver_match.url_name == 'student_settings' %}class="active"{% endif %}>
               <i class="fas fa-cog"></i>
               <span>Настройки</span>

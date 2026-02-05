@@ -18,7 +18,6 @@ urlpatterns = [
     path('student_feedback',student_views.student_feedback, name='student_feedback'),
     path('student_menu',student_views.student_menu, name='student_menu'),
     path('student_my_orders',student_views.student_my_orders, name='student_my_orders'),
-    path('student_order_history',student_views.student_order_history, name='student_order_history'),
     path('student_settings',student_views.student_settings, name='student_settings'),
     path('student/order/create/<int:card_id>/',student_views.student_order_create, name='student_order_create'),
     path('student/order/<int:order_id>/mark-received/',student_views.student_mark_received, name='student_mark_received'),
