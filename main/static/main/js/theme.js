@@ -77,11 +77,13 @@ class ThemeManager {
 
     addThemeListeners() {
         // Обработка системных изменений темы
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!localStorage.getItem('theme')) {
-                this.applyTheme(e.matches ? 'dark' : 'light');
-            }
-        });
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) {
+                    this.applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        }
     }
 
     // Метод для получения текущей темы извне

@@ -90,7 +90,7 @@
                             <div class="order-actions">
                                 {% if order.status == 'pending' %}
                                 <span class="badge bg-orange">В ожидании</span>
-                                <form method="post" class="mark-ready-form" data-order-id="{{ order.id }}" style="display:inline;">
+                                <form method="post" class="mark-ready-form" style="display:inline;" onsubmit="markAsReady(event, {{ order.id }})">
                                     {% csrf_token %}
                                     <input type="hidden" name="order_id" value="{{ order.id }}">
                                     <button type="submit" class="btn btn-success btn-sm">

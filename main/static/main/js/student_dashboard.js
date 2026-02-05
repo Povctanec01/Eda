@@ -52,10 +52,12 @@ function markAllPrepared() {
 // Функция для переключения чекбокса при клике по всей карточке
 function toggleCheckbox(checkboxId) {
     const checkbox = document.getElementById(checkboxId);
+    if (!checkbox) return;
+
     checkbox.checked = !checkbox.checked;
     // Имитируем событие изменения, чтобы обновить счетчик
     checkbox.dispatchEvent(new Event('change'));
-    
+
     // Показываем уведомление для аллергенов
     const allergenItem = checkbox.closest('.allergen-item');
     if (allergenItem) {
@@ -83,20 +85,32 @@ function updateCount(type, isChecked) {
 
 // Функции для работы с балансом
 function showTopUpModal() {
-    document.getElementById('topUpModal').style.display = 'block';
+    const modal = document.getElementById('topUpModal');
+    if (modal) {
+        modal.style.display = 'block';
+    }
 }
 
 function closeTopUpModal() {
-    document.getElementById('topUpModal').style.display = 'none';
-    document.getElementById('topUpAmount').value = '';
+    const modal = document.getElementById('topUpModal');
+    if (modal) {
+        modal.style.display = 'none';
+        const amountInput = document.getElementById('topUpAmount');
+        if (amountInput) amountInput.value = '';
+    }
 }
 
 function setAmount(amount) {
-    document.getElementById('topUpAmount').value = amount;
+    const amountInput = document.getElementById('topUpAmount');
+    if (amountInput) {
+        amountInput.value = amount;
+    }
 }
 
 function topUpBalance() {
     const amountInput = document.getElementById('topUpAmount');
+    if (!amountInput) return;
+
     const amount = parseFloat(amountInput.value);
 
     if (!amount || amount < 10 || amount > 10000) {
@@ -118,7 +132,9 @@ function topUpBalance() {
         if (data.success) {
             // Обновляем баланс на странице
             const balanceElement = document.getElementById('balanceAmount');
-            balanceElement.textContent = data.new_balance.toFixed(2);
+            if (balanceElement) {
+                balanceElement.textContent = data.new_balance.toFixed(2);
+            }
 
             // Обновляем баланс в сайдбаре
             const sidebarBalance = document.querySelector('.user-balance strong');
@@ -216,6 +232,8 @@ function handleOrder(cardId, cardTitle) {
 
 // Функция для обработки успешного сохранения аллергенов
 function handleAllergenSave(form, type) {
+    if (!form) return;
+
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -248,64 +266,6 @@ function handleAllergenSave(form, type) {
     });
 }
 
-// Функция для получения CSRF токена
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-// Функция для показа кастомных уведомлений
-function showNotification(title, message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `floating-notification ${type}`;
-
-    const typeIcons = {
-        'success': 'fa-check-circle',
-        'error': 'fa-times-circle',
-        'warning': 'fa-exclamation-triangle',
-        'info': 'fa-info-circle'
-    };
-
-    notification.innerHTML = `
-        <div class="notification-header">
-            <div class="d-flex align-items-center">
-                <i class="fas ${typeIcons[type] || 'fa-info-circle'} me-2"></i>
-                <h6 class="notification-title mb-0">${title}</h6>
-            </div>
-            <button class="notification-close" onclick="this.parentElement.parentElement.classList.add('fade-out')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <p class="notification-content">${message}</p>
-    `;
-
-    document.body.appendChild(notification);
-
-    // Показать с анимацией
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-
-    // Автоматическое скрытие через 5 секунд
-    setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, 5000);
-}
 
 // Функция для отметки заказа как полученного
 function markOrderReceived(orderId) {
@@ -315,7 +275,7 @@ function markOrderReceived(orderId) {
 // Функция для фильтрации блюд по типу
 function showMeals(mealType) {
     const dishItems = document.querySelectorAll('.dish-item');
-    
+
     dishItems.forEach(item => {
         if (mealType === 'Все' || item.dataset.mealType === mealType) {
             item.style.display = 'block';
@@ -323,6 +283,17 @@ function showMeals(mealType) {
             item.style.display = 'none';
         }
     });
+}
+
+// Функции для отчетов (добавлены)
+function generateReport(period) {
+    console.log('Генерация отчета за период:', period);
+    showNotification('Информация', `Генерация отчета за ${period}...`, 'info');
+}
+
+function viewDayDetails(date) {
+    console.log('Просмотр деталей дня:', date);
+    showNotification('Информация', `Просмотр деталей дня ${date}...`, 'info');
 }
 
 // Инициализация при загрузке страницы
@@ -344,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Обновляем отображение
     const criticalCountElement = document.getElementById('critical-count');
     const noncriticalCountElement = document.getElementById('noncritical-count');
-    
+
     if (criticalCountElement) criticalCountElement.textContent = `Всего: ${criticalCount}`;
     if (noncriticalCountElement) noncriticalCountElement.textContent = `Всего: ${noncriticalCount}`;
 
@@ -395,6 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
 // Функция для обработки отметки "Я забрал"
 function handleMarkReceived(event, form) {
     event.preventDefault(); // Останавливаем стандартную отправку
@@ -443,3 +415,5 @@ window.updateCount = updateCount;
 window.showMeals = showMeals;
 window.handleOrder = handleOrder;
 window.markOrderReceived = markOrderReceived;
+window.generateReport = generateReport;
+window.viewDayDetails = viewDayDetails;

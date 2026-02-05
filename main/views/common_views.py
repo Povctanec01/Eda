@@ -3,6 +3,24 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect
 from main.models import Profile
 
+# main/views.py (или в любом другом приложении)
+from django.shortcuts import render
+from django.http import Http404
+
+def custom_404(request, exception=None):
+    """
+    Кастомная страница 404
+    """
+    context = {
+        'error_message': str(exception) if exception else 'Страница не найдена',
+        'request_path': request.path,
+    }
+    return render(request, '404.html', context, status=404)
+
+def custom_500(request):
+    """Кастомная страница 500"""
+    return render(request, '500.html', status=500)
+
 #Переход в профиль при нажатии на кнопку 'Войти в профиль'
 def enter_profile(request):
     if not request.user.is_authenticated:

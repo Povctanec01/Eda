@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
+#Профиль
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=[('student', 'Student'), ('chef', 'Chef'), ('admin', 'Admin')])
@@ -34,7 +34,7 @@ class Profile(models.Model):
         help_text="Блюда с этими аллергенами будут отображаться с предупреждением"
     )
 
-    # ОТметка понравившегося
+    # Отметка понравившегося
     liked_cards = models.ManyToManyField(
         'Card',
         related_name='liked_by_profiles',
@@ -114,6 +114,7 @@ class Card(models.Model):
     class Meta:
         verbose_name = "Блюдо"
         verbose_name_plural = "Блюда"
+
 
 # Закупки шефа
 class CardBuys(models.Model):
@@ -215,6 +216,7 @@ class ProductRemaining(models.Model):
         """Проверяет, есть ли низкий запас продукта"""
         return self.quantity <= self.min_quantity
 
+
 # Буфет
 class BuffetProduct(models.Model):
     CATEGORY_CHOICES = [
@@ -257,6 +259,7 @@ class BuffetProduct(models.Model):
     def __str__(self):
         available = "✓" if self.is_available else "✗"
         return f"{self.name} ({self.get_category_display()}) - {self.price} руб. [{available}]"
+
 
 #Отзывы о блюдах
 class Review(models.Model):

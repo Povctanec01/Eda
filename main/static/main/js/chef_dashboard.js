@@ -1,34 +1,92 @@
 // === Функция: отметить один заказ как готовый ===
+
+// === Функция: отметить один заказ как готовый ===
 function markAsReady(event, orderId) {
     event.preventDefault();
-    const form = event.target;
-    fetch('', {
+
+    // Ищем форму по ID или другому селектору
+    const form = document.querySelector(`form[onsubmit*="${orderId}"]`) || event.target;
+
+    // Проверяем форму
+    if (!form) {
+        console.error('Форма не найдена для заказа', orderId);
+        alert('Форма не найдена');
+        return;
+    }
+
+    // Ищем CSRF токен внутри формы
+    const csrfTokenInput = form.querySelector('[name=csrfmiddlewaretoken]');
+    if (!csrfTokenInput) {
+        alert('Ошибка CSRF токена в форме');
+        return;
+    }
+
+    // Создаем FormData
+    const formData = new FormData(form);
+
+    // Для отладки - выводим данные формы
+    console.log('Отправляемые данные:', Object.fromEntries(formData.entries()));
+
+    // Получаем текущий URL
+    const currentUrl = window.location.pathname;
+
+    // Отправляем запрос
+    fetch(currentUrl, {
         method: 'POST',
-        body: new FormData(form),
+        body: formData,
         headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-CSRFToken': csrfTokenInput.value,
+            'X-Requested-With': 'XMLHttpRequest'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Статус ответа:', response.status);
+
+        // Проверяем успешность ответа
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Пытаемся получить JSON
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return response.json();
+        } else {
+            // Если сервер возвращает не JSON
+            return response.text().then(text => {
+                console.log('Не-JSON ответ:', text);
+                throw new Error('Сервер вернул не JSON');
+            });
+        }
+    })
     .then(data => {
-        if (data.success) {
+        console.log('Ответ сервера:', data);
+
+        if (data && data.success) {
             // Удаляем карточку
             const el = document.getElementById('order-' + orderId);
-            if (el) el.remove();
-
-            // Обновляем счётчик в боковом меню
-            const badge = document.getElementById('ordersBadge');
-            if (badge) {
-                let current = parseInt(badge.textContent);
-                if (!isNaN(current) && current > 0) {
-                    badge.textContent = current - 1;
-                }
+            if (el) {
+                el.style.opacity = '0.5';
+                setTimeout(() => el.remove(), 300);
             }
+
+            // Обновляем счётчик
+            updateOrdersBadge(-1);
+
+            // Показываем уведомление
+            if (typeof showNotification === 'function') {
+                showNotification('Блюдо готово', 'Хорошая работа!', 'success');
+            } else {
+                alert('Заказ отмечен как готовый!');
+            }
+        } else {
+            const errorMsg = data.error || data.message || 'Неизвестная ошибка сервера';
+            alert('Ошибка: ' + errorMsg);
         }
     })
     .catch(err => {
-        alert('Ошибка при обновлении заказа');
-        console.error(err);
+        console.error('Ошибка при обновлении заказа:', err);
+        alert('Ошибка при обновлении заказа: ' + err.message);
     });
 }
 
@@ -41,7 +99,10 @@ function markAllPrepared() {
     const total = forms.length;
 
     forms.forEach(form => {
-        const orderId = form.querySelector('input[name="order_id"]').value;
+        const orderIdInput = form.querySelector('input[name="order_id"]');
+        if (!orderIdInput) return;
+
+        const orderId = orderIdInput.value;
         fetch('', {
             method: 'POST',
             body: new FormData(form),
@@ -70,8 +131,15 @@ function markAllPrepared() {
 
 // === Инициализация Select2 для поля аллергенов ===
 function initSelect2() {
-    if ($('#id_allergens').length) {
-        $('#id_allergens').select2({
+    // Проверяем наличие jQuery
+    if (typeof $ === 'undefined') {
+        console.warn('jQuery не загружен, Select2 не будет инициализирован');
+        return;
+    }
+
+    const allergensSelect = $('#id_allergens');
+    if (allergensSelect.length) {
+        allergensSelect.select2({
             placeholder: "Выберите аллергены",
             allowClear: true,
             language: "ru",
@@ -108,6 +176,8 @@ function showMeals(type) {
 function toggleVisibilityFilter() {
     const items = document.querySelectorAll('.dish-item');
     const button = document.querySelector('button[onclick*="toggleVisibilityFilter"]');
+    if (!button) return;
+
     let currentState = button.getAttribute('data-state') || 'all'; // Сохраняем состояние в атрибуте кнопки
 
     if (currentState === 'all') {
@@ -296,32 +366,9 @@ function hideDishEditForm(cardId) {
     }
 }
 
-// === Инициализация при загрузке ===
-document.addEventListener('DOMContentLoaded', function () {
-    // Обновляем дату
-    const months = [
-        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
-    ];
-    const now = new Date();
-    const day = now.getDate();
-    const month = months[now.getMonth()];
-    const year = now.getFullYear();
-    const dateElement = document.getElementById('currentDate');
-    if (dateElement) {
-        dateElement.textContent = `${day} ${month} ${year}`;
-    }
-
-    // Обновляем счётчик заказов из Django
-    if (typeof window.djangoData !== 'undefined' && window.djangoData.allOrdersCount !== undefined) {
-        updateOrdersBadge(window.djangoData.allOrdersCount - (parseInt(document.getElementById('ordersBadge').textContent) || 0));
-    }
-
-    // Инициализируем Select2
-    initSelect2();
-});
-
 // === Инициализация jQuery при готовности ===
-$(document).ready(function() {
-    initSelect2();
-});
+if (typeof $ !== 'undefined') {
+    $(document).ready(function() {
+        initSelect2();
+    });
+}

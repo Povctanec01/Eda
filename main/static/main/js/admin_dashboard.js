@@ -2,65 +2,15 @@
 // ОСНОВНЫЕ УТИЛИТЫ И ХЕЛПЕРЫ
 // ============================================
 
-// Получение CSRF токена
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+// Валидация URL
+function isValidUrl(url) {
+    try {
+        new URL(url, window.location.origin);
+        return true;
+    } catch {
+        return false;
     }
-    return cookieValue;
 }
-
-// Функция для показа уведомлений
-function showNotification(title, message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `floating-notification ${type}`;
-
-    const typeIcons = {
-        'success': 'fa-check-circle',
-        'error': 'fa-times-circle',
-        'warning': 'fa-exclamation-triangle',
-        'info': 'fa-info-circle'
-    };
-
-    notification.innerHTML = `
-        <div class="notification-header">
-            <div class="d-flex align-items-center">
-                <i class="fas ${typeIcons[type] || 'fa-info-circle'} me-2"></i>
-                <h6 class="notification-title mb-0">${title}</h6>
-            </div>
-            <button class="notification-close" onclick="this.parentElement.parentElement.classList.add('fade-out')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <p class="notification-content">${message}</p>
-    `;
-
-    document.body.appendChild(notification);
-
-    // Показать с анимацией
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-
-    // Автоматическое скрытие через 5 секунд
-    setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, 5000);
-}
-
 // Глобальная функция для AJAX действий
 function handleAdminAction(url, method = 'POST', data = {}, successMessage, errorMessage) {
     const csrfToken = getCookie('csrftoken');
@@ -117,7 +67,6 @@ function updateDeleteButton() {
 // Подтверждение удаления пользователей
 function confirmUserDeletion(selectedUsernames) {
     const adminUsernames = [];
-    const superuserUsernames = [];
 
     // Проверить, нет ли среди выбранных администраторов
     selectedUsernames.forEach(username => {
@@ -179,6 +128,11 @@ function performUserDeletion(selectedUsernames) {
 
     if (!csrfToken) {
         showNotification('Ошибка', 'Ошибка CSRF токена. Пожалуйста, обновите страницу.', 'error');
+        return;
+    }
+
+    if (!deleteUrl || !isValidUrl(deleteUrl)) {
+        showNotification('Ошибка', 'Неверный URL для удаления', 'error');
         return;
     }
 
@@ -565,6 +519,27 @@ function handleDeleteAccountForm() {
             }
         });
     }
+}
+
+// ============================================
+// ФУНКЦИИ ДЛЯ ОТЧЕТОВ (добавлены)
+// ============================================
+
+function generateReport(period) {
+    console.log('Генерация отчета за период:', period);
+    showNotification('Информация', `Генерация отчета за ${period}...`, 'info');
+    // Реализация генерации отчета
+}
+
+function viewDayDetails(date) {
+    console.log('Просмотр деталей дня:', date);
+    showNotification('Информация', `Просмотр деталей дня ${date}...`, 'info');
+    // Реализация просмотра деталей дня
+}
+
+function printDetails() {
+    console.log('Печать деталей');
+    window.print();
 }
 
 // ============================================

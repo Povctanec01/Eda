@@ -23,7 +23,7 @@
                 </span>
             </div>
             <div class="order-footer">
-                <form method="post" style="display:inline;" onsubmit="markAsReady(event, {{ order.id }})">
+                <form method="post" class="mark-ready-form" style="display:inline;" onsubmit="markAsReady(event, {{ order.id }})">
                     {% csrf_token %}
                     <input type="hidden" name="order_id" value="{{ order.id }}">
                     <button type="submit" class="btn btn-success btn-sm">

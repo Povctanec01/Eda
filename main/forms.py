@@ -1,7 +1,7 @@
-# main/forms.py
+from .models import Card, CardBuys, ProductRemaining, BuffetProduct
 from django import forms
-from .models import Card, CardBuys, Allergen, ProductRemaining, BuffetProduct
 
+#Форма блюда
 class CardForm(forms.ModelForm):
     class Meta:
         model = Card
@@ -10,7 +10,7 @@ class CardForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'placeholder': 'Название блюда', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'placeholder': 'Описание', 'rows': 4, 'class': 'form-control'}),
             'meal_type': forms.Select(attrs={'class': 'form-control'}),
-            'price': forms.NumberInput(attrs={  # Добавить этот виджет
+            'price': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': '0.00',
                 'step': '0.01',
@@ -34,6 +34,7 @@ class CardForm(forms.ModelForm):
             raise forms.ValidationError("Цена не может быть отрицательной")
         return price
 
+#Форма для закупки ингридиентов
 class CardFormBuys(forms.ModelForm):
     class Meta:
         model = CardBuys
@@ -43,6 +44,7 @@ class CardFormBuys(forms.ModelForm):
             'description': forms.Textarea(attrs={'placeholder': 'Описание', 'rows': 4, 'class': 'form-control'}),
         }
 
+#Форма для контроля ингридиентов
 class ProductRemainingForm(forms.ModelForm):
     class Meta:
         model = ProductRemaining
@@ -80,7 +82,7 @@ class ProductRemainingForm(forms.ModelForm):
         }
 
 
-
+#Буфет
 class BuffetProductForm(forms.ModelForm):
     class Meta:
         model = BuffetProduct
