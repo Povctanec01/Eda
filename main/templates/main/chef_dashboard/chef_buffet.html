@@ -2,21 +2,6 @@
 {% load static %}
 {% block title %} Буфет{% endblock %}
 {% block body %}
-    {% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    {% if message.tags == 'error' %}
-    <div class="alert alert-error">
-        {{ message }}
-    </div>
-    {% else %}
-    <div class="alert alert-success">
-        {{ message }}
-    </div>
-    {% endif %}
-    {% endfor %}
-</div>
-{% endif %}
 
 <div class="container-fluid">
     <div class="row mb-4">

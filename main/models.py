@@ -25,7 +25,7 @@ class Profile(models.Model):
         verbose_name="Критические аллергены",
         help_text="Блюда с этими аллергенами будут скрыты"
     )
-
+    # Не критичные аллергены
     non_critical_allergens = models.ManyToManyField(
         'Allergen',
         related_name='non_critical_profiles',
@@ -34,7 +34,7 @@ class Profile(models.Model):
         help_text="Блюда с этими аллергенами будут отображаться с предупреждением"
     )
 
-    # ДОБАВЬТЕ ЭТО ПОЛЕ ДЛЯ ЛАЙКОВ
+    # ОТметка понравившегося
     liked_cards = models.ManyToManyField(
         'Card',
         related_name='liked_by_profiles',
@@ -69,6 +69,7 @@ class Profile(models.Model):
             return 'Студент'
         return role_display.get(self.role, self.role)
 
+#Аллергены
 class Allergen(models.Model):
     name = models.CharField('Название аллергена', max_length=100, unique=True)
 
@@ -79,6 +80,7 @@ class Allergen(models.Model):
         verbose_name = "Аллерген"
         verbose_name_plural = "Аллергены"
 
+# Карточка блюда
 class Card(models.Model):
     MEAL_CHOICES = [
         ('select', 'Выберите'),
@@ -113,6 +115,7 @@ class Card(models.Model):
         verbose_name = "Блюдо"
         verbose_name_plural = "Блюда"
 
+# Закупки шефа
 class CardBuys(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Ожидает'),
@@ -130,6 +133,7 @@ class CardBuys(models.Model):
         verbose_name_plural = "Блюда"
 
 
+# Статус блюда
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Готовится'),
@@ -178,9 +182,8 @@ def save_user_profile(sender, instance, **kwargs):
     else:
         Profile.objects.create(user=instance)
 
-
+# Контроль остатков продуктов
 class ProductRemaining(models.Model):
-    """Модель для отслеживания остатков продуктов на складе"""
     name = models.CharField(max_length=255, verbose_name="Название продукта")
     quantity = models.DecimalField(
         max_digits=10,
@@ -212,8 +215,7 @@ class ProductRemaining(models.Model):
         """Проверяет, есть ли низкий запас продукта"""
         return self.quantity <= self.min_quantity
 
-
-# Добавьте в конец models.py или после модели ProductRemaining
+# Буфет
 class BuffetProduct(models.Model):
     CATEGORY_CHOICES = [
         ('baked', 'Выпечка'),
@@ -255,13 +257,18 @@ class BuffetProduct(models.Model):
     def __str__(self):
         available = "✓" if self.is_available else "✗"
         return f"{self.name} ({self.get_category_display()}) - {self.price} руб. [{available}]"
+
+#Отзывы о блюдах
 class Review(models.Model):
-    """Модель для отзывов студентов на блюда"""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name="Пользователь",
         related_name='reviews'
+    )
+    rating = models.IntegerField(
+        verbose_name="Оценка",
+        choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')]
     )
     card = models.ForeignKey(
         Card,
@@ -269,10 +276,7 @@ class Review(models.Model):
         verbose_name="Блюдо",
         related_name='reviews'
     )
-    rating = models.IntegerField(
-        verbose_name="Оценка",
-        choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')]
-    )
+
     comment = models.TextField(
         verbose_name="Комментарий",
         blank=True,

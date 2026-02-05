@@ -2,17 +2,7 @@
 {% load static %}
 {% block title %}Управление блюдами{%endblock %}
 {% block body %}
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    {% if message.tags == 'error' %}
-    <div class="alert alert-error">{{ message }}</div>
-    {% else %}
-    <div class="alert alert-success">{{ message }}</div>
-    {% endif %}
-    {% endfor %}
-</div>
-{% endif %}
+
 <section class="menu-management" style="margin-top: 30px">
     <h2 class="dinner">Управление блюдами</h2>
     {% if cards %}

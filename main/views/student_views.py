@@ -1,51 +1,34 @@
-from decimal import Decimal
-
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect
 from main.models import Card, Order, Allergen, BuffetProduct, Review
-from django.utils import timezone
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
 from datetime import time, datetime, timedelta
 from django.contrib.auth import logout
+from django.http import JsonResponse
 from django.contrib import messages
-# Добавьте в начало student_views.py
+from django.utils import timezone
 from django.db.models import Avg
-from main.models import Card, Order, Allergen, BuffetProduct, Review  # Добавьте Review
+from main.forms import CardForm
+from decimal import Decimal
 
+
+# Домашняя страница
 @login_required
 def student_home_page(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
 
-    # Определяем начало и конец текущего дня
-    today = timezone.now().date()
-    start_of_day = timezone.make_aware(datetime.combine(today, time.min))
-    end_of_day = timezone.make_aware(datetime.combine(today, time.max))
-
-    # Подсчёт заказов за сегодня
-    pending_orders_count = Order.objects.filter(
-        user=request.user,
-        status='pending',
-        ordered_at__range=(start_of_day, end_of_day)
-    ).count()
-
-    ready_orders_count = Order.objects.filter(
-        user=request.user,
-        status='ready',
-        ordered_at__range=(start_of_day, end_of_day)
-    ).count()
-
-    # Получаем все НЕ скрытые блюда на сегодня
+    # Показвыаем все НЕ скрытые блюда на сегодня
     today_cards = Card.objects.filter(
         is_hidden=False  # Только не скрытые блюда
     ).exclude(meal_type='select').order_by('meal_type', 'title')
 
-    # Получаем аллергены пользователя
+    # Аллергены пользователя
     profile = request.user.profile
     critical_allergens = profile.critical_allergens.all()
     non_critical_allergens = profile.non_critical_allergens.all()
 
-    # Фильтруем блюда с критическими аллергенами
+    # Убираем блюда с критическими аллергенами
     if critical_allergens.exists():
         today_cards = today_cards.exclude(
             allergens__in=critical_allergens
@@ -54,12 +37,11 @@ def student_home_page(request):
     # Добавляем информацию об аллергенах и рейтингах для каждого блюда
     filtered_cards = []
     for card in today_cards:
-        # Проверяем некритические аллергены
+        # Проверяем некритичные аллергены
         card_non_critical_allergens = card.allergens.filter(
             id__in=non_critical_allergens.values_list('id', flat=True)
         )
 
-        # Добавляем признак наличия некритических аллергенов
         if card_non_critical_allergens.exists():
             card.has_non_critical_allergens = True
             card.non_critical_allergens_list = list(card_non_critical_allergens)
@@ -67,7 +49,6 @@ def student_home_page(request):
             card.has_non_critical_allergens = False
             card.non_critical_allergens_list = []
 
-        # Добавляем badge class для типа блюда
         if card.meal_type == 'breakfast':
             card.badge_class = 'bg-success'
         elif card.meal_type == 'lunch':
@@ -75,7 +56,7 @@ def student_home_page(request):
         else:
             card.badge_class = 'bg-secondary'
 
-        # Добавляем информацию о рейтинге
+        # Информацию о рейтинге
         reviews = Review.objects.filter(card=card)
         if reviews.exists():
             from django.db.models import Avg
@@ -95,15 +76,13 @@ def student_home_page(request):
         'today_cards': filtered_cards,
         'orders': recent_orders,
         'all_orders_count': all_orders_count,
-        'pending_orders_count': pending_orders_count,
-        'ready_orders_count': ready_orders_count,
-        'balance': profile.balance,  # Добавляем баланс в контекст
+        'balance': profile.balance,
     })
 
 
+# Пополнение счёта
 @login_required
 def top_up_balance(request):
-    """Обработчик пополнения баланса"""
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return JsonResponse({'success': False, 'error': 'Доступ запрещен'}, status=403)
 
@@ -131,66 +110,10 @@ def top_up_balance(request):
         except (ValueError, TypeError) as e:
             return JsonResponse({'success': False, 'error': 'Неверная сумма'})
 
-    return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
-
-@login_required
-def student_settings(request):
-    if not request.user.is_authenticated or request.user.profile.role != 'student':
-        return redirect('login')
-
-    if request.method == 'POST':
-        # Изменение пароля
-        if 'change_password' in request.POST:
-            current_password = request.POST.get('current_password')
-            new_password1 = request.POST.get('new_password1')
-            new_password2 = request.POST.get('new_password2')
-
-            # Проверка текущего пароля
-            if not request.user.check_password(current_password):
-                messages.error(request, "Текущий пароль указан неверно.")
-                return redirect('student_settings')
-
-            # Проверка совпадения новых паролей
-            if new_password1 != new_password2:
-                messages.error(request, "Новые пароли не совпадают.")
-                return redirect('student_settings')
-
-            # Проверка длины пароля
-            if len(new_password1) < 8:
-                messages.error(request, "Пароль должен содержать минимум 8 символов.")
-                return redirect('student_settings')
-
-            # Изменение пароля
-            request.user.set_password(new_password1)
-            request.user.save()
-
-            # Обновляем сессию, чтобы пользователь не разлогинился
-            from django.contrib.auth import update_session_auth_hash
-            update_session_auth_hash(request, request.user)
-
-            messages.success(request, "Пароль успешно изменён!")
-            return redirect('student_settings')
-
-        # Удаление аккаунта (если отправлена именно эта форма)
-        if 'delete_account' in request.POST:
-            user = request.user
-            username = user.username
-            user.delete()
-            logout(request)
-            messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
-            return redirect('login')
-
-        # Сохранение настроек автоперехода
-        profile = request.user.profile
-        profile.auto_redirect_to_home = 'auto_redirect' in request.POST
-        profile.save()
-        messages.success(request, "Настройки сохранены.")
-        return redirect('student_settings')
-
-    # GET: просто показываем страницу настроек
-    return render(request, 'main/student_dashboard/student_settings.html')
+    return JsonResponse({'success': False, 'error': 'Упс, Произошла Ошибка'})
 
 
+#Заказ
 @login_required
 def student_order_create(request, card_id):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
@@ -203,11 +126,10 @@ def student_order_create(request, card_id):
         messages.error(request, "Это блюдо временно недоступно для заказа.")
         return redirect('student_home_page')
 
-    # ПРОВЕРЯЕМ БАЛАНС СТУДЕНТА
+    # Проверяем баланс пользователя
     profile = request.user.profile
     if profile.balance < card.price:
-        messages.error(request,
-                       f"Недостаточно средств на счете. Требуется: {card.price} руб., доступно: {profile.balance} руб.")
+        messages.error(request,f"Недостаточно средств на счете. Требуется: {card.price} руб., доступно: {profile.balance} руб.")
         return redirect('student_home_page')
 
     # Списываем средства
@@ -220,11 +142,12 @@ def student_order_create(request, card_id):
     messages.success(request, f"Вы заказали: {card.title} за {card.price} руб.!")
     return redirect('student_home_page')
 
+#Меню
 @login_required
 def student_menu(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
-    from ..forms import CardForm
+
     form = CardForm(request.POST)
     # Показываем только не скрытые блюда
     cards = Card.objects.filter(is_hidden=False).order_by('meal_type', 'title')
@@ -237,18 +160,19 @@ def student_menu(request):
         else:
             card.average_rating = None
             card.review_count = 0
+
     return render(request, 'main/student_dashboard/student_menu.html', {
         'form': form,
         'cards': cards
     })
 
 
+# Отзывы
 @login_required
 def student_feedback(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
 
-    # Проверьте, что эти запросы возвращают данные
     thirty_days_ago = timezone.now() - timedelta(days=30)
 
     evaluable_orders = Order.objects.filter(
@@ -256,9 +180,6 @@ def student_feedback(request):
         ordered_at__gte=thirty_days_ago,
         status__in=['ready', 'received']
     ).select_related('card').order_by('-ordered_at')
-
-    # Отладочный вывод
-    print(f"Evaluable orders count: {evaluable_orders.count()}")
 
     reviewed_card_ids = Review.objects.filter(
         user=request.user
@@ -270,19 +191,16 @@ def student_feedback(request):
         user=request.user
     ).select_related('card').order_by('-created_at')
 
-    print(f"User reviews count: {user_reviews.count()}")
-
     return render(request, 'main/student_dashboard/student_feedback.html', {
         'evaluable_orders': evaluable_orders,
         'user_reviews': user_reviews
     })
 
-
+#Обработчик отправки отзыва
 @login_required
 def submit_review(request):
-    """Обработчик отправки отзыва"""
     if not request.user.is_authenticated or request.user.profile.role != 'student':
-        return JsonResponse({'success': False, 'error': 'Доступ запрещен'})
+        return redirect('login')
 
     if request.method == 'POST':
         try:
@@ -317,11 +235,9 @@ def submit_review(request):
             if existing_review:
                 # Обновляем существующий отзыв - теперь только рейтинг
                 existing_review.rating = rating
-                existing_review.comment = None  # Очищаем комментарий
                 existing_review.save()
                 messages.success(request, f"Оценка для {card.title} обновлена!")
             else:
-                # Создаем новый отзыв без комментария
                 Review.objects.create(
                     user=request.user,
                     card=card,
@@ -334,11 +250,12 @@ def submit_review(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-    return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
+    return JsonResponse({'success': False, 'error': 'Упс, Произошла Ошибка'})
 
+
+#Удаление отзыва
 @login_required
 def delete_review(request, review_id):
-    """Удаление отзыва"""
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
 
@@ -348,26 +265,25 @@ def delete_review(request, review_id):
     return redirect('student_feedback')
 
 
+#Отметка нравиться (страница)
 @login_required
 def student_likes(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
 
-    # Получаем все НЕ скрытые блюда
     all_cards = Card.objects.filter(is_hidden=False).exclude(meal_type='select').order_by('meal_type', 'title')
 
-    # Получаем лайкнутые блюда пользователя
+    # Лайкнутые блюда пользователя
     profile = request.user.profile
     liked_cards = profile.liked_cards.all()
 
-    # Сортируем: лайкнутые в начале
+    # Сортируем
     sorted_cards = []
     # Сначала лайкнутые
     for card in all_cards:
         if card in liked_cards:
             card.is_liked = True
             sorted_cards.append(card)
-    # Потом нелайкнутые
     for card in all_cards:
         if card not in liked_cards:
             card.is_liked = False
@@ -378,7 +294,7 @@ def student_likes(request):
         'liked_cards': liked_cards
     })
 
-
+# Отметка лайка
 @login_required
 def toggle_like(request, card_id):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
@@ -400,12 +316,13 @@ def toggle_like(request, card_id):
     return redirect('student_likes')
 
 
-
+#История
 @login_required
 def student_my_orders(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
 
+    #Отметка Забрал
     status_filter = request.GET.get('status')
     if status_filter in ['pending', 'ready']:
         orders = Order.objects.filter(user=request.user, status=status_filter).order_by('-ordered_at')
@@ -417,27 +334,16 @@ def student_my_orders(request):
         'current_status': status_filter
     })
 
-@login_required
-def student_mark_received(request, order_id):
-    if not request.user.is_authenticated or request.user.profile.role != 'student':
-        return redirect('login')
-    order = get_object_or_404(Order, id=order_id, user=request.user, status='ready')
-    order.status = 'received'
-    order.save()
-    return redirect(request.META.get('HTTP_REFERER', 'student_home_page'))
 
-
-# Добавить в student_views.py
-
+#Аллергены
 @login_required
 def student_allergens(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
 
-    # Получаем все аллергены
     all_allergens = Allergen.objects.all().order_by('name')
 
-    # Получаем аллергены студента из профиля
+    # Аллергены студента из профиля
     profile = request.user.profile
     critical_allergens = profile.critical_allergens.all()
     non_critical_allergens = profile.non_critical_allergens.all()
@@ -449,6 +355,7 @@ def student_allergens(request):
     })
 
 
+#Обновление крит аллергенов
 @login_required
 def update_critical_allergens(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
@@ -458,7 +365,7 @@ def update_critical_allergens(request):
         profile = request.user.profile
         selected_allergen_ids = request.POST.getlist('critical_allergens')
 
-        # Обновляем критические аллергены
+        # Обновляем
         profile.critical_allergens.clear()
         for allergen_id in selected_allergen_ids:
             try:
@@ -473,6 +380,7 @@ def update_critical_allergens(request):
     return redirect('student_allergens')
 
 
+#Обновление Не крит аллергенов
 @login_required
 def update_non_critical_allergens(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
@@ -482,7 +390,7 @@ def update_non_critical_allergens(request):
         profile = request.user.profile
         selected_allergen_ids = request.POST.getlist('non_critical_allergens')
 
-        # Обновляем некритичные аллергены
+        # Обновляем не крит аллергены
         profile.non_critical_allergens.clear()
         for allergen_id in selected_allergen_ids:
             try:
@@ -497,32 +405,32 @@ def update_non_critical_allergens(request):
     return redirect('student_allergens')
 
 
+#Буфет
 @login_required
 def student_buffet(request):
     if not request.user.is_authenticated or request.user.profile.role != 'student':
         return redirect('login')
 
-    # Получаем только доступные товары
+    # Получаем доступные товары
     products = BuffetProduct.objects.filter(
         is_available=True
     ).order_by('category', 'name')
 
-    # Фильтрация по категории
+    # Фильтрация
     category_filter = request.GET.get('category', '')
     if category_filter:
         products = products.filter(category=category_filter)
 
-    # Получаем аллергены пользователя для фильтрации
+    # Аллергены пользователя
     profile = request.user.profile
     critical_allergens = profile.critical_allergens.all()
 
-    # Фильтруем товары с критическими аллергенами
+    # Убираем товары с критическими аллергенами
     if critical_allergens.exists():
         products = products.exclude(
             allergens__in=critical_allergens
         ).distinct()
 
-    # Добавляем информацию о некритических аллергенах
     non_critical_allergens = profile.non_critical_allergens.all()
     filtered_products = []
 
@@ -571,3 +479,68 @@ def student_buffet(request):
         'category_filter': category_filter,
         'category_choices': BuffetProduct.CATEGORY_CHOICES,
     })
+
+# Настройки
+@login_required
+def student_settings(request):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+
+    if request.method == 'POST':
+        # Изменение пароля
+        if 'change_password' in request.POST:
+            current_password = request.POST.get('current_password')
+            new_password1 = request.POST.get('new_password1')
+            new_password2 = request.POST.get('new_password2')
+
+            # Проверка текущего пароля
+            if not request.user.check_password(current_password):
+                messages.error(request, "Текущий пароль указан неверно.")
+                return redirect('student_settings')
+
+            # Проверка совпадения новых паролей
+            if new_password1 != new_password2:
+                messages.error(request, "Новые пароли не совпадают.")
+                return redirect('student_settings')
+
+            # Проверка длины пароля
+            if len(new_password1) < 8:
+                messages.error(request, "Пароль должен содержать минимум 8 символов.")
+                return redirect('student_settings')
+
+            # Изменение пароля
+            request.user.set_password(new_password1)
+            request.user.save()
+
+
+            update_session_auth_hash(request, request.user)
+
+            messages.success(request, "Пароль успешно изменён!")
+            return redirect('student_settings')
+
+        # Удаление аккаунта
+        if 'delete_account' in request.POST:
+            user = request.user
+            username = user.username
+            user.delete()
+            logout(request)
+            messages.success(request, f"Ваш аккаунт '{username}' был успешно удалён.")
+            return redirect('login')
+
+        # Сохранение настроек автоперехода
+        profile = request.user.profile
+        profile.auto_redirect_to_home = 'auto_redirect' in request.POST
+        profile.save()
+        messages.success(request, "Настройки сохранены.")
+        return redirect('student_settings')
+
+    return render(request, 'main/student_dashboard/student_settings.html')
+
+@login_required
+def student_mark_received(request, order_id):
+    if not request.user.is_authenticated or request.user.profile.role != 'student':
+        return redirect('login')
+    order = get_object_or_404(Order, id=order_id, user=request.user, status='ready')
+    order.status = 'received'
+    order.save()
+    return redirect(request.META.get('HTTP_REFERER', 'student_home_page'))

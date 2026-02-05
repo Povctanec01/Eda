@@ -2,21 +2,6 @@
 {% load static %}
 {% block title %}Управление блюдами{% endblock %}
 {% block body %}
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    {% if message.tags == 'error' %}
-    <div class="alert alert-error">
-        {{ message }}
-    </div>
-    {% else %}
-    <div class="alert alert-success">
-        {{ message }}
-    </div>
-    {% endif %}
-    {% endfor %}
-</div>
-{% endif %}
 
 <div class="dashboard-header">
     <h1><i class="fas fa-utensils"></i> Управление блюдами</h1>

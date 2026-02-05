@@ -2,17 +2,6 @@
 {% load static %}
 {% block title %}Закупки{% endblock %}
 {% block body %}
-{% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    {% if message.tags == 'error' %}
-    <div class="alert alert-error">{{ message }}</div>
-    {% else %}
-    <div class="alert alert-success">{{ message }}</div>
-    {% endif %}
-    {% endfor %}
-</div>
-{% endif %}
 <section class="menu-management">
     <h2 class="dinner">Запросы на закупку</h2>
     <!-- Счётчики за последнюю неделю -->
