@@ -38,6 +38,25 @@
                     <h3>{{ card.title }}</h3>
                     <span class="badge" style="background: #667eea; color: white;">{{ card.get_meal_type_display }}</span>
                 </div>
+                    {% if card.average_rating %}
+                    <div class="star-rating small">
+                        {% with avg_rating=card.average_rating %}
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= avg_rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% elif forloop.counter|add:"-0.5" <= avg_rating %}
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="ml-1">{{ avg_rating|floatformat:1 }}/5</span>
+                            <span class="text-muted ml-2">({{ card.review_count }})</span>
+                        {% endwith %}
+                    </div>
+                    {% else %}
+                    <span class="text-muted small">Нет оценок</span>
+                    {% endif %}
             </div>
             <p class="dish-desc">Описание: {{ card.description|default:"Без описания" }}</p>
             <!-- Кнопка Заказать -->

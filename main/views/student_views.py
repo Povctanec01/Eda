@@ -228,6 +228,15 @@ def student_menu(request):
     form = CardForm(request.POST)
     # Показываем только не скрытые блюда
     cards = Card.objects.filter(is_hidden=False).order_by('meal_type', 'title')
+    for card in cards:
+        reviews = Review.objects.filter(card=card)
+        if reviews.exists():
+            avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+            card.average_rating = round(avg_rating, 1)
+            card.review_count = reviews.count()
+        else:
+            card.average_rating = None
+            card.review_count = 0
     return render(request, 'main/student_dashboard/student_menu.html', {
         'form': form,
         'cards': cards
