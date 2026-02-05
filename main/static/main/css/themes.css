@@ -133,6 +133,17 @@ body {
     color: var(--text-secondary);
 }
 
+/* Карточки‑контейнеры (например, на странице отзывов) */
+.section-box {
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .section-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
 /* Заголовки карточек (Bootstrap .card-header) в тёмной теме */
 [data-theme="dark"] .card-header.bg-white {
     background-color: var(--card-bg) !important;
@@ -267,6 +278,18 @@ table {
 
 .table-hover tbody tr:hover {
     background-color: var(--bg-secondary);
+}
+
+/* Принудительно перекрашиваем ячейки таблиц поверх Bootstrap‑переменных */
+[data-theme] .table > :not(caption) > * > * {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .table-warning {
+    --bs-table-bg: rgba(255, 193, 7, 0.08);
+    --bs-table-border-color: var(--border-color);
+    --bs-table-color: var(--text-primary);
 }
 
 /* Стили для форм в разных темах */
@@ -637,6 +660,43 @@ p {
 .allergen-info .allergen-id {
     color: var(--text-secondary);
     background: var(--bg-secondary);
+}
+
+/* Общие теги аллергенов (используются в разных дашбордах) */
+.allergen-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.allergen-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.allergen-tag.critical {
+    background: #ff6b6b;
+    color: #ffffff;
+}
+
+.allergen-tag.non-critical {
+    background: #ffc107;
+    color: #212529;
+}
+
+.allergen-tag.neutral {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .allergen-tag.neutral {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
 }
 
 .allergens-count {
