@@ -1279,8 +1279,7 @@ body {
     border-color: #007bff;
 }
 .product-card .card-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-bottom: 2px solid #dee2e6;
+    background: var(--card-bg);;
     padding: 1rem 1.25rem;
 }
 .allergen-tags {

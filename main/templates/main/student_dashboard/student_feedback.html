@@ -3,12 +3,8 @@
 {% block title %}Отзывы{% endblock %}
 {% block body %}
 
-<div class="reviews-container">
-    <h2><i class="fas fa-star"></i> Мои оценки</h2>
-
-    <!-- Блюда для оценки -->
+<div class="reviews-container menu-management" style="margin-bottom: 20px">
     {% if evaluable_orders %}
-    <div class="section-box mb-4">
         <h4><i class="fas fa-pen"></i> Оцените ваши заказы</h4>
         <div class="row">
             {% for order in evaluable_orders %}
@@ -34,49 +30,46 @@
             </div>
             {% endfor %}
         </div>
-    </div>
     {% else %}
     <div class="alert alert-info mb-4">
         <i class="fas fa-info-circle"></i> У вас нет новых заказов для оценки.
     </div>
     {% endif %}
+</div>
 
-    <!-- Мои оценки -->
-    <div class="section-box">
-        <h4><i class="fas fa-history"></i> Мои оценки</h4>
-        {% if user_reviews %}
-        <div class="reviews-list">
-            {% for review in user_reviews %}
-            <div class="review-item" id="review-{{ review.id }}">
-                <div class="review-header">
-                    <h5>{{ review.card.title|default:"[Блюдо удалено]" }}</h5>
-                    <div class="review-rating">
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= review.rating %}
-                            <i class="fas fa-star text-warning"></i>
-                            {% else %}
-                            <i class="far fa-star text-warning"></i>
-                            {% endif %}
-                        {% endfor %}
-                        <small class="text-muted ml-1">{{ review.rating }}/5</small>
-                    </div>
-                </div>
-                <div class="review-footer">
-                    <span class="review-date">{{ review.created_at|date:"d.m.Y H:i" }}</span>
-                    <button class="btn btn-sm btn-outline-danger"
-                            onclick="deleteReview({{ review.id }})">
-                        Удалить
-                    </button>
+<div class="reviews-container menu-management" style="margin-bottom: 20px">
+    <h4><i class="fas fa-history"></i> Мои оценки</h4>
+    {% if user_reviews %}
+    <div class="reviews-list">
+        {% for review in user_reviews %}
+        <div class="review-item" id="review-{{ review.id }}">
+            <div class="review-header">
+                <h5>{{ review.card.title|default:"[Блюдо удалено]" }}</h5>
+                <div class="review-rating">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}
+                        <i class="fas fa-star text-warning"></i>
+                        {% else %}
+                        <i class="far fa-star text-warning"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <small class="text-muted ml-1">{{ review.rating }}/5</small>
                 </div>
             </div>
-            {% endfor %}
+            <div class="review-footer">
+                <span class="review-date">{{ review.created_at|date:"d.m.Y H:i" }}</span>
+                <button class="btn btn-sm btn-outline-danger"onclick="deleteReview({{ review.id }})">
+                        Удалить
+                </button>
+            </div>
         </div>
-        {% else %}
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i> У вас пока нет оценок.
-        </div>
-        {% endif %}
+        {% endfor %}
     </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> У вас пока нет оценок.
+    </div>
+    {% endif %}
 </div>
 
 {% csrf_token %}

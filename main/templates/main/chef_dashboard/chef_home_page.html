@@ -3,8 +3,8 @@
 {% block title %}Панель повара{% endblock %}
 {% block body %}
 <div class="chest">
-    <header class="top-bar">
-        <div class="top-bar-left">
+    <header class="top-bar menu-management">
+        <div class="top-bar-left" style="margin-top: 10px">
             <h1 class="dinner2">Доброй день, {{ user.username }}!</h1>
             <p>Сегодня: <span id="currentDate">Загрузка...</span></p>
         </div>
@@ -48,7 +48,7 @@
             </div>
         </section>
         <div class="dashboard-grid bdf">
-            <section class="orders-section">
+            <section class="orders-section menu-management">
                 <div class="section-header">
                     <h2 class="dinner2"><i class="fas fa-concierge-bell"></i> Активные заказы</h2>
                     {% if orders %}
@@ -110,8 +110,8 @@
                 {% endif %}
             </section>
         </div>
-        <section class="inventory-section">
-            <div class="section-header">
+        <section class="inventory-section menu-management">
+            <div class="section-header ">
                 <h2 class="dinner2"><i class="fas fa-boxes"></i> Заявки на закупку</h2>
                 <a href="{% url 'chef_buys' %}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Новая заявка

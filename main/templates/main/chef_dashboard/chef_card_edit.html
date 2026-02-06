@@ -4,13 +4,13 @@
 {% block body %}
 
 <div class="dashboard-header">
-    <h1><i class="fas fa-utensils"></i> Управление блюдами</h1>
+    <h1><i class="fas fa-utensils" style="margin-top: 20px"></i> Управление блюдами</h1>
     <div class="header-stats">
         <div class="stat-card">
             <div class="stat-icon" style="background-color: #667eea;">
                 <i class="fas fa-utensils"></i>
             </div>
-            <div class="stat-info">
+            <div class="stat-info" >
                 <h3>{{ cards|length }}</h3>
                 <p>Всего блюд</p>
             </div>
@@ -29,7 +29,7 @@
 
 <div class="dashboard-content">
     <!-- Форма добавления -->
-    <div class="card mb-4">
+    <div class="card mb-4 menu-management">
         <div class="card-header">
             <h3><i class="fas fa-plus-circle"></i> Добавить новую карточку</h3>
         </div>
@@ -88,7 +88,7 @@
     </div>
 
     <!-- Список для управления -->
-    <div class="card">
+    <div class="card menu-management">
         <div class="card-header">
             <h3><i class="fas fa-list"></i> Список блюд ({{ cards|length }})</h3>
             <div class="dishes-filters">

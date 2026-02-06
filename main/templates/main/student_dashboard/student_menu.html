@@ -25,11 +25,11 @@
     </div>
     <div class="dishes-list">
         {% for card in cards %}
-        <div class="dish-item" data-meal-type="{{ card.meal_type }}">
+        <div class="dish-item card" data-meal-type="{{ card.meal_type }}" style="margin-top: 15px;">
             <div class="dish-header">
                 <div>
                     <h3>{{ card.title }}</h3>
-                    <span class="badge" style="background: #667eea; color: white;">{{ card.get_meal_type_display }}</span>
+                    <span class="badge" style="background: #667eea; color: white; margin-bottom: 7px">{{ card.get_meal_type_display }}</span>
                 </div>
                     {% if card.average_rating %}
                     <div class="star-rating small">
