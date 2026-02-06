@@ -754,7 +754,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Делаем функции глобально доступными
-window.showNotification = showNotification;
 window.handleAdminAction = handleAdminAction;
 window.confirmUserDeletion = confirmUserDeletion;
 window.performUserDeletion = performUserDeletion;
