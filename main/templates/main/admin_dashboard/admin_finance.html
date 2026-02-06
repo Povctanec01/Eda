@@ -91,7 +91,7 @@
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Статистика</h6>
-                    <a href="{% url 'generate_finance_pdf' %}" class="btn btn-danger btn-sm">
+                    <a href="{% url 'generate_finance_pdf' %}" class="btn btn-danger btn-sm" style="margin-left: 20px;">
                         <i class="fas fa-file-pdf"></i> Генерация отчета в PDF
                     </a>
                 </div>
@@ -109,7 +109,7 @@
                             <tbody>
                                 <tr>
                                     <td><strong>Выручка</strong></td>
-                                    <td class="text-success font-weight-bold">{{ revenue_today }} ₽</td>
+                                    <td class="font-weight-bold">{{ revenue_today }} ₽</td>
                                     <td>{{ revenue_week }} ₽</td>
                                     <td>{{ revenue_month }} ₽</td>
                                 </tr>
@@ -147,7 +147,7 @@
 
     <div class="row">
         <div class="col-lg-12">
-            <div class="card shadow">
+            <div class="card shadow" style="margin-bottom: 24px;">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Топ-5 блюд по выручке (месяц)</h6>
                 </div>
@@ -167,7 +167,7 @@
                                 <tr>
                                     <td>{{ dish.dish.title }}</td>
                                     <td>
-                                        <span class="badge {% if dish.dish.meal_type == 'breakfast' %}badge-primary{% else %}badge-success{% endif %}">
+                                        <span>
                                             {{ dish.dish.get_meal_type_display }}
                                         </span>
                                     </td>
@@ -192,7 +192,7 @@
         <div class="col-lg-12">
             <div class="card shadow">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-success">Топ-5 блюд по выручке (неделя)</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Топ-5 блюд по выручке (неделя)</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -210,7 +210,7 @@
                                 <tr>
                                     <td>{{ dish.dish.title }}</td>
                                     <td>
-                                        <span class="badge {% if dish.dish.meal_type == 'breakfast' %}badge-primary{% else %}badge-success{% endif %}">
+                                        <span>
                                             {{ dish.dish.get_meal_type_display }}
                                         </span>
                                     </td>

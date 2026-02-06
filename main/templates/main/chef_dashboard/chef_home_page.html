@@ -80,12 +80,6 @@
                                     Без ингредиентов
                                     {% endif %}
                                 </p>
-                                {% if order.card.allergens %}
-                                <div class="allergy-warning">
-                                    <i class="fas fa-exclamation-circle text-danger"></i>
-                                    <span class="text-danger">Аллергия: {{ order.card.allergens }}</span>
-                                </div>
-                                {% endif %}
                             </div>
                             <div class="order-actions">
                                 {% if order.status == 'pending' %}
