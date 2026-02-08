@@ -5,7 +5,6 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
-ENV STATIC_ROOT=/app/static
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -28,6 +27,10 @@ RUN pip install --upgrade pip \
 
 # Копируем проект
 COPY . /app/
+
+# Создаем папку для статики заранее с правильными правами
+RUN mkdir -p /app/static_collected && \
+    chmod -R 755 /app/static_collected
 
 # Копируем entrypoint
 COPY entrypoint.sh /app/entrypoint.sh
