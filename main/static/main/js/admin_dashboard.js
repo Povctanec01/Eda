@@ -619,32 +619,56 @@ document.addEventListener('DOMContentLoaded', function() {
         staffForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Собираем данные формы в объект
+            const formDataObj = {};
             const formData = new FormData(this);
+            for (let [key, value] of formData.entries()) {
+                formDataObj[key] = value;
+            }
+
+            // Добавляем заголовок для идентификации AJAX запроса
+            const csrfToken = getCookie('csrftoken');
 
             fetch(this.action, {
                 method: 'POST',
-                body: formData,
                 headers: {
-                    'X-CSRFToken': getCookie('csrftoken')
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'  // Теперь будет работать!
+                },
+                body: JSON.stringify(formDataObj)
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    // Если сервер вернул HTML вместо JSON
+                    throw new Error('Некорректный ответ от сервера');
                 }
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showNotification('Успех', 'Сотрудник успешно создан', 'success');
+                    showNotification('Успех', data.message || 'Сотрудник успешно создан', 'success');
                     this.reset();
 
                     // Обновить список пользователей
                     if (data.user_data) {
                         addUserToList(data.user_data);
                     }
+
+                    // Обновить счетчики статистики
+                    updateStatsCounters(data.user_data.role);
+
                 } else {
                     showNotification('Ошибка', data.error || 'Ошибка при создании сотрудника', 'error');
                 }
             })
             .catch(error => {
-                showNotification('Ошибка', 'Произошла ошибка при создании сотрудника', 'error');
                 console.error('Error:', error);
+                // Если AJAX не сработал, отправляем форму обычным способом
+                showNotification('Информация', 'Форма отправляется...', 'info');
+                this.submit();
             });
         });
     }

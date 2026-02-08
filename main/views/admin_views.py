@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from reportlab.pdfbase import pdfmetrics
 from django.contrib.auth import logout
 from reportlab.lib.pagesizes import A4
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from reportlab.pdfgen import canvas
 from django.utils import timezone
@@ -696,29 +696,46 @@ def admin_users_delete_selected(request):
 def admin_users_statistics(request):
     if not request.user.is_authenticated or request.user.profile.role != 'admin':
         return redirect('login')
+
     # Обработка формы добавления персонала
     staff_form = StaffRegistrationForm()
+
     if request.method == 'POST':
         staff_form = StaffRegistrationForm(request.POST)
         if staff_form.is_valid():
             try:
                 user = staff_form.save()
+
                 # Проверяем, что роль не пустая
-                if user.profile.role:
-                    role_display = user.profile.get_role_display()
-                else:
-                    role_display = "Не указана"
+                role_display = user.profile.get_role_display()
 
-                # Добавляем информацию о суперпользователе
-                if user.is_superuser:
-                    role_display += " (Суперпользователь)"
+                # Если запрос AJAX - возвращаем JSON
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'message': f"Пользователь '{user.username}' успешно создан как {role_display}.",
+                        'user_data': {
+                            'username': user.username,
+                            'id': user.id,
+                            'role': user.profile.role,
+                            'role_display': role_display
+                        }
+                    })
 
+                # Обычный запрос - показываем сообщение и редирект
                 messages.success(request, f"Пользователь '{user.username}' успешно создан как {role_display}.")
                 return redirect('admin_users_statistics')
+
             except Exception as e:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False,
+                        'error': f"Ошибка при создании пользователя: {str(e)}"
+                    }, status=400)
+
                 messages.error(request, f"Ошибка при создании пользователя: {str(e)}")
 
-    # Сбор статистики
+    # Сбор статистики (остальной код остается прежним)
     users_with_roles = []
     for user in User.objects.all():
         try:
@@ -733,16 +750,16 @@ def admin_users_statistics(request):
             'is_staff': user.is_staff,
             'id': user.id,
         })
+
     role_priority = {'admin': 1, 'chef': 2, 'student': 3}
     users_with_roles.sort(key=lambda x: role_priority.get(x['role'], 1))
+
     role_counts = {'student': 0, 'chef': 0, 'admin': 0}
     for ur in users_with_roles:
-        # Убедимся, что роль не пустая
         role = ur['role'] or 'student'
         if role in role_counts:
             role_counts[role] += 1
         else:
-            # Если роль какая-то нестандартная, считаем как студента
             role_counts['student'] += 1
 
     return render(request, 'main/admin_dashboard/admin_users_statistics.html', {
