@@ -1,24 +1,48 @@
+version: '3.8'  # Добавьте версию в начало
+
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: django_db
+    environment:
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+      POSTGRES_USER: postgres
+      POSTGRES_DB: django_db  # Добавлено явное указание базы данных
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - django_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   web:
     build: .
     container_name: django_web
     entrypoint: ["/app/entrypoint.sh"]
     volumes:
       - .:/app
-      - static_volume:/app/static_collected  # Путь, куда собираются статические файлы
+      - static_volume:/app/static_collected
     ports:
       - "8000:8000"
     environment:
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
       POSTGRES_DB: django_db
-      POSTGRES_USER: myuser
+      POSTGRES_USER: myuser  # Убедитесь, что этот пользователь создан в init.sql
       POSTGRES_PASSWORD: mypassword
       SECRET_KEY: ${SECRET_KEY:-django-insecure-default-key-change-me}
-      DEBUG: 1
+      DEBUG: 0  # Изменено на 0 для production
       ALLOWED_HOSTS: localhost,127.0.0.1,web,0.0.0.0
       DJANGO_SETTINGS_MODULE: cafeteria.settings
-      STATIC_ROOT: /app/static_collected  # Правильно!
+      STATIC_ROOT: /app/static_collected
       STATIC_URL: /static/
     depends_on:
       db:
@@ -33,7 +57,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - static_volume:/app/static_collected:ro  # Исправлено: тот же путь, что и в web
+      - static_volume:/app/static_collected:ro
     depends_on:
       - web
     networks:
