@@ -1,25 +1,44 @@
-FROM python:3.13.2
+# Используем официальный Python образ
+FROM python:3.12-slim
 
-SHELL ["/bin/bash", "-c"]
-
+# Устанавливаем переменные окружения
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+ENV STATIC_ROOT=/app/static
 
-RUN pip install --upgrade pip
+# Устанавливаем рабочую директорию
+WORKDIR /app
 
-RUN apt update && apt -qy install gcc libjpeg-dev libxslt-dev \
-libpq-dev libmariadb-dev libmariadb-dev-compat gettext cron openssh-client flake8 locales vim
+# Устанавливаем системные зависимости
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gcc \
+        libpq-dev \
+        curl \
+        postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -rms /bin/basn eda && chmod 777 /opt /run
+# Копируем requirements.txt
+COPY requirements.txt /app/
 
-WORKDIR /eda
+# Устанавливаем зависимости Python
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
 
-RUN mkdir /eda/static && mkdir /eda/media && chown -R eda:eda /eda && chmod 755 /eda
+# Копируем проект
+COPY . /app/
 
-COPY --chown=eda:eda . .
+# Копируем entrypoint
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-RUN pip install -r requirements.txt
+# Создаем пользователя без привилегий
+RUN adduser --disabled-password --gecos '' django-user \
+    && chown -R django-user:django-user /app
 
-USER eda
+# Переключаемся на пользователя
+USER django-user
 
-CMD ["gunicoen","-b", "0.0.0.0:8001","soaqaz.wsgi:application"]
+# Entrypoint вместо CMD
+ENTRYPOINT ["/app/entrypoint.sh"]
