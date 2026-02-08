@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15-alpine
@@ -7,7 +5,7 @@ services:
     environment:
       POSTGRES_PASSWORD: mypassword
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
-      POSTGRES_USER: postgres  # Явно указываем пользователя по умолчанию
+      POSTGRES_USER: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -25,9 +23,10 @@ services:
   web:
     build: .
     container_name: django_web
-    entrypoint: ["/app/entrypoint.sh"]  # Используем entrypoint вместо command
+    entrypoint: ["/app/entrypoint.sh"]
     volumes:
       - .:/app
+      - static_volume:/app/static_collected  # Добавлено: монтируем static_volume
     ports:
       - "8000:8000"
     environment:
@@ -40,7 +39,7 @@ services:
       DEBUG: 1
       ALLOWED_HOSTS: localhost,127.0.0.1,web,0.0.0.0
       DJANGO_SETTINGS_MODULE: cafeteria.settings
-      STATIC_ROOT: /app/static
+      STATIC_ROOT: /app/static_collected  # Исправлено: должно быть /app/static_collected
       STATIC_URL: /static/
     depends_on:
       db:
@@ -55,8 +54,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./static:/app/static:ro
-      - static_volume:/app/static_collected
+      - static_volume:/app/static:ro  # Исправлено: используем static_volume
     depends_on:
       - web
     networks:
@@ -64,6 +62,8 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  static_volume:  # Добавлено: определение static_volume
     driver: local
 
 networks:

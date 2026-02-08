@@ -118,10 +118,9 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
+# settings.py
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static_collected'  # Папка для collectstatic
+STATIC_ROOT = BASE_DIR / 'static_collected'  # Это правильный путь
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # Папка с исходными статическими файлами
+    BASE_DIR / 'static',  # Исходные файлы
 ]
