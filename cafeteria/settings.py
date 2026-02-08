@@ -118,9 +118,12 @@ USE_I18N = True
 USE_TZ = True
 
 
-# settings.py
+# Настройки статических файлов
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static_collected'  # Это правильный путь
+STATIC_ROOT = BASE_DIR / 'static_collected'  # Куда собирать статику
+
+# Исходные каталоги со статическими файлами
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # Исходные файлы
+    BASE_DIR / 'static',           # Глобальные статические файлы
+    BASE_DIR / 'main' / 'static',  # Статические файлы приложения main
 ]
