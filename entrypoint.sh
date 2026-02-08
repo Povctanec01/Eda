@@ -23,4 +23,4 @@ python manage.py collectstatic --noinput --clear 2>/dev/null || \
     echo "ВНИМАНИЕ: Не удалось собрать статику, продолжаем без неё"
 
 echo "Запуск Gunicorn..."
-exec gunicorn --bind 0.0.0.0:8000 Test_docker.wsgi:application
+exec gunicorn --bind 0.0.0.0:8000 cafeteria.wsgi:application

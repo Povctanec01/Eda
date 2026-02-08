@@ -39,7 +39,7 @@ services:
       SECRET_KEY: ${SECRET_KEY:-django-insecure-default-key-change-me}
       DEBUG: 1
       ALLOWED_HOSTS: localhost,127.0.0.1,web,0.0.0.0
-      DJANGO_SETTINGS_MODULE: Test_docker.settings
+      DJANGO_SETTINGS_MODULE: cafeteria.settings
       STATIC_ROOT: /app/static
       STATIC_URL: /static/
     depends_on:
