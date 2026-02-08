@@ -10,6 +10,7 @@ venv/
 .git/
 .gitignore
 README.md
+README
 Dockerfile
 docker-compose.yml
 *.sqlite3
