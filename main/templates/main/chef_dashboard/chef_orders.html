@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Заказы{% endblock %}
 {% block body %}
-<div class="settings-section">
+<div class="settings-section menu-management">
     <h2 class="dinner"><i class="fas fa-concierge-bell"></i> Активные заказы</h2>
     {% if orders %}
     <div class="orders-container">
@@ -18,7 +18,7 @@
                 <span class="badge
                     {% if order.card.meal_type == 'breakfast' %}bg-success
                     {% elif order.card.meal_type == 'lunch' %}bg-primary
-                    {% else %}bg-secondary{% endif %}">
+                    {% else %}bg-secondary{% endif %}" style="margin-bottom: 15px;">
                 {{ order.card.get_meal_type_display|default:"—" }}
                 </span>
             </div>

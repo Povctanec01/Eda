@@ -661,7 +661,7 @@ body {
 
 .section-box h4 {
     margin-bottom: 20px;
-    color: #333;
+    color: var(--text-primary);
     border-bottom: 2px solid #f0f0f0;
     padding-bottom: 10px;
 }

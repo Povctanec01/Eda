@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %} Буфет{% endblock %}
 {% block body %}
-<div class="container-fluid">
+<div>
     <!-- Заголовок и информация -->
     <div class="row mb-4">
         <div class="col-12">
@@ -90,9 +90,9 @@
                 <div class="card h-100 product-card">
                     <!-- Статус наличия в заголовке -->
                     <div class="card-header position-relative">
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 10px">
                             <h5 class="mb-0 text-truncate">{{ product.name }}</h5>
-                            <span class="badge {{ product.category_badge_class }}">
+                            <span class="{{ product.category_badge_class }}" style="margin-left: 5px">
                                 {{ product.get_category_display }}
                             </span>
                         </div>
@@ -100,15 +100,15 @@
                         <!-- Бейдж статуса -->
                         <div class="position-absolute top-0 end-0 mt-2 me-2">
                             {% if product.is_out_of_stock %}
-                            <span class="badge bg-danger">
+                            <span class="badge bg-danger" style="margin-right: 50px;margin-top: 45px;">
                                 <i class="fas fa-ban"></i> Нет
                             </span>
                             {% elif product.is_low_stock %}
-                            <span class="badge bg-warning">
-                                <i class="fas fa-exclamation"></i> Мало
+                            <span class="badge bg-warning" style="margin-right: 50px;margin-top: 45px;">
+                                <i class="fas fa-exclamation" ></i> Мало
                             </span>
                             {% else %}
-                            <span class="badge bg-success">
+                            <span class="badge bg-success" style="margin-right: 50px;margin-top: 45px;">
                                 <i class="fas fa-check"></i> Есть
                             </span>
                             {% endif %}

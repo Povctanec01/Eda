@@ -107,7 +107,7 @@
     </aside>
 
     <main class="main-content">  <!--Основной контент (вверх)-->
-        <header class="top-bar">
+        <header class="top-bar" style="margin-top: 20px">
         <div class="top-bar-left">
             <h1>Добро пожаловать, {{ user.username }}!</h1>
             <p>Сегодня: <span id="currentDate">Загрузка...</span></p>
@@ -123,7 +123,7 @@
             </div>
         </header>
         <div class="content-wrapper">
-            <div class="container-fluid">
+            <div>
                 {% block body %}
                 {% endblock %}
             </div>

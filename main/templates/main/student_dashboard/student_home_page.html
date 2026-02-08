@@ -50,16 +50,11 @@
                 <small class="text-muted">Нет оценок</small>
                 {% endif %}
             </div>
-
-            <span class="badge {{ card.badge_class }}">
-                <span class="badge bg-success text-white" style="margin-left: 5px;">
-                    {{ card.price }} руб.
-                </span>
-                {{ card.get_meal_type_display }}
-            </span>
+            <span class="badge text-white">{{ card.price }} руб.</span>
+            <span class="badge {{ card.badge_class }}">{{ card.get_meal_type_display }}</span>
             <!-- Отображение аллергенов -->
-            {% if card.allergens.exists %}
             <div class="allergens-list mt-1">
+                {% if card.allergens.exists %}
                 <small class="text-danger">
                 <i class="fas fa-exclamation-triangle"></i>
                 Аллергены:
@@ -67,8 +62,8 @@
                 <span class="badge bg-danger">{{ allergen.name }}</span>
                 {% endfor %}
                 </small>
+                {% endif %}
             </div>
-            {% endif %}
             <a href="{% url 'student_order_create' card.id %}" class="btn btn-sm btn-outline-primary mt-2">
             Заказать
             </a>
@@ -83,7 +78,7 @@
     {% if orders %}
     <div class="orders-list">
         {% for order in orders %}
-        <div class="order-item">
+        <div class="order-item card" style="flex-direction: row; margin-top: 10px">
             <div class="order-info">
                 <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
                 <p class="text-muted">{{ order.ordered_at|date:"d.m.Y H:i" }}</p>

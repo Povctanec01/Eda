@@ -7,8 +7,8 @@
     {% if orders %}
     <div class="orders-list">
         {% for order in orders %}
-        <div class="order-item">
-            <div class="order-info">
+        <div class="order-item card" style="margin-top: 15px; flex-direction: row;">
+            <div class="order-info" style="margin-top: 15px">
                 <h4>{{ order.card.title|default:"[Удалено]" }}</h4>
                 <p class="text-muted">{{ order.ordered_at|date:"d.m.Y H:i" }}</p>
             </div>

@@ -5,39 +5,39 @@
 
 <div class="container-fluid">
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
+        <div class="col-12 ">
+            <div class="card menu-management">
                 <div class="card-header">
                     <h3 class="card-title mb-0">
-                        <i class="fas fa-store-alt me-2"></i>Управление буфетом
+                        <i class="fas fa-store-alt me-2" style="top: 20px;"></i>Управление буфетом
                     </h3>
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-3 col-sm-6">
                             <div class="stat-card bg-primary text-white">
-                                <i class="fas fa-utensils fa-2x"></i>
+                                <i class="fas fa-utensils fa-2x" style="margin-right: 15px; margin-top: 10px;"></i>
                                 <h4>{{ products.count }}</h4>
                                 <p>Всего товаров</p>
                             </div>
                         </div>
                         <div class="col-md-3 col-sm-6">
                             <div class="stat-card bg-success text-white">
-                                <i class="fas fa-check-circle fa-2x"></i>
+                                <i class="fas fa-check-circle fa-2x" style="margin-right: 15px; margin-top: 10px;"></i>
                                 <h4>{{ available_count }}</h4>
-                                <p>Доступно</p>
+                                <p style="margin-left: 15px;">Доступно</p>
                             </div>
                         </div>
                         <div class="col-md-3 col-sm-6">
                             <div class="stat-card bg-warning text-white">
-                                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                <i class="fas fa-exclamation-triangle fa-2x" style="margin-right: 15px; margin-top: 10px;"></i>
                                 <h4>{{ low_stock_count }}</h4>
                                 <p>Мало на складе</p>
                             </div>
                         </div>
                         <div class="col-md-3 col-sm-6">
                             <div class="stat-card bg-danger text-white">
-                                <i class="fas fa-times-circle fa-2x"></i>
+                                <i class="fas fa-times-circle fa-2x" style="margin-right: 15px; margin-top: 10px;"></i>
                                 <h4>{{ out_of_stock_count }}</h4>
                                 <p>Нет в наличии</p>
                             </div>
@@ -68,7 +68,7 @@
     <div class="row">
         <!-- Форма добавления товара -->
         <div class="col-lg-4">
-            <div class="card">
+            <div class="card menu-management">
                 <div class="card-header bg-success text-white">
                     <h4 class="mb-0">
                         <i class="fas fa-plus-circle me-2"></i>Добавить товар
@@ -136,7 +136,7 @@
 
         <!-- Список товаров -->
         <div class="col-lg-8">
-            <div class="card">
+            <div class="card menu-management">
                 <div class="card-header">
                     <h4 class="mb-0">
                         <i class="fas fa-list me-2"></i>Список товаров ({{ products|length }})
