@@ -1,4 +1,4 @@
-version: '3.8'  # Добавьте версию в начало
+version: '3.8'
 
 services:
   db:
@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: mypassword
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
       POSTGRES_USER: postgres
-      POSTGRES_DB: django_db  # Добавлено явное указание базы данных
+      POSTGRES_DB: django_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -36,10 +36,10 @@ services:
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
       POSTGRES_DB: django_db
-      POSTGRES_USER: myuser  # Убедитесь, что этот пользователь создан в init.sql
+      POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       SECRET_KEY: ${SECRET_KEY:-django-insecure-default-key-change-me}
-      DEBUG: 0  # Изменено на 0 для production
+      DEBUG: 0
       ALLOWED_HOSTS: localhost,127.0.0.1,web,0.0.0.0
       DJANGO_SETTINGS_MODULE: cafeteria.settings
       STATIC_ROOT: /app/static_collected
