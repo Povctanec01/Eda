@@ -735,7 +735,7 @@ def admin_users_statistics(request):
 
                 messages.error(request, f"Ошибка при создании пользователя: {str(e)}")
 
-    # Сбор статистики (остальной код остается прежним)
+    # Сбор статистики
     users_with_roles = []
     for user in User.objects.all():
         try:

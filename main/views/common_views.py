@@ -2,10 +2,44 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect
 from main.models import Profile
-
+from django.contrib.auth.models import User
 # main/views.py (или в любом другом приложении)
 from django.shortcuts import render
 from django.http import Http404
+
+#Забыл пароль
+def forgot_password(request):
+    users_with_roles = []
+    for user in User.objects.all():
+        try:
+            role = user.profile.role or 'student'
+        except Profile.DoesNotExist:
+            role = 'student'
+
+        users_with_roles.append({
+            'username': user.username,
+            'role': role,
+            'is_superuser': user.is_superuser,
+            'is_staff': user.is_staff,
+            'id': user.id,
+        })
+
+    role_priority = {'admin': 1, 'chef': 2, 'student': 3}
+    users_with_roles.sort(key=lambda x: role_priority.get(x['role'], 1))
+
+    role_counts = {'student': 0, 'chef': 0, 'admin': 0}
+    for ur in users_with_roles:
+        role = ur['role'] or 'student'
+        if role in role_counts:
+            role_counts[role] += 1
+        else:
+            role_counts['student'] += 1
+
+    return render(request, "main/forgot_password.html", {
+        'users_with_roles': users_with_roles,
+        'role_counts': role_counts,
+    })
+
 
 def custom_404(request, exception=None):
     """

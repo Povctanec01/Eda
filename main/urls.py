@@ -13,6 +13,7 @@ urlpatterns = [
     path('logout/',common_views.logout_view, name='logout'),
     path('login/',common_views.auth_view, name='login'),
     path('enter-profile/',common_views.enter_profile, name='enter_profile'),
+    path('forgot_password.html',common_views.forgot_password, name='forgot_password'),
 
 #student
     path('student_home_page',student_views.student_home_page, name='student_home_page'),
